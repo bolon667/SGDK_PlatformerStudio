@@ -1,6 +1,6 @@
 # SGDK. One Screen Platformer Studio
 
-[SGDK. One Screen Platformer Logo](https://github.com/bolon667/SGDK_OneScreenPlatformerStudio/blob/main/readMe/readMe_logo.png)
+![SGDK. One Screen Platformer Logo](https://github.com/bolon667/SGDK_OneScreenPlatformerStudio/blob/main/readMe/readMe_logo.png)
 
 # About project
 
