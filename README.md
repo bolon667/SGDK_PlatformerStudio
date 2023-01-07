@@ -11,7 +11,7 @@ But, in near future, i hope, you will see easy to use studio to make one screen 
 # What done:
 
 - Collision Map Editor
-- Collision Code Generator
+- Collision Array Generator
 
 # What should be done:
 
