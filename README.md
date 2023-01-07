@@ -1,6 +1,6 @@
 # SGDK. One Screen Platformer Studio
 
-#About project
+# About project
 
 For now it's in **Work In Progress** state, which means, there almost nothing done... sorry.
 
