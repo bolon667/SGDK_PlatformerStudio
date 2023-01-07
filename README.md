@@ -1,5 +1,7 @@
 # SGDK. One Screen Platformer Studio
 
+[SGDK. One Screen Platformer Logo](https://github.com/bolon667/SGDK_OneScreenPlatformerStudio/blob/main/readMe/readMe_logo.png)
+
 # About project
 
 For now it's in **Work In Progress** state, which means, there almost nothing done... sorry.
