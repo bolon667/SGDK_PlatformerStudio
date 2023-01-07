@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "restore": {
+    "E:\\Code\\Godot\\SGDK_OneScreenPlatformerEngine\\GodotTileMapEditor.csproj": {}
+  },
+  "projects": {
+    "E:\\Code\\Godot\\SGDK_OneScreenPlatformerEngine\\GodotTileMapEditor.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "E:\\Code\\Godot\\SGDK_OneScreenPlatformerEngine\\GodotTileMapEditor.csproj",
+        "projectName": "GodotTileMapEditor",
+        "projectPath": "E:\\Code\\Godot\\SGDK_OneScreenPlatformerEngine\\GodotTileMapEditor.csproj",
+        "packagesPath": "C:\\Users\\bolon667\\.nuget\\packages\\",
+        "outputPath": "E:\\Code\\Godot\\SGDK_OneScreenPlatformerEngine\\.mono\\temp\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\bolon667\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net472"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "targetAlias": "net472",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net472": {
+          "targetAlias": "net472",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.101\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

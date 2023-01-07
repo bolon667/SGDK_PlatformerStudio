@@ -14,6 +14,10 @@ config/name="SGDKOneScreenPlatformerEngine"
 run/main_scene="res://Scenes/mapEditorScene.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+singleton="*res://Scripts/global.gd"
+
 [gui]
 
 common/drop_mouse_on_gui_input_disabled=true

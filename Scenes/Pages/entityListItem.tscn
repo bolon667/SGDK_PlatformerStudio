@@ -1,0 +1,22 @@
+[gd_scene format=2]
+
+[node name="EntityTypeContainer" type="HBoxContainer"]
+anchor_right = 1.0
+margin_left = 5.0
+margin_top = 5.0
+margin_right = -5.0
+margin_bottom = 5.0
+rect_min_size = Vector2( 0, 40 )
+
+[node name="TextBtn" type="Button" parent="."]
+margin_right = 974.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+text = "Test Text"
+
+[node name="DeleteBtn" type="Button" parent="."]
+margin_left = 978.0
+margin_right = 1014.0
+margin_bottom = 40.0
+text = "  X  "
+align = 2

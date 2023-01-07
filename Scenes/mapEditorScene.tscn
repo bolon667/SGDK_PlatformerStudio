@@ -33,29 +33,43 @@ window_title = "Открыть файл"
 mode = 0
 access = 2
 
+[node name="VBoxContainerLeft" type="VBoxContainer" parent="CanvasLayer"]
+
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
 anchor_left = 1.0
 anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = -231.0
+margin_left = -250.0
+margin_bottom = 68.0
+alignment = 2
 
 [node name="LoadBackgroundBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
-margin_right = 231.0
+margin_right = 250.0
 margin_bottom = 20.0
 text = "Import Image"
 
 [node name="GenCodeBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
 margin_top = 24.0
-margin_right = 231.0
+margin_right = 250.0
 margin_bottom = 44.0
 text = "Generate code"
 script = ExtResource( 3 )
 
 [node name="ChangeTileMode" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
 margin_top = 48.0
-margin_right = 231.0
+margin_right = 250.0
 margin_bottom = 68.0
 group = SubResource( 1 )
+
+[node name="ModeContainer" type="HBoxContainer" parent="CanvasLayer"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+margin_top = -40.0
+margin_right = 40.0
+
+[node name="addNewEntityTypeBtn" type="Button" parent="CanvasLayer/ModeContainer"]
+margin_right = 143.0
+margin_bottom = 40.0
+text = "Add New Entity Type"
 
 [connection signal="file_selected" from="CanvasLayer/SaveFile" to="." method="_on_LoadBGFile_file_selected"]
 [connection signal="file_selected" from="CanvasLayer/LoadBGFile" to="." method="_on_LoadBGFile_file_selected"]

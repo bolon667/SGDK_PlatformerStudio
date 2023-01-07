@@ -3,7 +3,7 @@ extends Node2D
 export var camera_speed = 300
 export var zoom_step = 0.1
 
-
+var zoom = 1
 var fixed_toggle_point = Vector2(0,0)
 
 var can_move_mouse = false
@@ -69,9 +69,17 @@ func move_camera(delta):
 	if(Input.is_action_pressed("ui_up")):
 		move_y -= 1
 	if(Input.is_action_just_released("wheel_up")):
-		$Camera2D.zoom = Vector2($Camera2D.zoom.x-zoom_step, $Camera2D.zoom.y-zoom_step)
+		zoom -= zoom_step
+		if(zoom < 0.5):
+			zoom = 0.5
+		$Camera2D.zoom = Vector2(zoom, zoom)
+		var window_size = get_viewport_rect().size
+		$Area2D/CollisionShape2D.shape.extents = Vector2((window_size.x*zoom)-2, window_size.y*zoom)
 	if(Input.is_action_just_released("wheel_down")):
-		$Camera2D.zoom = Vector2($Camera2D.zoom.x+zoom_step, $Camera2D.zoom.y+zoom_step)
+		zoom += zoom_step
+		$Camera2D.zoom = Vector2(zoom, zoom)
+		var window_size = get_viewport_rect().size
+		$Area2D/CollisionShape2D.shape.extents = Vector2((window_size.x*zoom)-2, window_size.y*zoom)
 		
 	# This happens once 'move_map' is pressed
 	if Input.is_action_just_pressed('wheel_btn'):
