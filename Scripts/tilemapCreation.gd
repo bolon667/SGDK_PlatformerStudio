@@ -2,6 +2,8 @@ extends Node2D
 
 var id_of_current_entity = 0
 
+onready var entity_menu_t = preload("res://Scenes/Pages/EntityMenu.tscn")
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -10,16 +12,10 @@ func _ready():
 	for tile_id in tile_ids:
 		var texture = $TileMapEditorWindow/TileMap.tile_set.tile_get_texture(tile_id)
 		$CanvasLayer/VBoxContainer/ChangeTileMode.add_icon_item(texture, str(tile_id), tile_id)
-	
-	
-
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
-
-
-
 
 func _on_LoadBackgroundBtn_button_down():
 	$CanvasLayer/LoadBGFile.popup_centered()
@@ -49,3 +45,9 @@ func _on_GenCodeBtn_button_down():
 func _on_ChangeTileMode_item_selected(index):
 	#pass
 	$TileMapEditorWindow.draw_tile_ind = index
+
+
+func _on_addNewEntityTypeBtn_button_down():
+	#get_tree().change_scene("res://Scenes/Pages/EntityMenu.tscn")
+	var inst = entity_menu_t.instance()
+	add_child(inst)

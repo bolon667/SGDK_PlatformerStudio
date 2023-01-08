@@ -16,3 +16,12 @@ E:\Code\Godot\SGDK_OneScreenPlatformerEngine\.mono\temp\obj\Debug\GodotTileMapEd
 E:\Code\Godot\SGDK_OneScreenPlatformerEngine\.mono\temp\obj\Debug\GodotTileMapEditor.csproj.CoreCompileInputs.cache
 E:\Code\Godot\SGDK_OneScreenPlatformerEngine\.mono\temp\obj\Debug\GodotTileMapEditor.dll
 E:\Code\Godot\SGDK_OneScreenPlatformerEngine\.mono\temp\obj\Debug\GodotTileMapEditor.pdb
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\bin\Debug\GodotTileMapEditor.dll
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\bin\Debug\GodotTileMapEditor.pdb
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\obj\Debug\GodotTileMapEditor.csproj.AssemblyReference.cache
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\obj\Debug\GodotTileMapEditor.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\obj\Debug\GodotTileMapEditor.AssemblyInfoInputs.cache
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\obj\Debug\GodotTileMapEditor.AssemblyInfo.cs
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\obj\Debug\GodotTileMapEditor.csproj.CoreCompileInputs.cache
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\obj\Debug\GodotTileMapEditor.dll
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\obj\Debug\GodotTileMapEditor.pdb

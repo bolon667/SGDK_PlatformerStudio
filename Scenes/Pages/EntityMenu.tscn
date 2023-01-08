@@ -1,198 +1,209 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Scripts/Pages/EnemyMenu.gd" type="Script" id=1]
-[ext_resource path="res://Scenes/Pages/entityFieldItem.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Scenes/Pages/entityFieldItemPropertyV2.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Scenes/Pages/addNewButton.tscn" type="PackedScene" id=3]
 
-[node name="Control" type="Control"]
+[node name="Control" type="Control" groups=["entityMenu"]]
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 1 )
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-rect_min_size = Vector2( 200, 0 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="VBoxChooseEntity" type="VBoxContainer" parent="HBoxContainer"]
-margin_right = 200.0
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
+margin_right = 1024.0
+margin_bottom = 50.0
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
+margin_top = 18.0
+margin_right = 970.0
+margin_bottom = 32.0
+size_flags_horizontal = 3
+text = "Entity Definitions:  "
+align = 2
+valign = 1
+
+[node name="ExitBtn" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
+margin_left = 974.0
+margin_right = 1024.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 50, 50 )
+text = "  X  "
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
+margin_top = 54.0
+margin_right = 1024.0
 margin_bottom = 600.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxChooseEntity" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+margin_right = 212.0
+margin_bottom = 546.0
 rect_min_size = Vector2( 200, 0 )
 
-[node name="Label" type="Label" parent="HBoxContainer/VBoxChooseEntity"]
-margin_right = 200.0
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity"]
+margin_right = 212.0
+margin_bottom = 68.0
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/VBoxContainer"]
+margin_right = 212.0
 margin_bottom = 14.0
 text = "Choose entity"
 align = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/VBoxChooseEntity"]
+[node name="AddNewEntityBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/VBoxContainer" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 0.0
 margin_top = 18.0
-margin_right = 200.0
-margin_bottom = 600.0
+margin_right = 212.0
+margin_bottom = 68.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity"]
+margin_top = 72.0
+margin_right = 212.0
+margin_bottom = 546.0
 size_flags_vertical = 3
 scroll_horizontal_enabled = false
 
-[node name="EntityListContainer" type="VBoxContainer" parent="HBoxContainer/VBoxChooseEntity/ScrollContainer"]
+[node name="EntityListContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer"]
 margin_right = 200.0
 margin_bottom = 500.0
 rect_min_size = Vector2( 200, 500 )
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
-margin_left = 204.0
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+margin_left = 216.0
 margin_right = 1024.0
-margin_bottom = 600.0
+margin_bottom = 546.0
 size_flags_horizontal = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
-margin_right = 820.0
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_right = 808.0
 margin_bottom = 40.0
 
-[node name="Label" type="Label" parent="HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 margin_top = 13.0
 margin_right = 86.0
 margin_bottom = 27.0
 text = "Entity Name: "
 
-[node name="TextEdit" type="TextEdit" parent="HBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="EntityNameEdit" type="TextEdit" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 margin_left = 90.0
-margin_right = 820.0
+margin_right = 808.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 300, 40 )
 size_flags_horizontal = 3
 text = "dsfsdfsdf"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="HBoxContainer/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_top = 44.0
-margin_right = 820.0
-margin_bottom = 600.0
+margin_right = 808.0
+margin_bottom = 546.0
 size_flags_vertical = 3
 
-[node name="ScrollContainer" type="ScrollContainer" parent="HBoxContainer/VBoxContainer/HBoxContainer2"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
 margin_right = 250.0
-margin_bottom = 556.0
+margin_bottom = 502.0
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer"]
+margin_right = 250.0
+margin_bottom = 14.0
+text = "Entity Fields"
+align = 1
+
+[node name="AddNewEntityField" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 0.0
+margin_top = 18.0
+margin_right = 250.0
+margin_bottom = 68.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer"]
+margin_top = 72.0
+margin_right = 250.0
+margin_bottom = 502.0
 rect_min_size = Vector2( 250, 0 )
+size_flags_vertical = 3
 scroll_horizontal_enabled = false
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer"]
-margin_right = 238.0
-margin_bottom = 656.0
+[node name="ContainerChooseField" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/ScrollContainer"]
+margin_right = 250.0
+margin_bottom = 430.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="EntityTypeContainer" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 0.0
-margin_right = 238.0
-margin_bottom = 40.0
-
-[node name="EntityTypeContainer2" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 44.0
-margin_right = 238.0
-margin_bottom = 84.0
-
-[node name="EntityTypeContainer3" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 88.0
-margin_right = 238.0
-margin_bottom = 128.0
-
-[node name="EntityTypeContainer4" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 132.0
-margin_right = 238.0
-margin_bottom = 172.0
-
-[node name="EntityTypeContainer5" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 176.0
-margin_right = 238.0
-margin_bottom = 216.0
-
-[node name="EntityTypeContainer6" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 220.0
-margin_right = 238.0
-margin_bottom = 260.0
-
-[node name="EntityTypeContainer7" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 264.0
-margin_right = 238.0
-margin_bottom = 304.0
-
-[node name="EntityTypeContainer8" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 308.0
-margin_right = 238.0
-margin_bottom = 348.0
-
-[node name="EntityTypeContainer9" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 352.0
-margin_right = 238.0
-margin_bottom = 392.0
-
-[node name="EntityTypeContainer10" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 396.0
-margin_right = 238.0
-margin_bottom = 436.0
-
-[node name="EntityTypeContainer11" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 440.0
-margin_right = 238.0
-margin_bottom = 480.0
-
-[node name="EntityTypeContainer12" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 484.0
-margin_right = 238.0
-margin_bottom = 524.0
-
-[node name="EntityTypeContainer13" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 528.0
-margin_right = 238.0
-margin_bottom = 568.0
-
-[node name="EntityTypeContainer14" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 572.0
-margin_right = 238.0
-margin_bottom = 612.0
-
-[node name="EntityTypeContainer15" parent="HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer" instance=ExtResource( 2 )]
-anchor_right = 0.0
-margin_left = 0.0
-margin_top = 616.0
-margin_right = 238.0
-margin_bottom = 656.0
-
-[node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/VBoxContainer/HBoxContainer2"]
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
 margin_left = 254.0
-margin_right = 820.0
-margin_bottom = 556.0
+margin_right = 808.0
+margin_bottom = 502.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+scroll_horizontal_enabled = false
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer"]
+margin_right = 554.0
+margin_bottom = 502.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="TextEdit" type="TextEdit" parent="HBoxContainer/VBoxContainer/HBoxContainer2/HBoxContainer"]
-margin_right = 566.0
-margin_bottom = 556.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
-text = "sssssssssssfsdfdsfssssssdasdasdas"
+[node name="entityFieldItemPropertyV2" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer2" instance=ExtResource( 2 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 554.0
+margin_bottom = 64.0
+
+[node name="entityFieldItemPropertyV3" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer2" instance=ExtResource( 2 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 68.0
+margin_right = 554.0
+margin_bottom = 132.0
+
+[node name="entityFieldItemPropertyV4" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer2" instance=ExtResource( 2 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 136.0
+margin_right = 554.0
+margin_bottom = 200.0
+
+[node name="entityFieldItemPropertyV5" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer2" instance=ExtResource( 2 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 204.0
+margin_right = 554.0
+margin_bottom = 268.0
+
+[node name="entityFieldItemPropertyV6" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer2" instance=ExtResource( 2 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 272.0
+margin_right = 554.0
+margin_bottom = 336.0
+
+[node name="entityFieldItemPropertyV7" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer2" instance=ExtResource( 2 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 340.0
+margin_right = 554.0
+margin_bottom = 404.0
+
+[node name="entityFieldItemPropertyV8" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/VBoxContainer2" instance=ExtResource( 2 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 408.0
+margin_right = 554.0
+margin_bottom = 472.0
+
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer2/ExitBtn" to="." method="_on_ExitBtn_button_down"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/VBoxContainer/AddNewEntityBtn" to="." method="_on_AddNewEntityBtn_button_down"]
+[connection signal="text_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/EntityNameEdit" to="." method="_on_EntityNameEdit_text_changed"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/AddNewEntityField" to="." method="_on_AddNewEntityField_button_down"]

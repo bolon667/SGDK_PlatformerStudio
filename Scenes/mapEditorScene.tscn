@@ -67,12 +67,13 @@ margin_top = -40.0
 margin_right = 40.0
 
 [node name="addNewEntityTypeBtn" type="Button" parent="CanvasLayer/ModeContainer"]
-margin_right = 143.0
+margin_right = 122.0
 margin_bottom = 40.0
-text = "Add New Entity Type"
+text = "Entity Definitions"
 
 [connection signal="file_selected" from="CanvasLayer/SaveFile" to="." method="_on_LoadBGFile_file_selected"]
 [connection signal="file_selected" from="CanvasLayer/LoadBGFile" to="." method="_on_LoadBGFile_file_selected"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/LoadBackgroundBtn" to="." method="_on_LoadBackgroundBtn_button_down"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/GenCodeBtn" to="." method="_on_GenCodeBtn_button_down"]
 [connection signal="item_selected" from="CanvasLayer/VBoxContainer/ChangeTileMode" to="." method="_on_ChangeTileMode_item_selected"]
+[connection signal="button_down" from="CanvasLayer/ModeContainer/addNewEntityTypeBtn" to="." method="_on_addNewEntityTypeBtn_button_down"]
