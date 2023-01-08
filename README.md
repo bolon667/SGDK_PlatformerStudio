@@ -12,7 +12,7 @@ But, in near future, i hope, you will see easy to use studio to make one screen 
 
 - Collision Map Editor
 - Collision Array Generator
-- Entity Definition System (about 50% i think)
+- Entity Definition System (about 80% i think)
 
 # What should be done:
 
