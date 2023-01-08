@@ -2,6 +2,8 @@ extends Node
 
 var cur_entity_type: String
 var cur_entity_type_ind: int
+var cur_entity_field_ind: int
+var entity_names_len: int = 0
 
 var entity_types = {
 	"defs": 
@@ -33,6 +35,21 @@ var entity_def_template = {
 	"fieldDefs": []
 }
 
+func change_name_of_cur_field(text: String):
+	
+	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind]["identifier"] = text
+	print(entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind])
+
+func get_cur_entity_field_names():
+	var entity_field_names = []
+	if(entity_names_len == 0):
+		 return entity_field_names
+	print("DEBUG")
+	print(cur_entity_type_ind)
+	print(entity_names_len)
+	for entity_field in entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"]:
+		entity_field_names.append(entity_field["identifier"])
+	return entity_field_names
 func get_entity_field_names(entity_name: String):
 	var entity_field_names = []
 	var ent_ind = -1
@@ -50,6 +67,45 @@ func get_entity_field_names(entity_name: String):
 		entity_field_names.append(entity_field["identifier"])
 
 	return entity_field_names
+	
+func get_entity_fields(entity_name: String):
+	#TODO: check if it works???!?!??
+	var entity_fields = []
+	var ent_ind = -1
+	var temp_ent_ind = 0
+	#find entity ind by name
+	for entity in entity_types["defs"]["entities"]:
+		if entity["identifier"] == entity_name:
+			ent_ind = temp_ent_ind
+			break
+		temp_ent_ind += 1
+	if ent_ind == -1:
+		return []
+	#check all fields for this entity type
+	
+
+	return entity_types["defs"]["entities"][ent_ind]["fieldDefs"]
+
+func get_cur_entity_one_field():
+	return entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind]
+
+func get_entity_one_field(entity_name: String, field_name: String):
+	#TODO: check if it works???!?!??
+	var ent_ind = -1
+	var temp_ent_ind = 0
+	#find entity ind by name
+	for entity in entity_types["defs"]["entities"]:
+		if entity["identifier"] == entity_name:
+			ent_ind = temp_ent_ind
+			break
+		temp_ent_ind += 1
+	if ent_ind == -1:
+		return {}
+	#check all fields for this entity type
+	
+	for field in entity_types["defs"]["entities"][ent_ind]["fieldDefs"]:
+		if(field["identifier"] == field_name):
+			return field
 
 func get_entity_names():
 	var entity_names = []
@@ -68,7 +124,7 @@ func get_entityDef(entity_name: String):
 func add_field_to_entity(entity_name: String, field_name:String):
 	var ent_ind = 0
 	var temp_ent_ind = 0
-	#find entity by name
+	#find entity ind by name
 	for entity in entity_types["defs"]["entities"]:
 		if entity["identifier"] == entity_name:
 			ent_ind = temp_ent_ind

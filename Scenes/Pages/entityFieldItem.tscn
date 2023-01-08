@@ -24,4 +24,5 @@ margin_bottom = 40.0
 text = "  X  "
 align = 2
 
+[connection signal="button_down" from="TextBtn" to="." method="_on_TextBtn_button_down"]
 [connection signal="button_down" from="DeleteBtn" to="." method="_on_DeleteBtn_button_down"]

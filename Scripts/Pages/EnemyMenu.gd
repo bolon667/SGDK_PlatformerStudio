@@ -3,11 +3,16 @@ extends Control
 
 onready var entity_item_t = preload("res://Scenes/Pages/entityListItem.tscn")
 onready var entity_field_t = preload("res://Scenes/Pages/entityFieldItem.tscn")
+onready var field_property_string_t = preload("res://Scenes/Pages/entityFieldItemPropertyString.tscn")
+
 
 onready var entity_field_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/ScrollContainer/ContainerChooseField 
 onready var entity_list_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/EntityListContainer
 onready var entity_name_edit = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/EntityNameEdit
 onready var add_new_field_btn = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/AddNewEntityField
+onready var field_properties_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/ContainerFieldProperties
+
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -21,9 +26,27 @@ func clear_list_of_entity():
 	for child in entity_list_container_children:
 		child.queue_free()
 
+func clear_field_properties():
+	var children = field_properties_container.get_children()
+	for child in children:
+		child.queue_free()
+
+func load_field_properties(entity_name: String, field_name: String):
+	
+	clear_field_properties()
+	var field_data = singleton.get_cur_entity_one_field()
+	for key in field_data:
+		var val = field_data[key]
+		var field_property_node = field_property_string_t.instance()
+		field_property_node.get_node("Label").text = key
+		field_property_node.get_node("TextEdit").text = str(val)
+		field_properties_container.add_child(field_property_node)
+	pass
+
 func load_list_of_entity():
 	var entity_names = singleton.get_entity_names()
 	var entity_names_len = len(entity_names)
+	singleton.entity_names_len = entity_names_len
 	print(entity_names)
 	print("entity_names_len: ", entity_names_len)
 	if(entity_names_len == 0):
@@ -47,19 +70,23 @@ func add_new_field_button():
 func get_entity_list():
 	clear_list_of_entity()
 	load_list_of_entity()
-	get_entity_fields(singleton.cur_entity_type)
+	#load_entity_fields()
 
-func get_entity_fields(entity_name: String):
-	#change entity_name field to what written on button
-	
-	entity_name_edit.text = entity_name
+func clear_entity_fields():
+	entity_name_edit.text = singleton.cur_entity_type
 	
 	#free all children
 	var tempChildrens = entity_field_container.get_children()
 	for child in tempChildrens:
 		child.queue_free()
+
+func load_entity_fields():
+	#free all children
+	clear_entity_fields()
+	if(singleton.entity_names_len == 0):
+		return
 	
-	var entity_field_names = singleton.get_entity_field_names(entity_name)
+	var entity_field_names = singleton.get_cur_entity_field_names()
 	#show children, generated from array
 	for entity_field_name in entity_field_names:
 		var entity_field_node = entity_field_t.instance()
@@ -93,13 +120,6 @@ func _on_AddNewEntityBtn_button_down():
 	
 
 
-func _on_EntityNameEdit_breakpoint_toggled(row):
-	#if you changed name, then trying to find that name array
-	
-	print(row)
-	pass # Replace with function body.
-
-
 func _on_AddNewEntityField_button_down():
 	#Adding button to list of field buttons
 	var field_name = "Field"
@@ -114,7 +134,7 @@ func _on_AddNewEntityField_button_down():
 			i+=1
 	
 	singleton.add_field_to_entity(singleton.cur_entity_type, final_field_name)
-	get_entity_fields(singleton.cur_entity_type)
+	load_entity_fields()
 	
 	#Adding this field to database
 	
