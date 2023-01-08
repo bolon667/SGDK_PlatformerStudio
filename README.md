@@ -4,7 +4,7 @@
 
 # About project
 
-For now it's in **Work In Progress** state, which means, there almost nothing done... sorry.
+For now it's in **Work In Progress** state, which means, there almost **nothing** done... sorry.
 
 But, in near future, i hope, you will see easy to use studio to make one screen platformers for Sega Genesis.
 
