@@ -19,6 +19,17 @@ current = true
 texture = ExtResource( 2 )
 centered = false
 
+[node name="tempTileMap" type="TileMap" parent="."]
+modulate = Color( 1, 1, 1, 0.905882 )
+tile_set = ExtResource( 3 )
+cell_size = Vector2( 8, 8 )
+cell_quadrant_size = 8
+cell_custom_transform = Transform2D( 0, 0, 0, 0, 0, 0 )
+format = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
 [node name="TileMap" type="TileMap" parent="."]
 modulate = Color( 1, 1, 1, 0.905882 )
 tile_set = ExtResource( 3 )

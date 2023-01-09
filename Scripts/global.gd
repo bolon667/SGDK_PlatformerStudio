@@ -5,6 +5,8 @@ var cur_entity_type_ind: int
 var cur_entity_field_ind: int
 var entity_names_len: int = 0
 
+var cur_level: int = 1
+
 var entity_types = {
 	"defs": 
 	{
@@ -13,16 +15,21 @@ var entity_types = {
 
 		]
 	},
+	"levels": 
+		[
+			
+		]
+	
 }
 
-var field_def_template = {
+const field_def_template = {	
 	"identifier": "Field",
 	"__type": "string",
 	"canBeNull": true,
 	"defaultValue": "test_string",
 }
 
-var entity_def_template = {
+const entity_def_template = {
 	"identifier": "testEntity",
 	"pos": [0,0],
 	"tags": [],
@@ -34,6 +41,76 @@ var entity_def_template = {
 	"limitScope": "PerLevel",
 	"fieldDefs": []
 }
+
+const level_template = {
+	"identifier": "Level1",
+	"worldX": 0,
+	"worldY": 0,
+	"pxWid": 500,
+	"pxHei": 500,
+	"bgRelPath": "",
+	"fieldInstances":
+		[
+			#ignore for now
+		],
+	"layerInstances":
+		[
+			
+		],
+	
+}
+
+const level_layer_template = {
+	"__identifier": "tLayer",
+	"__type": "Collision",
+	"__cWid": 500,
+	"__cHei": 500,
+	"__gridSize": 8,
+	"__tilesetRelPath": "",
+	"visible": true,
+	"intGridCsv": [],
+	"entityInstances": []
+}
+
+const entity_inst_template = {
+	"__identifier": "enemyInstance",
+	"__grid": [],
+	"__pivot": [],
+	"__tags": [],
+	"__sprite": "",
+	"__smartColor": "#FF9801",
+	"width": 32,
+	"height": 32,
+	"px": [0,0],
+	"fieldInstances": 
+		[
+			
+		]
+}
+
+const field_inst_template = {
+	"__identifier": "fieldInst",
+	"__value": "fieldVal",
+	"__type": "String",
+	"__sprite": "",
+	
+}
+
+func _ready():
+	add_level()
+	add_level_layer(0, "testingLayer", "Entity")
+
+func add_level_layer(level_num: int, layer_name: String, layer_type: String):
+	var level_layer_data = level_layer_template.duplicate()
+	level_layer_data["__identifier"] = layer_name
+	level_layer_data["__type"] = layer_type
+	entity_types["levels"][level_num]["layerInstances"].append(level_layer_data)
+
+func add_level():
+	var level_data = level_template.duplicate()
+	level_data["identifier"] = "Level_" + str(cur_level)
+	entity_types["levels"].append(level_data)
+	cur_level += 1
 
 func change_name_of_cur_field(text: String):
 	
