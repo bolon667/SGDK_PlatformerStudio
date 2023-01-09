@@ -6,7 +6,7 @@ export var zoom_step = 0.1
 var zoom = 1
 var fixed_toggle_point = Vector2(0,0)
 
-var can_move_mouse = false
+var focused_editor_window = false
 
 var draw_tile_ind = 0
 const erase_tile_ind = -1
@@ -15,12 +15,23 @@ var cell_pos = Vector2.ZERO
 var prev_cell_pos = Vector2.ZERO
 var prev_cell_pos_temp = Vector2.ZERO
 
+var local_mouse_pos
+
+onready var temp_tile_map = $BGSprite/tempTileMap
+onready var tile_map = $BGSprite/TileMap
+onready var entity_obj_list = $EntityList
+
+onready var camera = get_parent().get_node("Camera2D")
+#onready var camera = $Camera2D
+
+onready var entity_obj_t = preload("res://Scenes/entityScene.tscn")
+
 
 # moves the map around just like in the editor
 func move_map_around():
 	var ref = get_viewport().get_mouse_position()
-	$Camera2D.global_position.x -= (ref.x - fixed_toggle_point.x)*$Camera2D.zoom.x
-	$Camera2D.global_position.y -= (ref.y - fixed_toggle_point.y)*$Camera2D.zoom.y
+	camera.global_position.x -= (ref.x - fixed_toggle_point.x)*camera.zoom.x
+	camera.global_position.y -= (ref.y - fixed_toggle_point.y)*camera.zoom.y
 	fixed_toggle_point = ref
 
 
@@ -30,7 +41,7 @@ func _ready():
 	$Area2D/CollisionShape2D.shape.extents = window_size
 
 func area2d_follow_camera():
-	$Area2D.global_position = $Camera2D.global_position
+	$Area2D.global_position = camera.global_position
 
 func make_line_temp_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int):
 	var line_positions = []
@@ -42,7 +53,7 @@ func make_line_temp_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int):
 	else:
 		steps = abs(dy)
 	if(steps == 0):
-		$tempTileMap.set_cell(pos1.x, pos1.y, tile_ind);
+		temp_tile_map.set_cell(pos1.x, pos1.y, tile_ind);
 		return
 	var x_increment = dx / steps;
 	var y_increment = dy / steps;
@@ -53,7 +64,7 @@ func make_line_temp_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int):
 	while(v < steps):
 		x = x + x_increment
 		y = y + y_increment
-		$tempTileMap.set_cell(pos0.x+x, pos0.y+y, tile_ind);
+		temp_tile_map.set_cell(pos0.x+x, pos0.y+y, tile_ind);
 		line_positions.append({"x": pos0.x+x,"y": pos0.y+y})
 		v+=1
 	return 
@@ -97,7 +108,7 @@ func make_line_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int):
 	else:
 		steps = abs(dy)
 	if(steps == 0):
-		$TileMap.set_cell(pos1.x, pos1.y, tile_ind);
+		tile_map.set_cell(pos1.x, pos1.y, tile_ind);
 		return
 	var x_increment = dx / steps;
 	var y_increment = dy / steps;
@@ -108,14 +119,13 @@ func make_line_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int):
 	while(v < steps):
 		x = x + x_increment
 		y = y + y_increment
-		$TileMap.set_cell(pos0.x+x, pos0.y+y, tile_ind);
+		tile_map.set_cell(pos0.x+x, pos0.y+y, tile_ind);
 		v+=1
 	
 
 func move_camera(delta):
 	var move_x = 0
 	var move_y = 0
-	var mouse_pos_local
 	if(Input.is_action_pressed("ui_right")):
 		move_x += 1
 		print("move right")
@@ -126,15 +136,17 @@ func move_camera(delta):
 	if(Input.is_action_pressed("ui_up")):
 		move_y -= 1
 	if(Input.is_action_just_released("wheel_up")):
+		print("wheel_up")
+		print("camera.zoom", camera.zoom)
 		zoom -= zoom_step
 		if(zoom < 0.5):
 			zoom = 0.5
-		$Camera2D.zoom = Vector2(zoom, zoom)
+		camera.zoom = Vector2(zoom, zoom)
 		var window_size = get_viewport_rect().size
 		$Area2D/CollisionShape2D.shape.extents = Vector2((window_size.x*zoom)-2, window_size.y*zoom)
 	if(Input.is_action_just_released("wheel_down")):
 		zoom += zoom_step
-		$Camera2D.zoom = Vector2(zoom, zoom)
+		camera.zoom = Vector2(zoom, zoom)
 		var window_size = get_viewport_rect().size
 		$Area2D/CollisionShape2D.shape.extents = Vector2((window_size.x*zoom)-2, window_size.y*zoom)
 		
@@ -146,16 +158,16 @@ func move_camera(delta):
 	if Input.is_action_pressed('wheel_btn'):
 		move_map_around()
 	
-	$Camera2D.position += Vector2(move_x*camera_speed*delta, move_y*camera_speed*delta)
+	#camera.position += Vector2(move_x*camera_speed*delta, move_y*camera_speed*delta)
 
 func tile_map_handler(delta):
-	var global_mouse_pos = get_global_mouse_position()
+	
 	var bg_sprite_size = $BGSprite.texture.get_size()
-	if(global_mouse_pos.x < 0 or global_mouse_pos.y < 0):
+	if(local_mouse_pos.x < 0 or local_mouse_pos.y < 0):
 		return
-	if(global_mouse_pos.x > bg_sprite_size.x or global_mouse_pos.y > bg_sprite_size.y):
+	if(local_mouse_pos.x > bg_sprite_size.x or local_mouse_pos.y > bg_sprite_size.y):
 		return
-	cell_pos = $TileMap.world_to_map(global_mouse_pos)
+	cell_pos = tile_map.world_to_map(local_mouse_pos)
 	#rect drawing mode
 	if(Input.is_action_pressed("shift_key")):
 		
@@ -164,13 +176,13 @@ func tile_map_handler(delta):
 		if(Input.is_action_just_released("mouse1")):
 			#draw rect
 			print("draw rect")
-			make_rect_tileMap(prev_cell_pos, cell_pos, draw_tile_ind, $TileMap)
+			make_rect_tileMap(prev_cell_pos, cell_pos, draw_tile_ind, tile_map)
 		if(Input.is_action_just_pressed("mouse2")):
 			prev_cell_pos = cell_pos
 		if(Input.is_action_just_released("mouse2")):
 			#erase rect
 			print("erase rect")
-			make_rect_tileMap(prev_cell_pos, cell_pos, erase_tile_ind, $TileMap)
+			make_rect_tileMap(prev_cell_pos, cell_pos, erase_tile_ind, tile_map)
 	else: #standart point mode
 		if(Input.is_action_pressed("mouse1")):
 			make_line_tileMap(prev_cell_pos, cell_pos, draw_tile_ind)
@@ -182,17 +194,17 @@ func tile_map_handler(delta):
 	
 
 func clean_temp_tileMap():
-	var used_tile_positions = $tempTileMap.get_used_cells()
+	var used_tile_positions = temp_tile_map.get_used_cells()
 	for tile_pos in used_tile_positions:
-		$tempTileMap.set_cell(tile_pos[0], tile_pos[1], -1)
+		temp_tile_map.set_cell(tile_pos[0], tile_pos[1], -1)
 
 func temp_tile_map_handler(delta):
 	clean_temp_tileMap()
-	var global_mouse_pos = get_global_mouse_position()
+
 	var bg_sprite_size = $BGSprite.texture.get_size()
-	if(global_mouse_pos.x < 0 or global_mouse_pos.y < 0):
+	if(local_mouse_pos.x < 0 or local_mouse_pos.y < 0):
 		return
-	if(global_mouse_pos.x > bg_sprite_size.x or global_mouse_pos.y > bg_sprite_size.y):
+	if(local_mouse_pos.x > bg_sprite_size.x or local_mouse_pos.y > bg_sprite_size.y):
 		return
 	#var cell_pos = $TileMap.world_to_map(global_mouse_pos)
 	#rect drawing mode
@@ -201,7 +213,7 @@ func temp_tile_map_handler(delta):
 			prev_cell_pos_temp = cell_pos
 		elif(Input.is_action_pressed("mouse1")):
 			#draw fake rect
-			make_rect_tileMap(prev_cell_pos_temp, cell_pos, draw_tile_ind, $tempTileMap)
+			make_rect_tileMap(prev_cell_pos_temp, cell_pos, draw_tile_ind, temp_tile_map)
 		else:
 			prev_cell_pos_temp = cell_pos
 			make_line_temp_tileMap(prev_cell_pos_temp, cell_pos, draw_tile_ind)
@@ -213,24 +225,40 @@ func temp_tile_map_handler(delta):
 		make_line_temp_tileMap(prev_cell_pos_temp, cell_pos, draw_tile_ind)
 		prev_cell_pos_temp = cell_pos
 
-func _process(delta):
-	area2d_follow_camera()
-	if(can_move_mouse):
-		move_camera(delta)
-		temp_tile_map_handler(delta)
-		tile_map_handler(delta)
+func delete_all_highlighted_entity_objs():
+	var children = entity_obj_list.get_children()
+	for child in children:
+		if child.highlight == true:
+			child.queue_free()
+
+func entity_list_handler():
+	var entity_obj_node = entity_obj_t.instance()
+	if(Input.is_action_just_pressed("mouse1") and singleton.can_create_entity_obj and singleton.cur_entity_type_ind != -1):
+		entity_obj_node.global_position = get_global_mouse_position()
+		entity_obj_list.add_child(entity_obj_node)
+	if(Input.is_action_pressed("mouse2")):
+		delete_all_highlighted_entity_objs()
+		singleton.can_create_entity_obj = true
+	
 	
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func _process(delta):
+	area2d_follow_camera()
+	if(focused_editor_window):
+		local_mouse_pos = $BGSprite.get_local_mouse_position()
+		move_camera(delta)
+		entity_list_handler()
+		temp_tile_map_handler(delta)
+		tile_map_handler(delta)
 
 
 func _on_Area2D_mouse_entered():
+	print("area entered")
+	focused_editor_window = true
 	pass # Replace with function body.
-	can_move_mouse = true
 
 
 func _on_Area2D_mouse_exited():
-	pass # Replace with function body.
-	can_move_mouse = false
+	print("area existed")
+	clean_temp_tileMap()
+	focused_editor_window = false

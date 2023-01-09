@@ -1,11 +1,17 @@
 extends Node
 
 var cur_entity_type: String
-var cur_entity_type_ind: int
+var cur_entity_type_ind: int = -1
 var cur_entity_field_ind: int
+
+var cur_level_ind: int = 0
+var cur_level_layer_ind: int = 0
+
 var entity_names_len: int = 0
 
 var cur_level: int = 1
+
+var can_create_entity_obj: bool = true
 
 var entity_types = {
 	"defs": 
@@ -98,7 +104,8 @@ const field_inst_template = {
 
 func _ready():
 	add_level()
-	add_level_layer(0, "testingLayer", "Entity")
+	add_level_layer(cur_level_ind, "EntityLayer", "Entity")
+	add_level_layer(cur_level_ind, "CollisionLayer", "Collision")
 
 func add_level_layer(level_num: int, layer_name: String, layer_type: String):
 	var level_layer_data = level_layer_template.duplicate()
@@ -116,6 +123,16 @@ func change_name_of_cur_field(text: String):
 	
 	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind]["identifier"] = text
 	print(entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind])
+
+func get_cur_level_layer_names():
+	var layer_names = []
+	var layers = get_cur_level_layers()
+	for layer in layers:
+		layer_names.append(layer["__identifier"])
+	return layer_names
+
+func get_cur_level_layers():
+	return entity_types["levels"][cur_level_ind]["layerInstances"]
 
 func get_cur_entity_field_names():
 	var entity_field_names = []

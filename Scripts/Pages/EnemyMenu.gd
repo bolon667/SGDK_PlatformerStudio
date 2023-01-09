@@ -155,4 +155,5 @@ func _on_EntityNameEdit_text_changed():
 
 
 func _on_ExitBtn_button_down():
+	singleton.cur_entity_type_ind = -1
 	queue_free()

@@ -2,9 +2,9 @@ extends Area2D
 
 export var entity_name: String = "testEntity"
 onready var VBoxContainerLeft: VBoxContainer = $"../../../CanvasLayer/VBoxContainerLeft"
-onready var mainController: Node2D = $"../../../"
+onready var mainController = $"../../../"
 onready var settings_nodes = preload("res://Scenes/Fields/string_field.tscn")
-onready var camera2D = $"../../Camera2D"
+onready var camera2D = $"../../../Camera2D"
 
 	
 export var entity_fields: Dictionary = {"spriteDefinition": "&spr_test"}
@@ -21,6 +21,7 @@ func _ready():
 	print($Sprite.texture.get_size()/2)
 	$CollisionShape2D.shape.extents = $Sprite.texture.get_size()/2
 	
+	fixed_toggle_point = get_viewport().get_mouse_position()
 	_draw()
 	
 	
@@ -72,13 +73,14 @@ func move_entity():
 
 
 func _on_Area2D_mouse_entered():
-	
 	remove_settings_of_entity()
 	show_settings_of_entity()
 	can_move = true
 	highlight = true
+	singleton.can_create_entity_obj = false
 
 func _on_Area2D_mouse_exited():
 	remove_settings_of_entity()
 	highlight = false
 	can_move = false
+	singleton.can_create_entity_obj = true

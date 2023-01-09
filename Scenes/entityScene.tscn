@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://1.png" type="Texture" id=1]
+[ext_resource path="res://coffe_cup_2.png" type="Texture" id=1]
 [ext_resource path="res://Scripts/entityScene.gd" type="Script" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]

@@ -5,12 +5,18 @@ var id_of_current_entity = 0
 onready var entity_menu_t = preload("res://Scenes/Pages/EntityMenu.tscn")
 
 
+
+onready var TileMapEditorWindow = $TileMapEditorWindow
+onready var TileMapEditorWindow_tileMap = $TileMapEditorWindow/BGSprite/TileMap
+
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
-	var tile_ids = $TileMapEditorWindow/TileMap.tile_set.get_tiles_ids()
+	var tile_ids = TileMapEditorWindow_tileMap.tile_set.get_tiles_ids()
 	for tile_id in tile_ids:
-		var texture = $TileMapEditorWindow/TileMap.tile_set.tile_get_texture(tile_id)
+		var texture = TileMapEditorWindow_tileMap.tile_set.tile_get_texture(tile_id)
 		$CanvasLayer/VBoxContainer/ChangeTileMode.add_icon_item(texture, str(tile_id), tile_id)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -51,3 +57,14 @@ func _on_addNewEntityTypeBtn_button_down():
 	#get_tree().change_scene("res://Scenes/Pages/EntityMenu.tscn")
 	var inst = entity_menu_t.instance()
 	add_child(inst)
+
+
+
+func _on_TileMapEditorWindow_mouse_entered():
+	print("mouse entered")
+	pass # Replace with function body.
+
+
+func _on_Button_button_down():
+	print("test")
+	pass # Replace with function body.
