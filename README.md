@@ -17,7 +17,6 @@ But, in near future, i hope, you will see easy to use studio to make one screen 
 
 # What should be done:
 
-- Entity system like in LDTK
 - Ability to change sprite of entity (not like in LDTK)
 - Ability to change code of entity in VS Code.
 - Compile & Run button in BlastEm
