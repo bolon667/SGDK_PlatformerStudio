@@ -4,7 +4,7 @@
 
 # About project
 
-For now it's in **Work In Progress** state, which means, there almost **nothing** done... sorry. Right now, it's unusable buggy programm.
+For now it's in **Work In Progress** state, which means, there almost **nothing** done... sorry. Right now, it's can only create collision code, if you already have your own onescreen platformer engine, use can use it.
 
 But, in near future, i hope, you will see easy to use studio to make one screen platformers for Sega Genesis.
 
