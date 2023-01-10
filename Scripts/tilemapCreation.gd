@@ -8,6 +8,7 @@ onready var entity_menu_t = preload("res://Scenes/Pages/EntityMenu.tscn")
 
 onready var TileMapEditorWindow = $TileMapEditorWindow
 onready var TileMapEditorWindow_tileMap = $TileMapEditorWindow/BGSprite/TileMap
+onready var TileMapEditorWindow_bg_sprite = $TileMapEditorWindow/BGSprite/
 
 
 
@@ -19,9 +20,13 @@ func _ready():
 		var texture = TileMapEditorWindow_tileMap.tile_set.tile_get_texture(tile_id)
 		$CanvasLayer/VBoxContainer/ChangeTileMode.add_icon_item(texture, str(tile_id), tile_id)
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func _process(delta):
+	if(Input.is_action_just_pressed("save_project")):
+		var texture_size = TileMapEditorWindow_bg_sprite.texture.get_size()
+		var collision_map_size = Vector2(texture_size.x/singleton.cell_size, texture_size.y/singleton.cell_size)
+		singleton.save_collisionMap(TileMapEditorWindow_tileMap, collision_map_size)
+		singleton.save_project()
+		
 
 func _on_LoadBackgroundBtn_button_down():
 	$CanvasLayer/LoadBGFile.popup_centered()

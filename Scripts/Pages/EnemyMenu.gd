@@ -110,10 +110,6 @@ func _on_AddNewEntityBtn_button_down():
 	
 	#Add entity to database
 	singleton.add_entity_def(final_entity_name)
-	var file = File.new()
-	file.open("res://test.json", File.WRITE)
-	file.store_string(to_json(singleton.entity_types))
-	file.close()
 	
 	clear_list_of_entity()
 	load_list_of_entity()

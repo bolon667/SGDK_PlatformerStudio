@@ -9,7 +9,7 @@ onready var settings_field_t = preload("res://Scenes/Fields/string_field.tscn")
 onready var settings_head_t = preload("res://Scenes/Fields/settings_head.tscn")
 onready var camera2D = $"../../../Camera2D"
 
-var entity_definition_id = -1
+var entityInst_id = -1
 #var entity_definition: Dictionary = {
 #	"__identifier":"testIdentifierName",
 #	"fieldInstances": [],
@@ -54,8 +54,8 @@ func _process(delta):
 func show_fields_of_entity():
 	ContainerRight.visible = true
 	var settings_head_node = settings_head_t.instance()
-	var entity_definition = singleton.get_entityInst_by_instId(entity_definition_id)
-	#TODO: make entity definition not local
+	var entity_definition = singleton.get_entityInst_by_instId(entityInst_id)
+
 	settings_head_node.get_node("Label").text = entity_definition["__identifier"]
 	
 	VBoxContainerRight.add_child(settings_head_node)
@@ -102,4 +102,5 @@ func _on_Area2D_mouse_exited():
 			remove_fields_of_entity()
 			highlight = false
 			can_move = false
+			singleton.save_entityInst_pos(entityInst_id, [position.x, position.y])
 			singleton.can_create_entity_obj = true

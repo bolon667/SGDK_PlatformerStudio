@@ -5,7 +5,11 @@ enum EditorMode {
   ENTITY,
 }
 
-var cur_editor_mode = EditorMode.COLLISION
+var cell_size: int = 8
+
+var cur_project_path: String = ""
+
+var cur_editor_mode: int = EditorMode.COLLISION
 
 var cur_entity_type: String
 var cur_entity_type_ind: int = -1
@@ -21,6 +25,16 @@ var cur_level: int = 1
 var can_create_entity_obj: bool = true
 
 var entity_types = {
+	"__header__": 
+	{
+		"fileType": "SGDK Studio Project JSON",
+		"app": "SGDK Studio",
+		"doc": "???",
+		"appAuthor": "bolon667",
+		"appVersion": "1.0.0 alpha",
+		"url": "https://github.com/bolon667/SGDK_OneScreenPlatformerStudio",
+	},
+	"jsonVersion": "1.0.0",
 	"defs": 
 	{
 		"entities": 
@@ -31,7 +45,7 @@ var entity_types = {
 	"levels": 
 		[
 			
-		]
+		],
 	
 }
 
@@ -122,9 +136,59 @@ func _ready():
 	add_level_layer(cur_level_ind, "CollisionLayer", "Collision")
 
 
+
+func load_project(projectPath: String):
+	var dict = {}
+	var file = File.new()
+	file.open(projectPath, file.READ)
+	var text = file.get_as_text()
+	file.close()
+	var data_parse = JSON.parse(text)
+	cur_project_path = projectPath
+	if data_parse.error != OK:
+		return
 	
+	singleton.entity_types = data_parse.result
+
+func save_project():
+	
+	print("saving project")
+	print("cur_path ", cur_project_path)
+	var file = File.new()
+	file.open(cur_project_path, File.WRITE)
+	file.store_string(to_json(entity_types))
+	file.close()
+
+
+func save_collisionMap(tile_map, size: Vector2):
+	var intGridCsv_arr: Array = []
+	for y in range(size.y):
+		for x in range(size.x):
+			intGridCsv_arr.append(tile_map.get_cell(x,y)+1)
+	var collision_layer_ind: int = 0
+	for layer_inst in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if(layer_inst["__type"] == "Collision"):
+			break
+		collision_layer_ind += 1
+	entity_types["levels"][cur_level_ind]["layerInstances"][collision_layer_ind]["intGridCsv"] = intGridCsv_arr
+	pass
+	
+func get_collisionMap():
+	var collision_layer_ind: int = 0
+	#find collision_layer index in array
+	for layer_inst in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if(layer_inst["__type"] == "Collision"):
+			break
+		collision_layer_ind += 1
+	return entity_types["levels"][cur_level_ind]["layerInstances"][collision_layer_ind]["intGridCsv"]
+
 func change_entityInstName_by_defId(entity_name: String, defId: int):
-	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+	var entity_layer_ind: int = 0
+	for layer_inst in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if(layer_inst["__type"] == "Entity"):
+			break
+		entity_layer_ind += 1
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][entity_layer_ind]["entityInstances"]:
 		if entity_inst["defId"] == defId:
 			entity_inst["__identifier"] = entity_name
 		continue
@@ -132,12 +196,13 @@ func change_entityInstName_by_defId(entity_name: String, defId: int):
 func change_entityInstFieldName_by_fieldId(field_name: String, fieldId: int):
 	print(entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"])
 	print("THIS")
-	if(len(entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]) == 0):
-		return
-	for field in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_entity_field_ind]["fieldInstances"]:
-		if field["fieldId"] == fieldId:
-			field["__identifier"] = field_name
-		continue
+	
+	#[cur_entity_field_ind]["fieldInstances"]
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+		for field_inst in entity_inst["fieldInstances"]:
+			if field_inst["fieldId"] == fieldId:
+				field_inst["__identifier"] = field_name
+				break
 
 
 func get_unique_entity_fieldId():
@@ -163,7 +228,23 @@ func get_unique_entity_defId():
 			defId += 1
 		continue
 	return defId
-	
+
+func delete_entityInstance(instId: int):
+	var posInArray: int = 0
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+		if entity_inst["instId"] == instId:
+			entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"].remove(posInArray)
+		posInArray += 1
+
+func save_entityInst_pos(instId: int, posPx: Array):
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+		if entity_inst["instId"] == instId:
+			entity_inst["px"] = [int(posPx[0]), int(posPx[1])]
+
+func get_entityInstances():
+	return entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]
+
+
 func get_entityInst_by_instId(instId: int):
 	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
 		if entity_inst["instId"] == instId:
@@ -251,6 +332,8 @@ func get_entity_fields(entity_name: String):
 
 func get_cur_entity_one_field():
 	return entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind]
+
+
 
 func get_entity_one_field(entity_name: String, field_name: String):
 	#TODO: check if it works???!?!??

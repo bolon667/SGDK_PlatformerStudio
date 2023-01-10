@@ -17,6 +17,8 @@ var prev_cell_pos_temp = Vector2.ZERO
 
 var local_mouse_pos
 
+
+
 onready var temp_tile_map = $BGSprite/tempTileMap
 onready var tile_map = $BGSprite/TileMap
 onready var entity_obj_list = $EntityList
@@ -35,10 +37,40 @@ func move_map_around():
 	fixed_toggle_point = ref
 
 
+func load_tileMap():
+	var texture_size = $BGSprite.texture.get_size()
+	var collision_map_size = Vector2(texture_size.x/singleton.cell_size, texture_size.y/singleton.cell_size)
+	var intGridCsv:Array = singleton.get_collisionMap()
+	if len(intGridCsv) == 0:
+		return
+	for y in range(collision_map_size.y):
+		for x in range(collision_map_size.x):
+			var tile_value: int = intGridCsv[x+(y*collision_map_size.x)]-1
+			tile_map.set_cell(x, y, tile_value) 
+	
+
+func load_entities_on_scene():
+	var entity_instantes = singleton.get_entityInstances()
+	for entity_inst in entity_instantes:
+		var entity_node = entity_obj_t.instance()
+		var entity_pos = entity_inst["px"]
+		entity_node.position = Vector2(entity_pos[0], entity_pos[1])
+		entity_node.entityInst_id = entity_inst["instId"]
+		entity_obj_list.add_child(entity_node)
+		
+
 func _ready():
 	var window_size = get_viewport_rect().size
 	print(window_size)
 	$Area2D/CollisionShape2D.shape.extents = window_size
+	
+	#add entities on scene from database (singleton.entity_types)
+	load_entities_on_scene()
+	
+	#Fill tilemap with data from json (singleton.entity_types)
+	load_tileMap()
+
+
 
 func area2d_follow_camera():
 	$Area2D.global_position = camera.global_position
@@ -229,6 +261,7 @@ func delete_all_highlighted_entity_objs():
 	var children = entity_obj_list.get_children()
 	for child in children:
 		if child.highlight == true:
+			singleton.delete_entityInstance(child.entityInst_id)
 			child.queue_free()
 
 func entity_list_handler():
@@ -236,15 +269,15 @@ func entity_list_handler():
 	
 	if(Input.is_action_just_pressed("mouse1") and singleton.can_create_entity_obj and singleton.cur_entity_type_ind != -1):
 		entity_obj_node.global_position = get_global_mouse_position()
-		#Got uid for entityInst
-		entity_obj_node.entity_definition_id = singleton.add_cur_entityInstance()
+		#Got uid for entityInst & Put entityInst in database
+		entity_obj_node.entityInst_id = singleton.add_cur_entityInstance()
 		
-		#Put entityInst in database
-		
-		
+		singleton.save_entityInst_pos(entity_obj_node.entityInst_id, [entity_obj_node.position.x, entity_obj_node.position.y])
 		entity_obj_list.add_child(entity_obj_node)
+		
 	if(Input.is_action_pressed("mouse2")):
 		delete_all_highlighted_entity_objs()
+		
 		singleton.can_create_entity_obj = true
 	
 	

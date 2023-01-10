@@ -1,0 +1,137 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Images/createdByBolon667.png" type="Texture" id=1]
+[ext_resource path="res://Images/sgdkStudio_logo.png" type="Texture" id=2]
+[ext_resource path="res://Scenes/startWindow/prevProjectButton.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Scripts/startWindow/startUpMenu.gd" type="Script" id=4]
+
+[node name="startUpMenu" type="Control" groups=["startUpMenu"]]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 4 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 20.0
+margin_top = 20.0
+margin_right = -20.0
+margin_bottom = -20.0
+
+[node name="Logo" type="TextureRect" parent="VBoxContainer"]
+margin_right = 984.0
+margin_bottom = 212.0
+texture = ExtResource( 2 )
+stretch_mode = 4
+
+[node name="ContainerButtons" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 216.0
+margin_right = 984.0
+margin_bottom = 266.0
+
+[node name="NewProjBtn" type="Button" parent="VBoxContainer/ContainerButtons"]
+margin_right = 89.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 0, 50 )
+text = "New project"
+
+[node name="LoadProjBtn" type="Button" parent="VBoxContainer/ContainerButtons"]
+margin_left = 93.0
+margin_right = 184.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 0, 50 )
+text = "Load project"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 270.0
+margin_right = 984.0
+margin_bottom = 492.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Control" type="Control" parent="VBoxContainer/HBoxContainer"]
+margin_right = 984.0
+margin_bottom = 222.0
+size_flags_horizontal = 3
+
+[node name="ColorRect" type="ColorRect" parent="VBoxContainer/HBoxContainer/Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.352941, 0.352941, 0.352941, 1 )
+
+[node name="ListContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/Control"]
+margin_left = 4.0
+margin_right = 984.0
+margin_bottom = 222.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/Control/ListContainer"]
+margin_right = 980.0
+margin_bottom = 14.0
+text = "Recent projects"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer/Control/ListContainer"]
+margin_top = 18.0
+margin_right = 980.0
+margin_bottom = 222.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/HBoxContainer/Control/ListContainer/HBoxContainer"]
+margin_right = 980.0
+margin_bottom = 204.0
+size_flags_horizontal = 3
+scroll_horizontal_enabled = false
+
+[node name="prevProjectsContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/Control/ListContainer/HBoxContainer/ScrollContainer"]
+margin_right = 980.0
+margin_bottom = 204.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Button" parent="VBoxContainer/HBoxContainer/Control/ListContainer/HBoxContainer/ScrollContainer/prevProjectsContainer" instance=ExtResource( 3 )]
+margin_right = 980.0
+disabled = true
+
+[node name="Author" type="TextureRect" parent="VBoxContainer"]
+margin_top = 496.0
+margin_right = 984.0
+margin_bottom = 560.0
+texture = ExtResource( 1 )
+stretch_mode = 3
+
+[node name="createProjectDialog" type="FileDialog" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -247.0
+margin_top = -167.0
+margin_right = 247.0
+margin_bottom = 167.0
+window_title = "Сохранить файл"
+access = 2
+
+[node name="loadProjectDialog" type="FileDialog" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -246.0
+margin_top = -164.0
+margin_right = 248.0
+margin_bottom = 167.0
+window_title = "Открыть файл"
+mode = 0
+access = 2
+
+[connection signal="button_down" from="VBoxContainer/ContainerButtons/NewProjBtn" to="." method="_on_NewProjBtn_button_down"]
+[connection signal="button_down" from="VBoxContainer/ContainerButtons/LoadProjBtn" to="." method="_on_LoadProjBtn_button_down"]
+[connection signal="file_selected" from="createProjectDialog" to="." method="_on_createProjectDialog_file_selected"]
+[connection signal="file_selected" from="loadProjectDialog" to="." method="_on_loadProjectDialog_file_selected"]
