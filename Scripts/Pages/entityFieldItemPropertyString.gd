@@ -20,6 +20,7 @@ func _on_TextEdit_text_changed():
 	
 	var text = $TextEdit.text
 	if $Label.text == "identifier":
-		singleton.change_name_of_cur_field(text)
+		singleton.change_name_of_cur_fieldDef(text)
+		
 		get_tree().call_group("entityMenu", "load_entity_fields")
 	

@@ -30,6 +30,7 @@ func load_layer_values(btn: Button):
 	print(btn.type)
 	match btn.type:
 		"Entity":
+			singleton.cur_editor_mode = singleton.EditorMode.ENTITY
 			print("load entity values")
 			var entity_names = singleton.get_entity_names()
 			print(entity_names)
@@ -37,6 +38,10 @@ func load_layer_values(btn: Button):
 				var entity_layer_value_btn_node = entity_layer_value_btn_t.instance()
 				entity_layer_value_btn_node.text = entity_name
 				layer_value_list.add_child(entity_layer_value_btn_node)
+		"Collision":
+			singleton.cur_editor_mode = singleton.EditorMode.COLLISION
+			print("Collision mode")
+			singleton.cur_entity_type_ind = -1 #Can't create entity
 
 
 func _on_addNewEntityTypeBtn_button_down():

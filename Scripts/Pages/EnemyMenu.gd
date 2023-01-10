@@ -109,7 +109,7 @@ func _on_AddNewEntityBtn_button_down():
 			i+=1
 	
 	#Add entity to database
-	singleton.add_entity(final_entity_name)
+	singleton.add_entity_def(final_entity_name)
 	var file = File.new()
 	file.open("res://test.json", File.WRITE)
 	file.store_string(to_json(singleton.entity_types))
@@ -149,11 +149,17 @@ func _on_EntityNameEdit_text_changed():
 	print("singleton.cur_entity_type_ind: ", singleton.cur_entity_type_ind)
 	print("singleton.cur_entity_type: ", singleton.cur_entity_type)
 	#TODO: filter not ASCII symbols
-	singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["identifier"] = entity_name_edit.text
+	var text = entity_name_edit.text
+	var defId = singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["defId"]
+	print(defId, " defId")
+	singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["identifier"] = text
+	singleton.change_entityInstName_by_defId(text, defId)
+	
 	clear_list_of_entity()
 	load_list_of_entity()
 
 
 func _on_ExitBtn_button_down():
 	singleton.cur_entity_type_ind = -1
+	get_tree().call_group("leftContainer", "clear_layer_values")
 	queue_free()

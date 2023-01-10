@@ -233,8 +233,15 @@ func delete_all_highlighted_entity_objs():
 
 func entity_list_handler():
 	var entity_obj_node = entity_obj_t.instance()
+	
 	if(Input.is_action_just_pressed("mouse1") and singleton.can_create_entity_obj and singleton.cur_entity_type_ind != -1):
 		entity_obj_node.global_position = get_global_mouse_position()
+		#Got uid for entityInst
+		entity_obj_node.entity_definition_id = singleton.add_cur_entityInstance()
+		
+		#Put entityInst in database
+		
+		
 		entity_obj_list.add_child(entity_obj_node)
 	if(Input.is_action_pressed("mouse2")):
 		delete_all_highlighted_entity_objs()
@@ -247,9 +254,11 @@ func _process(delta):
 	if(focused_editor_window):
 		local_mouse_pos = $BGSprite.get_local_mouse_position()
 		move_camera(delta)
-		entity_list_handler()
-		temp_tile_map_handler(delta)
-		tile_map_handler(delta)
+		if(singleton.cur_editor_mode == singleton.EditorMode.ENTITY):
+			entity_list_handler()
+		if(singleton.cur_editor_mode == singleton.EditorMode.COLLISION):
+			temp_tile_map_handler(delta)
+			tile_map_handler(delta)
 
 
 func _on_Area2D_mouse_entered():

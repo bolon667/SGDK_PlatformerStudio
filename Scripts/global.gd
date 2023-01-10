@@ -1,5 +1,12 @@
 extends Node
 
+enum EditorMode {
+  COLLISION,
+  ENTITY,
+}
+
+var cur_editor_mode = EditorMode.COLLISION
+
 var cur_entity_type: String
 var cur_entity_type_ind: int = -1
 var cur_entity_field_ind: int
@@ -31,6 +38,7 @@ var entity_types = {
 const field_def_template = {	
 	"identifier": "Field",
 	"__type": "string",
+	"fieldId": -1,
 	"canBeNull": true,
 	"defaultValue": "test_string",
 }
@@ -41,6 +49,8 @@ const entity_def_template = {
 	"tags": [],
 	"width": 16,
 	"height": 16,
+	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
+	#entity name or field name in entity menu.
 	"color": "#0048FF",
 	"showName": true,
 	"maxCount": -1,
@@ -88,6 +98,9 @@ const entity_inst_template = {
 	"width": 32,
 	"height": 32,
 	"px": [0,0],
+	"instId": -1, #id of entity instance, to quicly find in databse
+	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
+	#entity name or field name in entity menu.
 	"fieldInstances": 
 		[
 			
@@ -99,6 +112,7 @@ const field_inst_template = {
 	"__value": "fieldVal",
 	"__type": "String",
 	"__sprite": "",
+	"fieldId": -1,
 	
 }
 
@@ -106,6 +120,59 @@ func _ready():
 	add_level()
 	add_level_layer(cur_level_ind, "EntityLayer", "Entity")
 	add_level_layer(cur_level_ind, "CollisionLayer", "Collision")
+
+
+	
+func change_entityInstName_by_defId(entity_name: String, defId: int):
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+		if entity_inst["defId"] == defId:
+			entity_inst["__identifier"] = entity_name
+		continue
+
+func change_entityInstFieldName_by_fieldId(field_name: String, fieldId: int):
+	print(entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"])
+	print("THIS")
+	if(len(entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]) == 0):
+		return
+	for field in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_entity_field_ind]["fieldInstances"]:
+		if field["fieldId"] == fieldId:
+			field["__identifier"] = field_name
+		continue
+
+
+func get_unique_entity_fieldId():
+	var fieldId = 0
+	for entity_def in entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"]:
+		if entity_def["fieldId"] == fieldId:
+			fieldId += 1
+		continue
+	return fieldId
+
+func get_unique_entity_instId():
+	var instId = 0
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+		if entity_inst["instId"] == instId:
+			instId += 1
+		continue
+	return instId
+
+func get_unique_entity_defId():
+	var defId = 0
+	for entity_def in entity_types["defs"]["entities"]:
+		if entity_def["defId"] == defId:
+			defId += 1
+		continue
+	return defId
+	
+func get_entityInst_by_instId(instId: int):
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+		if entity_inst["instId"] == instId:
+			return entity_inst
+	
+func add_cur_entityInstance():
+	var entity_instance = get_cur_entityInstance_t()
+	entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"].append(entity_instance)
+	return entity_instance["instId"]
 
 func add_level_layer(level_num: int, layer_name: String, layer_type: String):
 	var level_layer_data = level_layer_template.duplicate()
@@ -119,9 +186,11 @@ func add_level():
 	entity_types["levels"].append(level_data)
 	cur_level += 1
 
-func change_name_of_cur_field(text: String):
+func change_name_of_cur_fieldDef(text: String):
 	
 	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind]["identifier"] = text
+	var fieldId = entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind]["fieldId"]
+	change_entityInstFieldName_by_fieldId(text, fieldId)
 	print(entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind])
 
 func get_cur_level_layer_names():
@@ -207,6 +276,37 @@ func get_entity_names():
 		entity_names.append(entity["identifier"])
 	return entity_names
 
+func get_cur_entityDef():
+	return entity_types["defs"]["entities"][cur_entity_type_ind]
+
+
+	
+
+func get_cur_entityInstance_t():
+	var def = entity_types["defs"]["entities"][cur_entity_type_ind]
+	var entity_inst = entity_inst_template.duplicate()
+	entity_inst["__identifier"] = def["identifier"]
+	entity_inst["defId"] = def["defId"]
+	#entity_inst["fieldId"] = def["fieldId"]
+	entity_inst["instId"] = get_unique_entity_instId()
+	var filed_inst_arr = []
+	#Get all fields from entityDef, and copy name,value to fields in entityInstance
+	#Entity definition - template for entity
+	#Entity instance - actual entity
+	for field in def["fieldDefs"]:	
+		var field_inst = field_inst_template.duplicate()
+		field_inst["__identifier"] = field["identifier"]
+		field_inst["__value"] = field["defaultValue"]
+		field_inst["__type"] = field["__type"]
+		field_inst["fieldId"] = field["fieldId"]
+		filed_inst_arr.append(field_inst)
+	entity_inst["fieldInstances"] = filed_inst_arr
+	return entity_inst
+	
+
+func get_entityDef_by_ind(entity_ind: int):
+	return entity_types["defs"]["entities"][entity_ind]
+
 func get_entityDef(entity_name: String):
 	var ind = 0
 	for entity in entity_types["defs"]["entities"]:
@@ -226,15 +326,17 @@ func add_field_to_entity(entity_name: String, field_name:String):
 		temp_ent_ind += 1
 	var field_def_data = field_def_template.duplicate(true)
 	field_def_data["identifier"] = field_name
+	field_def_data["fieldId"] = get_unique_entity_fieldId()
 	print("Debug")
 	print(field_def_data)
 	print(entity_types)
 	entity_types["defs"]["entities"][ent_ind]["fieldDefs"].append(field_def_data)
 
 
-func add_entity(entity_name: String):
+func add_entity_def(entity_name: String):
 	var entity_def_data = entity_def_template.duplicate(true)
 	entity_def_data["identifier"] = entity_name
+	entity_def_data["defId"] = get_unique_entity_defId()
 	entity_types["defs"]["entities"].append(entity_def_data)
 	print(entity_def_data)
 	

@@ -1,15 +1,22 @@
 extends Area2D
 
 export var entity_name: String = "testEntity"
-onready var VBoxContainerLeft: VBoxContainer = $"../../../CanvasLayer/VBoxContainerLeft"
+onready var ContainerRight: Control = $"../../../CanvasLayer/ContainerRight"
+onready var VBoxContainerRight: VBoxContainer = $"../../../CanvasLayer/ContainerRight/VBoxContainerRight"
+onready var ContainerRightColorRect: ColorRect = $"../../../CanvasLayer/ContainerRight/ColorRect"
 onready var mainController = $"../../../"
-onready var settings_nodes = preload("res://Scenes/Fields/string_field.tscn")
+onready var settings_field_t = preload("res://Scenes/Fields/string_field.tscn")
+onready var settings_head_t = preload("res://Scenes/Fields/settings_head.tscn")
 onready var camera2D = $"../../../Camera2D"
 
-	
-export var entity_fields: Dictionary = {"spriteDefinition": "&spr_test"}
+var entity_definition_id = -1
+#var entity_definition: Dictionary = {
+#	"__identifier":"testIdentifierName",
+#	"fieldInstances": [],
+#	}
 
 var can_move = false
+var is_moving = false
 var fixed_toggle_point = Vector2.ZERO
 
 var highlight = false
@@ -40,47 +47,59 @@ func _draw():
 
 func _process(delta):
 	pass
-	move_entity()
-	_draw()
+	if(singleton.cur_editor_mode == singleton.EditorMode.ENTITY):
+		move_entity()
+		_draw()
 
-func show_settings_of_entity():
-	var settings_node = settings_nodes.instance()
-	for key in entity_fields:
-		var value = entity_fields[key] 
-		print(key)
-		print(value)
-		settings_node.get_node("Label").text = str(key)
-		settings_node.get_node("LineEdit").text = str(value)
-	VBoxContainerLeft.add_child(settings_node)
+func show_fields_of_entity():
+	ContainerRight.visible = true
+	var settings_head_node = settings_head_t.instance()
+	var entity_definition = singleton.get_entityInst_by_instId(entity_definition_id)
+	#TODO: make entity definition not local
+	settings_head_node.get_node("Label").text = entity_definition["__identifier"]
 	
-func remove_settings_of_entity():
-	var children = VBoxContainerLeft.get_children()
+	VBoxContainerRight.add_child(settings_head_node)
+	for field_inst in entity_definition["fieldInstances"]:
+		var settings_field_node = settings_field_t.instance()
+		
+		settings_field_node.get_node("Label").text = field_inst["__identifier"]
+		settings_field_node.get_node("LineEdit").text = field_inst["__value"]
+		VBoxContainerRight.add_child(settings_field_node)
+	
+func remove_fields_of_entity():
+	ContainerRight.visible = false
+	var children = VBoxContainerRight.get_children()
 	for n in children:
-		VBoxContainerLeft.remove_child(n)
+		VBoxContainerRight.remove_child(n)
 		n.queue_free()
 
 func move_entity():
 	if(!can_move):
-		
 		return
 	
 	var ref = get_viewport().get_mouse_position()
-	if(Input.is_action_pressed("mouse1")):
-		
+	if(Input.is_action_just_pressed("mouse1")):
+		is_moving = true
+	if(is_moving):
 		global_position.x += (ref.x - fixed_toggle_point.x)*camera2D.zoom.x
 		global_position.y += (ref.y - fixed_toggle_point.y)*camera2D.zoom.y
+	if(Input.is_action_just_released("mouse1")):
+		is_moving = false
 	fixed_toggle_point = ref
 
 
 func _on_Area2D_mouse_entered():
-	remove_settings_of_entity()
-	show_settings_of_entity()
-	can_move = true
-	highlight = true
-	singleton.can_create_entity_obj = false
+	if(singleton.cur_editor_mode == singleton.EditorMode.ENTITY):
+		remove_fields_of_entity()
+		show_fields_of_entity()
+		can_move = true
+		highlight = true
+		singleton.can_create_entity_obj = false
 
 func _on_Area2D_mouse_exited():
-	remove_settings_of_entity()
-	highlight = false
-	can_move = false
-	singleton.can_create_entity_obj = true
+	if(!is_moving):
+		if(singleton.cur_editor_mode == singleton.EditorMode.ENTITY):
+			remove_fields_of_entity()
+			highlight = false
+			can_move = false
+			singleton.can_create_entity_obj = true

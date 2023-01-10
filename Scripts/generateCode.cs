@@ -17,7 +17,7 @@ public class generateCode : Button
 
 	private void _OnSaveDialog(String path)
 	{
-		TileMap tileMap = (TileMap)GetNode("/root/Control/TileMapEditorWindow/TileMap");
+		TileMap tileMap = (TileMap)GetNode("/root/Control/TileMapEditorWindow/BGSprite/TileMap");
 		Sprite bgSprite = (Sprite)GetNode("/root/Control/TileMapEditorWindow/BGSprite");
 
 		Vector2 cellSize = tileMap.CellSize;
@@ -25,7 +25,7 @@ public class generateCode : Button
 		Vector2 bgSpriteSize = bgSprite.Texture.GetSize();
 		Vector2 bgSpriteSizeInCells = new Vector2(bgSpriteSize.x / cellSize.x, bgSpriteSize.y / cellSize.y);
 
-		String resultCode = "const u8 const collArr[][] = {\n";
+		String resultCode = "const u8 const collArr[" + bgSpriteSizeInCells.y + "][" + bgSpriteSizeInCells.x + "] = {\n";
 
 		for (int curY = 0; curY < (int)bgSpriteSizeInCells.y; curY++)
 		{

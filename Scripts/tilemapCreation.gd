@@ -28,7 +28,6 @@ func _on_LoadBackgroundBtn_button_down():
 
 
 func _on_LoadBGFile_file_selected(path):
-	pass # Replace with function body.
 	var ext = path.get_extension();
 	if(!(ext in ['png', 'jpg', 'bmp'])):
 		return

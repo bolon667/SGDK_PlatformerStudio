@@ -1,9 +1,8 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Scripts/TileMapEditorWindow.gd" type="Script" id=1]
 [ext_resource path="res://1.png" type="Texture" id=2]
 [ext_resource path="res://TileSets/pico8x8tileset2.tres" type="TileSet" id=3]
-[ext_resource path="res://Scenes/entityScene.tscn" type="PackedScene" id=4]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 523.5, 308 )
@@ -43,14 +42,10 @@ __meta__ = {
 
 [node name="EntityList" type="Node2D" parent="."]
 
-[node name="Area2D2" parent="EntityList" instance=ExtResource( 4 )]
-position = Vector2( 830, 143 )
-
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
 current = true
-editor_draw_limits = true
-editor_draw_drag_margin = true
+editor_draw_screen = false
 __meta__ = {
 "_edit_lock_": true
 }
