@@ -13,7 +13,8 @@ But, in near future, i hope, you will see easy to use studio to make one screen 
 - Collision Map Editor
 - Collision Array Generator
 - Ability to draw rect (press Shift) in Collsion Mode
-- Entity Editor (almost done)
+- Entity Editor (sorta)
+- Save & Load System (Ctrl+S)
 
 # What should be done:
 
@@ -21,5 +22,4 @@ But, in near future, i hope, you will see easy to use studio to make one screen 
 - Ability to change code of entity in VS Code.
 - Compile & Run button in BlastEm
 - Link between Levels
-- Save & Load System
 - and more...
