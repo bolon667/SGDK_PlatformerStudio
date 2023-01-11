@@ -17,9 +17,13 @@ var prev_cell_pos_temp = Vector2.ZERO
 
 var local_mouse_pos
 
+var map_size_px:Vector2
+var map_size_tiles:Vector2
 
 
 onready var temp_tile_map = $BGSprite/tempTileMap
+#onready var temp_tile_map = $tempTileMap
+
 onready var tile_map = $BGSprite/TileMap
 onready var entity_obj_list = $EntityList
 
@@ -126,8 +130,13 @@ func make_rect_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int, tileMap: Til
 	curPosY = startPosY
 	while(curPosY <= lastPosY):
 		while(curPosX <= lastPosX):
-			tileMap.set_cell(curPosX, curPosY, tile_ind)
 			curPosX += 1
+			if(curPosX < 0 or curPosY < 0):
+				continue
+			if(curPosX >= map_size_tiles.x or curPosY >= map_size_tiles.y):
+				continue
+			tileMap.set_cell(curPosX, curPosY, tile_ind)
+			
 		curPosY+=1
 		curPosX = startPosX
 
@@ -140,6 +149,10 @@ func make_line_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int):
 	else:
 		steps = abs(dy)
 	if(steps == 0):
+		if(pos1.x < 0 or pos1.y < 0):
+			return
+		if(pos1.x >= map_size_tiles.x or pos1.y >= map_size_tiles.y):
+			return
 		tile_map.set_cell(pos1.x, pos1.y, tile_ind);
 		return
 	var x_increment = dx / steps;
@@ -148,11 +161,22 @@ func make_line_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int):
 	var v=0;
 	var x = 0
 	var y = 0
+	var real_pos_x = 0
+	var real_pos_y = 0
 	while(v < steps):
 		x = x + x_increment
 		y = y + y_increment
-		tile_map.set_cell(pos0.x+x, pos0.y+y, tile_ind);
+		
+		
 		v+=1
+		real_pos_x = pos0.x+x
+		real_pos_y = pos0.y+y
+		if(real_pos_x < 0 or real_pos_y < 0):
+			continue
+		if(real_pos_x >= map_size_tiles.x or real_pos_y >= map_size_tiles.y):
+			continue
+		tile_map.set_cell(pos0.x+x, pos0.y+y, tile_ind);
+		
 	
 
 func move_camera(delta):
@@ -195,10 +219,13 @@ func move_camera(delta):
 func tile_map_handler(delta):
 	
 	var bg_sprite_size = $BGSprite.texture.get_size()
-	if(local_mouse_pos.x < 0 or local_mouse_pos.y < 0):
-		return
-	if(local_mouse_pos.x > bg_sprite_size.x or local_mouse_pos.y > bg_sprite_size.y):
-		return
+	map_size_px = bg_sprite_size
+	map_size_tiles = Vector2(bg_sprite_size.x/singleton.cell_size, bg_sprite_size.y/singleton.cell_size)
+	#if(local_mouse_pos.x < 0 or local_mouse_pos.y < 0):
+	#	return
+	#if(local_mouse_pos.x > bg_sprite_size.x or local_mouse_pos.y > bg_sprite_size.y):
+	#	return
+	
 	cell_pos = tile_map.world_to_map(local_mouse_pos)
 	#rect drawing mode
 	if(Input.is_action_pressed("shift_key")):
@@ -234,10 +261,12 @@ func temp_tile_map_handler(delta):
 	clean_temp_tileMap()
 
 	var bg_sprite_size = $BGSprite.texture.get_size()
-	if(local_mouse_pos.x < 0 or local_mouse_pos.y < 0):
-		return
-	if(local_mouse_pos.x > bg_sprite_size.x or local_mouse_pos.y > bg_sprite_size.y):
-		return
+	#if(local_mouse_pos.x < 0 or local_mouse_pos.y < 0):
+	#	return
+	#if(local_mouse_pos.x > bg_sprite_size.x or local_mouse_pos.y > bg_sprite_size.y):
+	#	return
+		
+	
 	#var cell_pos = $TileMap.world_to_map(global_mouse_pos)
 	#rect drawing mode
 	if(Input.is_action_pressed("shift_key")):
@@ -282,7 +311,7 @@ func entity_list_handler():
 	
 	
 
-func _process(delta):
+func _physics_process(delta):
 	area2d_follow_camera()
 	if(focused_editor_window):
 		local_mouse_pos = $BGSprite.get_local_mouse_position()

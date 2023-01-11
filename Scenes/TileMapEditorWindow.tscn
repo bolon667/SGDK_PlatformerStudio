@@ -18,7 +18,7 @@ __meta__ = {
 "_edit_group_": true
 }
 
-[node name="tempTileMap" type="TileMap" parent="BGSprite"]
+[node name="TileMap" type="TileMap" parent="BGSprite"]
 modulate = Color( 1, 1, 1, 0.905882 )
 tile_set = ExtResource( 3 )
 cell_size = Vector2( 8, 8 )
@@ -29,7 +29,7 @@ __meta__ = {
 "_edit_lock_": true
 }
 
-[node name="TileMap" type="TileMap" parent="BGSprite"]
+[node name="tempTileMap" type="TileMap" parent="BGSprite"]
 modulate = Color( 1, 1, 1, 0.905882 )
 tile_set = ExtResource( 3 )
 cell_size = Vector2( 8, 8 )

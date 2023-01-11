@@ -1,8 +1,7 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Images/createdByBolon667.png" type="Texture" id=1]
 [ext_resource path="res://Images/sgdkStudio_logo.png" type="Texture" id=2]
-[ext_resource path="res://Scenes/startWindow/prevProjectButton.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Scripts/startWindow/startUpMenu.gd" type="Script" id=4]
 
 [node name="startUpMenu" type="Control" groups=["startUpMenu"]]
@@ -94,10 +93,6 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-
-[node name="Button" parent="VBoxContainer/HBoxContainer/Control/ListContainer/HBoxContainer/ScrollContainer/prevProjectsContainer" instance=ExtResource( 3 )]
-margin_right = 980.0
-disabled = true
 
 [node name="Author" type="TextureRect" parent="VBoxContainer"]
 margin_top = 496.0

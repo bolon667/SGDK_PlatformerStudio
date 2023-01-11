@@ -149,6 +149,47 @@ func load_project(projectPath: String):
 		return
 	
 	singleton.entity_types = data_parse.result
+	
+func load_project_last_paths():
+	var paths = {
+		"last_project_paths": [],
+	}
+	var file = File.new()
+	var file_path = "res://InsternalData/lastPath_arr.json"
+	if file.file_exists(file_path):
+		file.open("res://InsternalData/lastPath_arr.json", file.READ)
+		var text = file.get_as_text()
+		file.close()
+		var data_parse = JSON.parse(text)
+		if data_parse.error != OK:
+			return paths
+		return data_parse.result
+	else:
+		file.open("res://InsternalData/lastPath_arr.json", file.WRITE)
+		file.store_string(to_json(paths))
+		file.close()
+		return paths
+		
+func save_project_last_paths():
+	#TODO here
+	var paths = {}
+	var file = File.new()
+	#Get cur paths
+	var file_path = "res://InsternalData/lastPath_arr.json"
+	file.open("res://InsternalData/lastPath_arr.json", file.READ)
+	var text = file.get_as_text()
+	file.close()
+	var data_parse = JSON.parse(text)
+	if data_parse.error != OK:
+		return
+	var paths_dict =  data_parse.result
+	#Add new one
+	paths_dict["last_project_paths"].append(cur_project_path)
+	#Save
+	var file2 = File.new()
+	file2.open("res://InsternalData/lastPath_arr.json", file2.WRITE)
+	file2.store_string(to_json(paths_dict))
+	file2.close()
 
 func save_project():
 	
