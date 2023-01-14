@@ -52,7 +52,7 @@ margin_bottom = 60.0
 [node name="LayerValuesList" type="ScrollContainer" parent="VBoxContainer"]
 margin_top = 64.0
 margin_right = 200.0
-margin_bottom = 600.0
+margin_bottom = 558.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 scroll_horizontal_enabled = false
@@ -61,4 +61,22 @@ scroll_horizontal_enabled = false
 margin_right = 200.0
 size_flags_horizontal = 3
 
+[node name="HSeparator3" type="HSeparator" parent="VBoxContainer"]
+modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
+margin_top = 562.0
+margin_right = 200.0
+margin_bottom = 566.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 570.0
+margin_right = 200.0
+margin_bottom = 600.0
+
+[node name="changeStartPosBtn" type="Button" parent="VBoxContainer/HBoxContainer"]
+margin_right = 113.0
+margin_bottom = 30.0
+rect_min_size = Vector2( 0, 30 )
+text = "change startPos"
+
 [connection signal="button_down" from="VBoxContainer/ModeContainer/addNewEntityTypeBtn" to="." method="_on_addNewEntityTypeBtn_button_down"]
+[connection signal="button_down" from="VBoxContainer/HBoxContainer/changeStartPosBtn" to="." method="_on_changeStartPosBtn_button_down"]

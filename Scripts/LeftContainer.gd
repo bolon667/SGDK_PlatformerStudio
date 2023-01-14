@@ -6,6 +6,8 @@ onready var layer_value_list = $VBoxContainer/LayerValuesList/LayerValuesContain
 onready var entity_menu_t = preload("res://Scenes/Pages/EntityMenu.tscn")
 onready var layer_button_t = preload("res://Scenes/LayerButton.tscn")
 
+onready var change_start_pos_t = preload("res://Scenes/Pages/changeStartPos.tscn")
+
 onready var entity_layer_value_btn_t = preload("res://Scenes/EntityLayerValueButton.tscn")
 
 
@@ -50,3 +52,10 @@ func _on_addNewEntityTypeBtn_button_down():
 	add_child(inst)
 
 
+
+
+func _on_changeStartPosBtn_button_down():
+	print("start pos")
+	
+	var start_pos_node = change_start_pos_t.instance()
+	add_child(start_pos_node)

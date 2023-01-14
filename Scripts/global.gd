@@ -1,15 +1,18 @@
 extends Node
 
 enum EditorMode {
+  NONE,
   COLLISION,
   ENTITY,
+  START_POS,
 }
 
-var cell_size: int = 8
+var cell_size: int = 16
 
 var cur_project_path: String = ""
 
 var cur_editor_mode: int = EditorMode.COLLISION
+var prev_editor_mode: int = EditorMode.COLLISION
 
 var cur_entity_type: String
 var cur_entity_type_ind: int = -1
@@ -35,6 +38,9 @@ var entity_types = {
 		"url": "https://github.com/bolon667/SGDK_OneScreenPlatformerStudio",
 	},
 	"jsonVersion": "1.0.0",
+	"engineRootPath": "./StudioType/SGDK/Engines/platformer",
+	"isOneScreen": true,
+	"defaultGridSize": 16,
 	"defs": 
 	{
 		"entities": 
@@ -52,6 +58,7 @@ var entity_types = {
 const field_def_template = {	
 	"identifier": "Field",
 	"__type": "string",
+	"inCodeType": "String",
 	"fieldId": -1,
 	"canBeNull": true,
 	"defaultValue": "test_string",
@@ -63,11 +70,28 @@ const entity_def_template = {
 	"tags": [],
 	"width": 16,
 	"height": 16,
+	"show": true,
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
 	#entity name or field name in entity menu.
 	"color": "#0048FF",
 	"showName": true,
 	"maxCount": -1,
+	"limitScope": "PerLevel",
+	"fieldDefs": []
+}
+
+const startPos_def_template = {
+	"identifier": "testEntity",
+	"pos": [0,0],
+	"tags": [],
+	"width": 16,
+	"height": 16,
+	"show": true,
+	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
+	#entity name or field name in entity menu.
+	"color": "#0048FF",
+	"showName": true,
+	"maxCount": 1,
 	"limitScope": "PerLevel",
 	"fieldDefs": []
 }
@@ -79,6 +103,8 @@ const level_template = {
 	"pxWid": 500,
 	"pxHei": 500,
 	"bgRelPath": "",
+	"bgRelPath2": "",
+	"startPos": [0,0],
 	"fieldInstances":
 		[
 			#ignore for now
@@ -125,10 +151,19 @@ const field_inst_template = {
 	"__identifier": "fieldInst",
 	"__value": "fieldVal",
 	"__type": "String",
+	"__inCodeType": "string",
 	"__sprite": "",
 	"fieldId": -1,
 	
 }
+
+
+
+func get_engine_root_path():
+	return entity_types["engineRootPath"]
+
+func get_cell_size():
+	return cell_size
 
 func _ready():
 	add_level()
@@ -154,29 +189,34 @@ func load_project_last_paths():
 	var paths = {
 		"last_project_paths": [],
 	}
+
 	var file = File.new()
-	var file_path = "res://InsternalData/lastPath_arr.json"
+	var file_path = "./InternalData/lastPath_arr.json"
 	if file.file_exists(file_path):
-		file.open("res://InsternalData/lastPath_arr.json", file.READ)
+		file.open(file_path, file.READ)
 		var text = file.get_as_text()
 		file.close()
 		var data_parse = JSON.parse(text)
 		if data_parse.error != OK:
 			return paths
+		
 		return data_parse.result
 	else:
-		file.open("res://InsternalData/lastPath_arr.json", file.WRITE)
+		var dir = Directory.new()
+		dir.open("./")
+		dir.make_dir("InternalData")
+		
+		file.open(file_path, file.WRITE)
 		file.store_string(to_json(paths))
 		file.close()
 		return paths
 		
 func save_project_last_paths():
-	#TODO here
 	var paths = {}
 	var file = File.new()
 	#Get cur paths
-	var file_path = "res://InsternalData/lastPath_arr.json"
-	file.open("res://InsternalData/lastPath_arr.json", file.READ)
+	var file_path = "./InternalData/lastPath_arr.json"
+	file.open(file_path, file.READ)
 	var text = file.get_as_text()
 	file.close()
 	var data_parse = JSON.parse(text)
@@ -187,7 +227,7 @@ func save_project_last_paths():
 	paths_dict["last_project_paths"].append(cur_project_path)
 	#Save
 	var file2 = File.new()
-	file2.open("res://InsternalData/lastPath_arr.json", file2.WRITE)
+	file2.open(file_path, file2.WRITE)
 	file2.store_string(to_json(paths_dict))
 	file2.close()
 
@@ -199,6 +239,7 @@ func save_project():
 	file.open(cur_project_path, File.WRITE)
 	file.store_string(to_json(entity_types))
 	file.close()
+	
 
 
 func save_collisionMap(tile_map, size: Vector2):
@@ -213,7 +254,26 @@ func save_collisionMap(tile_map, size: Vector2):
 		collision_layer_ind += 1
 	entity_types["levels"][cur_level_ind]["layerInstances"][collision_layer_ind]["intGridCsv"] = intGridCsv_arr
 	pass
+
+func change_start_pos(start_pos_coord: Vector2):
+	entity_types["levels"][cur_level_ind]["startPos"] = [int(start_pos_coord.x), int(start_pos_coord.y)]
+
+func get_start_pos():
+	return entity_types["levels"][cur_level_ind]["startPos"]
+
+func change_level_size(size: Vector2):
+	entity_types["levels"][cur_level_ind]["pxWid"] = size.x;
+	entity_types["levels"][cur_level_ind]["pxHei"] = size.y;
 	
+func get_level_size():
+	return Vector2(entity_types["levels"][cur_level_ind]["pxWid"], entity_types["levels"][cur_level_ind]["pxHei"]);
+
+func change_bgRelPath(new_bg_path: String):
+	entity_types["levels"][cur_level_ind]["bgRelPath"] = new_bg_path
+
+func get_bgRelPath():
+	return entity_types["levels"][cur_level_ind]["bgRelPath"]
+
 func get_collisionMap():
 	var collision_layer_ind: int = 0
 	#find collision_layer index in array
@@ -308,6 +368,9 @@ func add_level():
 	entity_types["levels"].append(level_data)
 	cur_level += 1
 
+func change_cur_field():
+	pass
+
 func change_name_of_cur_fieldDef(text: String):
 	
 	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind]["identifier"] = text
@@ -324,6 +387,9 @@ func get_cur_level_layer_names():
 
 func get_cur_level_layers():
 	return entity_types["levels"][cur_level_ind]["layerInstances"]
+	
+func get_cur_level():
+	return entity_types["levels"][cur_level_ind]
 
 func get_cur_entity_field_names():
 	var entity_field_names = []
@@ -374,7 +440,8 @@ func get_entity_fields(entity_name: String):
 func get_cur_entity_one_field():
 	return entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind]
 
-
+func get_entity_types():
+	return entity_types
 
 func get_entity_one_field(entity_name: String, field_name: String):
 	#TODO: check if it works???!?!??
@@ -397,7 +464,15 @@ func get_entity_one_field(entity_name: String, field_name: String):
 func get_entity_names():
 	var entity_names = []
 	for entity in entity_types["defs"]["entities"]:
+		
 		entity_names.append(entity["identifier"])
+	return entity_names
+	
+func get_def_entity_names():
+	var entity_names = []
+	for entity in entity_types["defs"]["entities"]:
+		if entity["show"]:
+			entity_names.append(entity["identifier"])
 	return entity_names
 
 func get_cur_entityDef():
@@ -486,9 +561,23 @@ func get_entity_field(entity_name: String, field_name:String):
 	
 	return result
 
-func delete_fieldDef(entity_name: String, field_name: String):
-	var entity_field = get_entity_field(entity_name, field_name)
-	entity_types["defs"]["entities"][entity_field["entityInd"]]["fieldDefs"].remove(entity_field["fieldInd"])
+
+func get_merged_fieldDef():
+	var mergedFieldDef_arr = []
+	var mergedFieldDef_names = []
+	for entity in entity_types["defs"]["entities"]:
+		for field in entity["fieldDefs"]:
+			var fieldDef_name = field["identifier"]
+			if !(fieldDef_name in mergedFieldDef_names):
+				mergedFieldDef_arr.append(field)
+				mergedFieldDef_names.append(fieldDef_name)
+				pass
+	return mergedFieldDef_arr
+		
+
+func delete_fieldDef(field_ind: int):
+	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"].remove(field_ind)
+	
 
 func delete_entityDef(entity_name: String):
 	var entity_def = get_entityDef(entity_name)

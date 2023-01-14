@@ -26,6 +26,7 @@ onready var temp_tile_map = $BGSprite/tempTileMap
 
 onready var tile_map = $BGSprite/TileMap
 onready var entity_obj_list = $EntityList
+onready var start_pos_spr = $BGSprite/startPos
 
 onready var camera = get_parent().get_node("Camera2D")
 #onready var camera = $Camera2D
@@ -61,49 +62,45 @@ func load_entities_on_scene():
 		entity_node.position = Vector2(entity_pos[0], entity_pos[1])
 		entity_node.entityInst_id = entity_inst["instId"]
 		entity_obj_list.add_child(entity_node)
-		
+
+func change_start_pos():
+	print("change start pos")
+	start_pos_spr.global_position = get_global_mouse_position()
+	
+	if start_pos_spr.position.x < 0:
+		start_pos_spr.position.x = 0
+	if start_pos_spr.position.y < 0:
+		start_pos_spr.position.y = 0
+	singleton.change_start_pos(start_pos_spr.position)
+	print("New start pos: ", start_pos_spr.position)
 
 func _ready():
 	var window_size = get_viewport_rect().size
 	print(window_size)
 	$Area2D/CollisionShape2D.shape.extents = window_size
 	
+	#Changing tilemap cell size
+	tile_map.cell_size = Vector2(singleton.cell_size, singleton.cell_size)
+	temp_tile_map.cell_size = tile_map.cell_size
+	#get image of level background
+	var bgRelPath: String = singleton.get_bgRelPath()
+	if bgRelPath:
+		$BGSprite.texture = load(bgRelPath)
 	#add entities on scene from database (singleton.entity_types)
 	load_entities_on_scene()
-	
 	#Fill tilemap with data from json (singleton.entity_types)
 	load_tileMap()
+	#Move start pos
+	load_start_pos()
 
-
+func load_start_pos():
+	var start_position = singleton.get_start_pos()
+	start_pos_spr.position = Vector2(start_position[0], start_position[1])
 
 func area2d_follow_camera():
 	$Area2D.global_position = camera.global_position
 
-func make_line_temp_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int):
-	var line_positions = []
-	var dx = pos1.x - pos0.x
-	var dy = pos1.y - pos0.y
-	var steps
-	if (abs(dx) > abs(dy)):
-		steps = abs(dx)
-	else:
-		steps = abs(dy)
-	if(steps == 0):
-		temp_tile_map.set_cell(pos1.x, pos1.y, tile_ind);
-		return
-	var x_increment = dx / steps;
-	var y_increment = dy / steps;
-	
-	var v=0;
-	var x = 0
-	var y = 0
-	while(v < steps):
-		x = x + x_increment
-		y = y + y_increment
-		temp_tile_map.set_cell(pos0.x+x, pos0.y+y, tile_ind);
-		line_positions.append({"x": pos0.x+x,"y": pos0.y+y})
-		v+=1
-	return 
+
 
 func make_rect_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int, tileMap: TileMap):
 	var startPosX: int
@@ -140,7 +137,33 @@ func make_rect_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int, tileMap: Til
 		curPosY+=1
 		curPosX = startPosX
 
-func make_line_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int):
+func make_line_temp_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int):
+	var line_positions = []
+	var dx = pos1.x - pos0.x
+	var dy = pos1.y - pos0.y
+	var steps
+	if (abs(dx) > abs(dy)):
+		steps = abs(dx)
+	else:
+		steps = abs(dy)
+	if(steps == 0):
+		temp_tile_map.set_cell(pos1.x, pos1.y, tile_ind);
+		return
+	var x_increment = dx / steps;
+	var y_increment = dy / steps;
+	
+	var v=0;
+	var x = 0
+	var y = 0
+	while(v < steps):
+		x = x + x_increment
+		y = y + y_increment
+		temp_tile_map.set_cell(pos0.x+x, pos0.y+y, tile_ind);
+		line_positions.append({"x": pos0.x+x,"y": pos0.y+y})
+		v+=1
+	return 
+
+func make_line_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int, tile_map):
 	var dx = pos1.x - pos0.x
 	var dy = pos1.y - pos0.y
 	var steps
@@ -244,9 +267,9 @@ func tile_map_handler(delta):
 			make_rect_tileMap(prev_cell_pos, cell_pos, erase_tile_ind, tile_map)
 	else: #standart point mode
 		if(Input.is_action_pressed("mouse1")):
-			make_line_tileMap(prev_cell_pos, cell_pos, draw_tile_ind)
+			make_line_tileMap(prev_cell_pos, cell_pos, draw_tile_ind, tile_map)
 		if(Input.is_action_pressed("mouse2")):
-			make_line_tileMap(prev_cell_pos, cell_pos, erase_tile_ind)
+			make_line_tileMap(prev_cell_pos, cell_pos, erase_tile_ind, tile_map)
 		prev_cell_pos = cell_pos
 	
 	
@@ -277,13 +300,13 @@ func temp_tile_map_handler(delta):
 			make_rect_tileMap(prev_cell_pos_temp, cell_pos, draw_tile_ind, temp_tile_map)
 		else:
 			prev_cell_pos_temp = cell_pos
-			make_line_temp_tileMap(prev_cell_pos_temp, cell_pos, draw_tile_ind)
+			make_line_tileMap(prev_cell_pos_temp, cell_pos, draw_tile_ind, temp_tile_map)
 		if(Input.is_action_just_pressed("mouse2")):
 			if(Input.is_action_pressed("mouse2")):
-				make_line_temp_tileMap(prev_cell_pos_temp, cell_pos, draw_tile_ind)
+				make_line_tileMap(prev_cell_pos_temp, cell_pos, draw_tile_ind, temp_tile_map)
 		
 	else: #standart point mode
-		make_line_temp_tileMap(prev_cell_pos_temp, cell_pos, draw_tile_ind)
+		make_line_tileMap(prev_cell_pos_temp, cell_pos, draw_tile_ind, temp_tile_map)
 		prev_cell_pos_temp = cell_pos
 
 func delete_all_highlighted_entity_objs():
@@ -308,6 +331,7 @@ func entity_list_handler():
 		delete_all_highlighted_entity_objs()
 		
 		singleton.can_create_entity_obj = true
+		
 	
 	
 

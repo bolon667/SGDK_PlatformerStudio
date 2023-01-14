@@ -17,9 +17,12 @@ func _ready():
 
 
 func _on_DeleteBtn_button_down():
-	print(singleton.cur_entity_type)
-	print($TextBtn.text)
-	singleton.delete_fieldDef(singleton.cur_entity_type, $TextBtn.text)
+	var cur_field_ind = get_index()
+	
+	singleton.delete_fieldDef(cur_field_ind)
+	
+	get_tree().call_group("entityMenu" , "clear_field_properties")
+	
 	
 	queue_free()
 

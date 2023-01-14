@@ -36,6 +36,8 @@ func load_field_properties(entity_name: String, field_name: String):
 	clear_field_properties()
 	var field_data = singleton.get_cur_entity_one_field()
 	for key in field_data:
+		if key == "fieldId":
+			continue
 		var val = field_data[key]
 		var field_property_node = field_property_string_t.instance()
 		field_property_node.get_node("Label").text = key
@@ -44,7 +46,7 @@ func load_field_properties(entity_name: String, field_name: String):
 	pass
 
 func load_list_of_entity():
-	var entity_names = singleton.get_entity_names()
+	var entity_names = singleton.get_def_entity_names()
 	var entity_names_len = len(entity_names)
 	singleton.entity_names_len = entity_names_len
 	print(entity_names)
@@ -55,9 +57,9 @@ func load_list_of_entity():
 	else:
 		entity_name_edit.readonly = false
 		add_new_field_btn.disabled = false
-	for entity_type in entity_names:
+	for entity_name in entity_names:
 		var entity_item = entity_item_t.instance()
-		entity_item.get_node("HBoxContainer/TextBtn").text = entity_type
+		entity_item.get_node("HBoxContainer/TextBtn").text = entity_name
 		entity_list_container.add_child(entity_item)
 		
 

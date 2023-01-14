@@ -1,0 +1,1 @@
+out/res/tilesets.o: res/tilesets.res

@@ -15,6 +15,8 @@ public class generateCode : Button
 		saveFileDialog.Connect("file_selected", this, "_OnSaveDialog");
 	}
 
+	
+
 	private void _OnSaveDialog(String path)
 	{
 		TileMap tileMap = (TileMap)GetNode("/root/Control/TileMapEditorWindow/BGSprite/TileMap");

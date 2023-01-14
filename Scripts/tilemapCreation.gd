@@ -4,13 +4,9 @@ var id_of_current_entity = 0
 
 onready var entity_menu_t = preload("res://Scenes/Pages/EntityMenu.tscn")
 
-
-
 onready var TileMapEditorWindow = $TileMapEditorWindow
 onready var TileMapEditorWindow_tileMap = $TileMapEditorWindow/BGSprite/TileMap
 onready var TileMapEditorWindow_bg_sprite = $TileMapEditorWindow/BGSprite/
-
-
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -33,20 +29,25 @@ func _on_LoadBackgroundBtn_button_down():
 
 
 func _on_LoadBGFile_file_selected(path):
+	
 	var ext = path.get_extension();
 	if(!(ext in ['png', 'jpg', 'bmp'])):
 		return
 	print(ext)
+	singleton.change_bgRelPath(path)
+	
 	var bgImage = Image.new()
 	bgImage.load(path)
 	var imgTex = ImageTexture.new()
 	imgTex.create_from_image(bgImage, 1)
 	
 	$TileMapEditorWindow/BGSprite.texture = imgTex;
-
-
+	var level_size = $TileMapEditorWindow/BGSprite.texture.get_size()
+	singleton.change_level_size(level_size);
+	
 	
 
+	
 
 func _on_GenCodeBtn_button_down():
 	$CanvasLayer/VBoxContainer/GenCodeBtn.call("test")
@@ -71,4 +72,14 @@ func _on_TileMapEditorWindow_mouse_entered():
 
 func _on_Button_button_down():
 	print("test")
+	pass # Replace with function body.
+
+
+func _on_buildProjectBtn_pressed():
+	$CanvasLayer/VBoxContainer/buildProjectBtn.call("buildProject")
+	pass # Replace with function body.
+
+
+func _on_Button_pressed():
+	print(singleton.get_merged_fieldDef())
 	pass # Replace with function body.

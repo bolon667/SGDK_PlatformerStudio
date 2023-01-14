@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Scripts/tilemapCreation.gd" type="Script" id=1]
 [ext_resource path="res://Scenes/TileMapEditorWindow.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Scripts/generateCode.cs" type="Script" id=3]
 [ext_resource path="res://Scenes/LeftContainer.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Scripts/buidProject.cs" type="Script" id=5]
 
 [sub_resource type="ButtonGroup" id=1]
 
@@ -76,16 +77,30 @@ margin_bottom = 20.0
 text = "Import Image"
 
 [node name="GenCodeBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
+visible = false
 margin_top = 24.0
 margin_right = 250.0
 margin_bottom = 44.0
-text = "Generate code"
+text = "Build project"
 script = ExtResource( 3 )
 
-[node name="ChangeTileMode" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
+[node name="buildProjectBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
+margin_top = 24.0
+margin_right = 250.0
+margin_bottom = 44.0
+text = "Build project"
+script = ExtResource( 5 )
+
+[node name="Button" type="Button" parent="CanvasLayer/VBoxContainer"]
 margin_top = 48.0
 margin_right = 250.0
 margin_bottom = 68.0
+text = "Test Button"
+
+[node name="ChangeTileMode" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
+margin_top = 72.0
+margin_right = 250.0
+margin_bottom = 92.0
 group = SubResource( 1 )
 
 [node name="LeftContainer" parent="CanvasLayer" instance=ExtResource( 4 )]
@@ -95,4 +110,6 @@ mouse_filter = 0
 [connection signal="file_selected" from="CanvasLayer/LoadBGFile" to="." method="_on_LoadBGFile_file_selected"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/LoadBackgroundBtn" to="." method="_on_LoadBackgroundBtn_button_down"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/GenCodeBtn" to="." method="_on_GenCodeBtn_button_down"]
+[connection signal="pressed" from="CanvasLayer/VBoxContainer/buildProjectBtn" to="." method="_on_buildProjectBtn_pressed"]
+[connection signal="pressed" from="CanvasLayer/VBoxContainer/Button" to="." method="_on_Button_pressed"]
 [connection signal="item_selected" from="CanvasLayer/VBoxContainer/ChangeTileMode" to="." method="_on_ChangeTileMode_item_selected"]
