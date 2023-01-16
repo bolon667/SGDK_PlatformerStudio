@@ -1,0 +1,134 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Scenes/Pages/addNewButton.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scripts/Pages/MessagePack/MessagePacksMenu.gd" type="Script" id=2]
+
+[node name="MessagePacksMenu" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 2 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+modulate = Color( 0.203922, 0.196078, 0.192157, 1 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
+margin_right = 1024.0
+margin_bottom = 50.0
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
+margin_top = 18.0
+margin_right = 970.0
+margin_bottom = 32.0
+size_flags_horizontal = 3
+text = "Message Packs:  "
+align = 2
+valign = 1
+
+[node name="ExitBtn" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
+margin_left = 974.0
+margin_right = 1024.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 50, 50 )
+text = "  X  "
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
+margin_top = 54.0
+margin_right = 1024.0
+margin_bottom = 600.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxChooseEntity" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+margin_right = 510.0
+margin_bottom = 546.0
+rect_min_size = Vector2( 200, 0 )
+size_flags_horizontal = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity"]
+margin_right = 510.0
+margin_bottom = 68.0
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/VBoxContainer"]
+margin_right = 510.0
+margin_bottom = 14.0
+text = "Choose MessagePack"
+align = 1
+
+[node name="AddNewEntityBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/VBoxContainer" instance=ExtResource( 1 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 0.0
+margin_top = 18.0
+margin_right = 510.0
+margin_bottom = 68.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity"]
+margin_top = 72.0
+margin_right = 510.0
+margin_bottom = 546.0
+size_flags_vertical = 3
+scroll_horizontal_enabled = false
+
+[node name="EntityListContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer"]
+margin_right = 510.0
+margin_bottom = 474.0
+rect_min_size = Vector2( 200, 200 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+margin_left = 514.0
+margin_right = 1024.0
+margin_bottom = 546.0
+size_flags_horizontal = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_right = 510.0
+margin_bottom = 546.0
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
+margin_right = 510.0
+margin_bottom = 546.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer"]
+margin_right = 510.0
+margin_bottom = 14.0
+text = "Messages"
+align = 1
+
+[node name="AddNewEntityField" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer" instance=ExtResource( 1 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 0.0
+margin_top = 18.0
+margin_right = 510.0
+margin_bottom = 68.0
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer"]
+margin_top = 72.0
+margin_right = 510.0
+margin_bottom = 546.0
+rect_min_size = Vector2( 250, 0 )
+size_flags_vertical = 3
+scroll_horizontal_enabled = false
+
+[node name="ContainerChooseField" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/ScrollContainer"]
+margin_right = 510.0
+margin_bottom = 474.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[connection signal="pressed" from="CanvasLayer/VBoxContainer/HBoxContainer2/ExitBtn" to="." method="_on_ExitBtn_pressed"]

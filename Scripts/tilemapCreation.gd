@@ -81,5 +81,5 @@ func _on_buildProjectBtn_pressed():
 
 
 func _on_Button_pressed():
-	print(singleton.get_merged_fieldDef())
+	print(singleton.get_entityInstanAmount_by_levelNum(0))
 	pass # Replace with function body.

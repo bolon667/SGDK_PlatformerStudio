@@ -12,5 +12,5 @@ out/src/player.o: src/player.c src/../inc/player.h C:/SGDK/inc/genesis.h \
  C:/SGDK/inc/ym2612.h C:/SGDK/inc/psg.h C:/SGDK/inc/joy.h \
  C:/SGDK/inc/timer.h C:/SGDK/inc/task.h C:/SGDK/inc/task_cst.h \
  src/../inc/physics.h src/../inc/types.h src/../inc/camera.h \
- src/../inc/levels.h src/../inc/global.h src/../inc/levelgenerator.h \
- src/../inc/maps.h src/../res/resources.h
+ src/../inc/levels.h src/../inc/global.h src/../inc/maps.h \
+ src/../res/resources.h

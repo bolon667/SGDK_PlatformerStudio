@@ -88,11 +88,15 @@ func load_entity_fields():
 	if(singleton.entity_names_len == 0):
 		return
 	
-	var entity_field_names = singleton.get_cur_entity_field_names()
+	#var entity_field_names = singleton.get_cur_entity_field_names()
+	var entity_fields = singleton.get_entity_fields()
 	#show children, generated from array
-	for entity_field_name in entity_field_names:
+	for field in entity_fields:
+		var field_name = field["identifier"]
+		
 		var entity_field_node = entity_field_t.instance()
-		entity_field_node.get_node("TextBtn").text = entity_field_name
+		entity_field_node.get_node("TextBtn").text = field_name
+		entity_field_node.get_node("DeleteBtn").disabled = !field["canBeDeleted"]
 		entity_field_container.add_child(entity_field_node)
 
 

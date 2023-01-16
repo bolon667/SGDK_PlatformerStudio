@@ -1,9 +1,11 @@
 extends Control
 
 onready var layer_list = $VBoxContainer/LayerList
+onready var button_list = $VBoxContainer/ButtonList
 onready var layer_value_list = $VBoxContainer/LayerValuesList/LayerValuesContainer
 
 onready var entity_menu_t = preload("res://Scenes/Pages/EntityMenu.tscn")
+onready var msg_packs_menu_t = preload("res://Scenes/Pages/MessagePack/MessagePacksMenu.tscn")
 onready var layer_button_t = preload("res://Scenes/LayerButton.tscn")
 
 onready var change_start_pos_t = preload("res://Scenes/Pages/changeStartPos.tscn")
@@ -56,6 +58,10 @@ func _on_addNewEntityTypeBtn_button_down():
 
 func _on_changeStartPosBtn_button_down():
 	print("start pos")
-	
 	var start_pos_node = change_start_pos_t.instance()
 	add_child(start_pos_node)
+
+
+func _on_msgPacksBtn_button_down():
+	var msg_packs_node = msg_packs_menu_t.instance()
+	add_child(msg_packs_node)

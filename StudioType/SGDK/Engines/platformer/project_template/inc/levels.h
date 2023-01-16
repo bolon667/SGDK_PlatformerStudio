@@ -9,6 +9,9 @@
 extern const LevelFull const LevelFull_arr[];
 extern u16 levelNum;
 
+extern Level* curLvlData;
+extern EntityAll* curEntityAll;
+
 void updateRoomSize(Level* lvl);
 void loadLevel(u16 levelNum);
 

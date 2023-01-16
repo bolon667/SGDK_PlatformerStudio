@@ -52,16 +52,30 @@ var entity_types = {
 		[
 			
 		],
-	
+	"messagePacks":
+		[
+			
+		],
 }
 
 const field_def_template = {	
 	"identifier": "Field",
-	"__type": "string",
-	"inCodeType": "String",
+	"__type": "Int",
+	"inCodeType": "s16",
 	"fieldId": -1,
 	"canBeNull": true,
-	"defaultValue": "test_string",
+	"defaultValue": "0",
+	"canBeDeleted": true,
+}
+
+const field_def_spriteDef = {	
+	"identifier": "sprDef",
+	"__type": "Sprite",
+	"inCodeType": "SpriteDefinition*",
+	"fieldId": -1,
+	"canBeNull": true,
+	"defaultValue": "NULL",
+	"canBeDeleted": false,
 }
 
 const entity_def_template = {
@@ -368,7 +382,8 @@ func add_level():
 	entity_types["levels"].append(level_data)
 	cur_level += 1
 
-func change_cur_field():
+func change_cur_field(field_property_name: String, field_property_value: String):
+	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind][field_property_name] = field_property_value
 	pass
 
 func change_name_of_cur_fieldDef(text: String):
@@ -377,6 +392,16 @@ func change_name_of_cur_fieldDef(text: String):
 	var fieldId = entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind]["fieldId"]
 	change_entityInstFieldName_by_fieldId(text, fieldId)
 	print(entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind])
+	
+func get_entityMeged_ids_dict():
+	var cur_ind: int = 0
+	var dict:Dictionary = {}
+	for entity in entity_types["defs"]["entities"]:
+		var entity_name = entity["identifier"]
+		if !dict.has(entity_name):
+			dict[entity_name] = cur_ind
+			cur_ind += 1
+	return dict
 
 func get_cur_level_layer_names():
 	var layer_names = []
@@ -391,16 +416,42 @@ func get_cur_level_layers():
 func get_cur_level():
 	return entity_types["levels"][cur_level_ind]
 
+func get_entity_fields():
+	return entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"]
+
+func get_entityInstanAmount_by_levelNum(level_num: int):
+	var temp_entity_layer_ind: int = 0
+	var entity_layer_ind: int = -1
+	for layer in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if layer["__type"] == "Entity":
+			entity_layer_ind = temp_entity_layer_ind
+			break
+		temp_entity_layer_ind += 1
+	if entity_layer_ind < 0:
+		return
+	return len(entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["entityInstances"])
+	
+func get_entityInstances_by_levelNum(level_num: int):
+	var temp_entity_layer_ind: int = 0
+	var entity_layer_ind: int = -1
+	for layer in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if layer["__type"] == "Entity":
+			entity_layer_ind = temp_entity_layer_ind
+			break
+		temp_entity_layer_ind += 1
+	if entity_layer_ind < 0:
+		return
+	
+	return entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["entityInstances"]
+
 func get_cur_entity_field_names():
 	var entity_field_names = []
 	if(entity_names_len == 0):
 		 return entity_field_names
-	print("DEBUG")
-	print(cur_entity_type_ind)
-	print(entity_names_len)
 	for entity_field in entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"]:
 		entity_field_names.append(entity_field["identifier"])
 	return entity_field_names
+
 func get_entity_field_names(entity_name: String):
 	var entity_field_names = []
 	var ent_ind = -1
@@ -419,8 +470,7 @@ func get_entity_field_names(entity_name: String):
 
 	return entity_field_names
 	
-func get_entity_fields(entity_name: String):
-	#TODO: check if it works???!?!??
+func get_entity_fields_backup_posibly_need_to_delete(entity_name: String):
 	var entity_fields = []
 	var ent_ind = -1
 	var temp_ent_ind = 0
@@ -513,7 +563,10 @@ func get_entityDef(entity_name: String):
 			return {"ind": ind,"val": entity}
 		ind += 1
 	return {"ind": 0,"val": []}
-	
+
+func add_fieldDef_to_entity(fieldDef: Dictionary):
+	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"].append(fieldDef)
+
 func add_field_to_entity(entity_name: String, field_name:String):
 	var ent_ind = 0
 	var temp_ent_ind = 0
@@ -537,6 +590,9 @@ func add_entity_def(entity_name: String):
 	entity_def_data["identifier"] = entity_name
 	entity_def_data["defId"] = get_unique_entity_defId()
 	entity_types["defs"]["entities"].append(entity_def_data)
+	
+	add_fieldDef_to_entity(field_def_spriteDef)
+	
 	print(entity_def_data)
 	
 

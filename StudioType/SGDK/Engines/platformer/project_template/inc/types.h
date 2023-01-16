@@ -32,7 +32,21 @@ typedef struct {
 } Level;
 
 typedef struct {
-  u16 EntityMerged_size;
+	bool alive;
+	Vect2D_s16 firstPos;
+	Vect2D_s16 lastPos;
+	s8 trigger_type;
+	s8 trigger_value;
+	s16 triggerHp;
+} Trigger;
+
+//$entityMergedStruct$
+
+typedef struct {
+    u16 EntityMerged_size;
+	EntityMerged* EntityMerged_arr;
+	u16 Trigger_size;
+	Trigger* Trigger_arr;
 } EntityAll;
 
 typedef struct {

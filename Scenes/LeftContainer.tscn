@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Scripts/LeftContainer.gd" type="Script" id=1]
+[ext_resource path="res://Scenes/LayerButton.tscn" type="PackedScene" id=2]
 
 [node name="LeftContainer" type="Control" groups=["leftContainer"]]
 anchor_bottom = 1.0
@@ -21,55 +22,80 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="ModeContainer" type="HBoxContainer" parent="VBoxContainer"]
-margin_right = 200.0
+margin_right = 234.0
 margin_bottom = 40.0
 
 [node name="addNewEntityTypeBtn" type="Button" parent="VBoxContainer/ModeContainer"]
-margin_right = 200.0
+margin_right = 122.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 0, 40 )
 size_flags_horizontal = 3
 text = "Entity Definitions"
 
+[node name="msgPacksBtn" type="Button" parent="VBoxContainer/ModeContainer"]
+margin_left = 126.0
+margin_right = 234.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 0, 40 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Message Packs"
+
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
 modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
 margin_top = 44.0
-margin_right = 200.0
+margin_right = 234.0
 margin_bottom = 48.0
 
 [node name="LayerList" type="VBoxContainer" parent="VBoxContainer"]
 margin_top = 52.0
-margin_right = 200.0
+margin_right = 234.0
 margin_bottom = 52.0
 size_flags_horizontal = 3
 
 [node name="HSeparator2" type="HSeparator" parent="VBoxContainer"]
 modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
 margin_top = 56.0
-margin_right = 200.0
+margin_right = 234.0
 margin_bottom = 60.0
 
-[node name="LayerValuesList" type="ScrollContainer" parent="VBoxContainer"]
+[node name="ButtonList" type="VBoxContainer" parent="VBoxContainer"]
 margin_top = 64.0
-margin_right = 200.0
+margin_right = 234.0
+margin_bottom = 94.0
+
+[node name="LayerButton" parent="VBoxContainer/ButtonList" instance=ExtResource( 2 )]
+margin_right = 234.0
+margin_bottom = 30.0
+text = "MessagePacks"
+
+[node name="HSeparator4" type="HSeparator" parent="VBoxContainer"]
+modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
+margin_top = 98.0
+margin_right = 234.0
+margin_bottom = 102.0
+
+[node name="LayerValuesList" type="ScrollContainer" parent="VBoxContainer"]
+margin_top = 106.0
+margin_right = 234.0
 margin_bottom = 558.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 scroll_horizontal_enabled = false
 
 [node name="LayerValuesContainer" type="VBoxContainer" parent="VBoxContainer/LayerValuesList"]
-margin_right = 200.0
+margin_right = 234.0
 size_flags_horizontal = 3
 
 [node name="HSeparator3" type="HSeparator" parent="VBoxContainer"]
 modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
 margin_top = 562.0
-margin_right = 200.0
+margin_right = 234.0
 margin_bottom = 566.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 margin_top = 570.0
-margin_right = 200.0
+margin_right = 234.0
 margin_bottom = 600.0
 
 [node name="changeStartPosBtn" type="Button" parent="VBoxContainer/HBoxContainer"]
@@ -79,4 +105,5 @@ rect_min_size = Vector2( 0, 30 )
 text = "change startPos"
 
 [connection signal="button_down" from="VBoxContainer/ModeContainer/addNewEntityTypeBtn" to="." method="_on_addNewEntityTypeBtn_button_down"]
+[connection signal="button_down" from="VBoxContainer/ModeContainer/msgPacksBtn" to="." method="_on_msgPacksBtn_button_down"]
 [connection signal="button_down" from="VBoxContainer/HBoxContainer/changeStartPosBtn" to="." method="_on_changeStartPosBtn_button_down"]

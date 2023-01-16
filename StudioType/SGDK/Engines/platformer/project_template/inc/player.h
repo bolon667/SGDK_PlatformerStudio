@@ -5,7 +5,6 @@
 #include "physics.h"
 #include "types.h"
 #include "camera.h"
-#include "levelgenerator.h"
 
 struct pBody {
 	Sprite* sprite;

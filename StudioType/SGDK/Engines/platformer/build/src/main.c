@@ -3,6 +3,7 @@
 #include "../inc/levels.h"
 #include "../inc/camera.h"
 #include "../inc/player.h"
+#include "../inc/entityHandler.h"
 
 void inGameJoyEvent(u16 joy, u16 changed, u16 state);
 
@@ -28,6 +29,8 @@ int main(bool resetType) {
 		//First we update all the things that have to be updated each frame
 		updatePlayer();
 		updateCamera();
+
+		showEntityAll();
 
 		//Then we update sprites and after that we tell the Mega Drive that we have finished processing all the frame data
 		SPR_update();

@@ -54,6 +54,46 @@ public class buidProject : Node
 		}
 	}
 
+	private void typesH_CodeReplacer()
+	{
+		Node singleton = (Node)GetNode("/root/singleton");
+		Godot.Collections.Array mergedFieldDef_arr = (Godot.Collections.Array)singleton.Call("get_merged_fieldDef");
+
+		String typesH_path = engineRootPath + "/build/inc/types.h";
+		String typesCode = System.IO.File.ReadAllText(typesH_path);
+		String mergedStructCode = genMergedStructCode(mergedFieldDef_arr);
+		typesCode = typesCode.Replace("//$entityMergedStruct$", mergedStructCode);
+		System.IO.File.WriteAllText(typesH_path, typesCode);
+		GD.Print("types.h code replaced");
+	}
+
+	private String genMergedStructCode(Godot.Collections.Array mergedFieldDef_arr)
+	{
+		String result = "typedef struct {\n";
+		//Predefined strct vars
+
+		result += "  u16 entityType;\n";
+		result += "  bool alive;\n";
+		result += "  Vect2D_s16 posInt;\n";
+		result += "  Vect2D_f32 pos;\n";
+		result += "  Vect2D_f16 spd;\n";
+		result += "  Vect2D_s16 size;\n";
+		result += "  bool onScreen;\n";
+		result += "  Sprite* spr;\n";
+
+		foreach (Godot.Collections.Dictionary field in mergedFieldDef_arr)
+		{
+
+			String fieldName = (String)field["identifier"];
+			String fieldType = (String)field["inCodeType"];
+			result += $"  {fieldType} {fieldName};\n";
+
+		}
+		result += "} EntityMerged;\n";
+
+		return result;
+	}
+
 	private void makeNewProjectFromTemplate()
 	{
 		String fromFolder = engineRootPath + "/project_template";
@@ -69,7 +109,8 @@ public class buidProject : Node
 		makeNewProjectFromTemplate();
 		copyRes();
 		codeReplacer();
-		genResCode();
+
+		//System.Threading.Thread.Sleep(3000);
 		compileProject();
 		runProject();
 	}
@@ -102,6 +143,11 @@ public class buidProject : Node
 
 	private void compileProject()
 	{
+		//Deleting "out" folder
+
+		System.IO.Directory.Delete(fullEngineRootPath + "/build/out/res", true);
+
+		//Compiling
 		GD.Print("Compile project");
 
 		Process iStartProcess = new Process();
@@ -127,9 +173,12 @@ public class buidProject : Node
 
 	private void codeReplacer()
 	{
+		genResCode();
 		mapsC_CodeReplacer();
 		mapsH_CodeReplacer();
 		levelsC_CodeReplacer();
+		typesH_CodeReplacer();
+		
 	}
 
 	private void levelsC_CodeReplacer()
@@ -223,11 +272,133 @@ public class buidProject : Node
 		return levelCode;
 	}
 
+	private String genEntityAllCode(int curLevel)
+	{
+		Node singleton = (Node)GetNode("/root/singleton");
+		
+		String result = "";
+		//Getting "entity_name: mergedId" pairs
+		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict");
+		//Getting entityInstances in curLevel
+		Godot.Collections.Array entityInstances = (Godot.Collections.Array)singleton.Call("get_entityInstances_by_levelNum", curLevel);
+
+		//Opening entityAll block
+		result += "{";
+
+		//EntityMerged count
+		int entityMergedAmount = (int)singleton.Call("get_entityInstanAmount_by_levelNum", curLevel);
+		result += entityMergedAmount.ToString() + ", ";
+		foreach (Godot.Collections.Dictionary entityInst in entityInstances)
+		{
+
+			
+			//Getting useful data about entity
+			String entityName = (String)entityInst["__identifier"];
+			int mergedId = (int)mergedIdsDict[entityName];
+			Godot.Collections.Array pos = (Godot.Collections.Array)entityInst["px"];
+			float width = (float)entityInst["width"];
+			float height = (float)entityInst["height"];
+			int[] spd = { 0, 0 };
+
+			//Opening entityMerged block
+			result += "{";
+
+			//Applying to generated code
+
+			/*****---> Struct reminder <---*****
+			 
+				result += "  u16 entityType;\n";
+				result += "  bool alive;\n";
+				result += "  Vect2D_s16 posInt;\n";
+				result += "  Vect2D_f32 pos;\n";
+				result += "  Vect2D_f16 spd;\n";
+				result += "  Vect2D_s16 size;\n";
+				result += "  bool onScreen;\n";
+				result += "  Sprite* spr;\n";
+
+			**********************************/
+
+			result += $"{mergedId.ToString()},"; //mergedId
+			result += $" TRUE, "; //alive 
+			result += "{" + pos[0].ToString() + ", " + pos[1].ToString() + "}, "; //posInt
+			result += "{FIX32(" + pos[0].ToString() + "), FIX32(" + pos[1].ToString() + ")}, "; //pos
+			result += "{" + spd[0].ToString() + ", " + spd[1].ToString() + "}, "; //spd
+			result += "{" + width.ToString() + ", " + height.ToString() + "}, "; //size
+			result += "FALSE, "; //onScreen
+			result += "NULL,"; //spr
+
+			//Checking every field
+			Godot.Collections.Array fieldInstances = (Godot.Collections.Array)entityInst["fieldInstances"];
+			
+			foreach(Godot.Collections.Dictionary field in fieldInstances)
+			{
+				//String inCodeType = (String)field["__inCodeType"];
+				String value = (String)field["__value"];
+				result += value + ", ";
+			}
+
+			//Closing entityMerged block
+			result += "}, ";
+
+		}
+
+		//Gen Trigger_arr values
+
+		result += entityMergedAmount.ToString() + ", ";
+		foreach (Godot.Collections.Dictionary entityInst in entityInstances)
+		{
+			//Getting useful data about entity
+			String entityName = (String)entityInst["__identifier"];
+			int mergedId = (int)mergedIdsDict[entityName];
+			Godot.Collections.Array pos = (Godot.Collections.Array)entityInst["px"];
+			float width = (float)entityInst["width"];
+			float height = (float)entityInst["height"];
+			int[] spd = { 0, 0 };
+
+			//Opening Trigger block
+			result += "{";
+
+			//Applying to generated code
+
+			/*****---> Struct reminder <---*****
+			 
+				typedef struct {
+					bool alive;
+					Vect2D_s16 firstPos;
+					Vect2D_s16 lastPos;
+					s8 trigger_type;
+					s8 trigger_value;
+					s16 triggerHp;
+				} Trigger;
+
+			**********************************/
+
+			result += "TRUE, "; //alive
+			result += "{0,0}, "; //firstPos
+			result += "{0,0}, "; //lastPos
+			result += "0, "; //triggerType
+			result += "0, "; //triggerValue
+			result += "1, "; //triggerHp
+
+			//Closing Trigger block
+			result += "}, ";
+
+		}
+
+		//Closing entityAll block
+		result += "}, ";
+
+
+		//GD.Print("entityInstances ", entityInstances); 
+		return result;
+	}
+
+
 	private String genLevelFulArr_Code()
 	{
 		int curLevel = 0;
 		String levelCode = genLvlCode(curLevel);
-		String entityAllCode = "0";
+		String entityAllCode = genEntityAllCode(curLevel);
 		String result = "const LevelFull const LevelFull_arr[] = {";
 		result += "{";
 		result += "{" + levelCode + "},{" + entityAllCode + "}}, ";
