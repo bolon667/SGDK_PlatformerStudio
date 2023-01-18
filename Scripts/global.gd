@@ -9,6 +9,8 @@ enum EditorMode {
 
 var cell_size: int = 16
 
+var cur_engine: String = "platformer"
+
 var cur_project_path: String = ""
 
 var cur_editor_mode: int = EditorMode.COLLISION
@@ -17,6 +19,7 @@ var prev_editor_mode: int = EditorMode.COLLISION
 var cur_entity_type: String
 var cur_entity_type_ind: int = -1
 var cur_entity_field_ind: int
+var cur_entity_inst_ind: int
 
 var cur_level_ind: int = 0
 var cur_level_layer_ind: int = 0
@@ -85,6 +88,7 @@ const entity_def_template = {
 	"width": 16,
 	"height": 16,
 	"show": true,
+	"spritePath": "",
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
 	#entity name or field name in entity menu.
 	"color": "#0048FF",
@@ -147,7 +151,7 @@ const entity_inst_template = {
 	"__grid": [],
 	"__pivot": [],
 	"__tags": [],
-	"__sprite": "",
+	"__spritePath": "",
 	"__smartColor": "#FF9801",
 	"width": 32,
 	"height": 32,
@@ -198,7 +202,21 @@ func load_project(projectPath: String):
 		return
 	
 	singleton.entity_types = data_parse.result
-	
+
+func get_sprite_size_from_path(path:String):
+	var result
+	var sprite_name = path.substr(path.find_last("/"))
+	sprite_name = path.split(".")[0]
+	var temp_1 = sprite_name.split("-")
+	if len(temp_1) > 1:
+		var sprite_info = temp_1[1]
+		var info_arr = sprite_info.split("_")
+		var t_width: int = int(info_arr[0])
+		var t_height: int = int(info_arr[1])
+				
+		result = Vector2(t_width*8, t_height*8)
+	return result
+
 func load_project_last_paths():
 	var paths = {
 		"last_project_paths": [],
@@ -327,6 +345,8 @@ func get_unique_entity_fieldId():
 			fieldId += 1
 		continue
 	return fieldId
+	
+
 
 func get_unique_entity_instId():
 	var instId = 0
@@ -364,7 +384,30 @@ func get_entityInst_by_instId(instId: int):
 	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
 		if entity_inst["instId"] == instId:
 			return entity_inst
+			
+func change_fiendInst_by_instId(fieldName: String, fieldValue):
+	var instId = cur_entity_inst_ind
+	var cur_inst_ind: int = 0
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+		if entity_inst["instId"] == instId:
+			break
+		cur_inst_ind += 1
+	var cur_fieldInst_ind: int = 0
+	for fieldInst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_inst_ind]["fieldInstances"]:
+		if fieldInst["__identifier"] == fieldName:
+			break
+		cur_fieldInst_ind += 1
+	entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_inst_ind]["fieldInstances"][cur_fieldInst_ind]["__value"] = fieldValue
 	
+func change_sprite_by_instId(spritePath: String):
+	var instId = cur_entity_inst_ind
+	var cur_inst_ind: int = 0
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+		if entity_inst["instId"] == instId:
+			entity_inst["__spritePath"] = spritePath
+			break
+		cur_inst_ind += 1
+
 func add_cur_entityInstance():
 	var entity_instance = get_cur_entityInstance_t()
 	entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"].append(entity_instance)
@@ -415,6 +458,9 @@ func get_cur_level_layers():
 	
 func get_cur_level():
 	return entity_types["levels"][cur_level_ind]
+
+func get_cur_entityDef():
+	return entity_types["defs"]["entities"][cur_entity_type_ind]
 
 func get_entity_fields():
 	return entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"]
@@ -525,11 +571,6 @@ func get_def_entity_names():
 			entity_names.append(entity["identifier"])
 	return entity_names
 
-func get_cur_entityDef():
-	return entity_types["defs"]["entities"][cur_entity_type_ind]
-
-
-	
 
 func get_cur_entityInstance_t():
 	var def = entity_types["defs"]["entities"][cur_entity_type_ind]

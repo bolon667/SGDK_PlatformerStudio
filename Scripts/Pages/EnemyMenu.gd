@@ -8,7 +8,7 @@ onready var field_property_string_t = preload("res://Scenes/Pages/entityFieldIte
 
 onready var entity_field_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/ScrollContainer/ContainerChooseField 
 onready var entity_list_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/EntityListContainer
-onready var entity_name_edit = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/EntityNameEdit
+onready var entity_name_edit = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3/EntityNameEdit
 onready var add_new_field_btn = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/AddNewEntityField
 onready var field_properties_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/ContainerFieldProperties
 
@@ -81,6 +81,10 @@ func clear_entity_fields():
 	var tempChildrens = entity_field_container.get_children()
 	for child in tempChildrens:
 		child.queue_free()
+
+func load_entity_pic():
+	singleton.get_cur_entityDef()
+	pass
 
 func load_entity_fields():
 	#free all children

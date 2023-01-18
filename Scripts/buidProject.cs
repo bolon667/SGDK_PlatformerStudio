@@ -143,9 +143,10 @@ public class buidProject : Node
 
 	private void compileProject()
 	{
-		//Deleting "out" folder
-
-		System.IO.Directory.Delete(fullEngineRootPath + "/build/out/res", true);
+		//Deleting "out/res" folder
+		//System.IO.Directory.Delete(fullEngineRootPath + "/build/out/res", true);
+		//Deleting "out/src" folder
+		//System.IO.Directory.Delete(fullEngineRootPath + "/build/out/src", true);
 
 		//Compiling
 		GD.Print("Compile project");
@@ -272,26 +273,25 @@ public class buidProject : Node
 		return levelCode;
 	}
 
-	private String genEntityAllCode(int curLevel)
+	private String genEntityMergedCode(int curLevel)
 	{
 		Node singleton = (Node)GetNode("/root/singleton");
-		
-		String result = "";
+
+		String result = "";;
 		//Getting "entity_name: mergedId" pairs
 		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict");
 		//Getting entityInstances in curLevel
 		Godot.Collections.Array entityInstances = (Godot.Collections.Array)singleton.Call("get_entityInstances_by_levelNum", curLevel);
 
-		//Opening entityAll block
+		result += $"const EntityMerged const EntityMerged_arr_Level_{curLevel.ToString()}[] = ";
+
+		//Opening EntityMerged_arr block
 		result += "{";
 
-		//EntityMerged count
-		int entityMergedAmount = (int)singleton.Call("get_entityInstanAmount_by_levelNum", curLevel);
-		result += entityMergedAmount.ToString() + ", ";
 		foreach (Godot.Collections.Dictionary entityInst in entityInstances)
 		{
 
-			
+
 			//Getting useful data about entity
 			String entityName = (String)entityInst["__identifier"];
 			int mergedId = (int)mergedIdsDict[entityName];
@@ -329,8 +329,8 @@ public class buidProject : Node
 
 			//Checking every field
 			Godot.Collections.Array fieldInstances = (Godot.Collections.Array)entityInst["fieldInstances"];
-			
-			foreach(Godot.Collections.Dictionary field in fieldInstances)
+
+			foreach (Godot.Collections.Dictionary field in fieldInstances)
 			{
 				//String inCodeType = (String)field["__inCodeType"];
 				String value = (String)field["__value"];
@@ -341,10 +341,26 @@ public class buidProject : Node
 			result += "}, ";
 
 		}
+		//Closing EntityMerged_arr block
+		result += "};\n";
+		return result;
+	}
 
-		//Gen Trigger_arr values
+	private String genTriggerCode(int curLevel)
+	{
+		Node singleton = (Node)GetNode("/root/singleton");
 
-		result += entityMergedAmount.ToString() + ", ";
+		String result = ""; ;
+		//Getting "entity_name: mergedId" pairs
+		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict");
+		//Getting entityInstances in curLevel
+		Godot.Collections.Array entityInstances = (Godot.Collections.Array)singleton.Call("get_entityInstances_by_levelNum", curLevel);
+
+		result += $"const Trigger const Trigger_arr_Level_{curLevel.ToString()}[] = ";
+
+		//Opening Trigger_arr block
+		result += "{";
+
 		foreach (Godot.Collections.Dictionary entityInst in entityInstances)
 		{
 			//Getting useful data about entity
@@ -385,11 +401,40 @@ public class buidProject : Node
 
 		}
 
-		//Closing entityAll block
-		result += "}, ";
+
+		//Closing Trigger_arr block
+		result += "};\n";
+		return result;
+	}
+
+	private String genEntityAllCode(int curLevel)
+	{
+		Node singleton = (Node)GetNode("/root/singleton");
+		
+		String result = "";
+		result += $"const EntityAll const EntityAll_arr_Level_{curLevel}[] = ";
+		//Getting "entity_name: mergedId" pairs
+		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict");
+		//Getting entityInstances in curLevel
+		Godot.Collections.Array entityInstances = (Godot.Collections.Array)singleton.Call("get_entityInstances_by_levelNum", curLevel);
 
 
-		//GD.Print("entityInstances ", entityInstances); 
+		//Opening entityAll_arr block
+		result += "{";
+
+		//Entity count
+		int entityAmount = (int)singleton.Call("get_entityInstanAmount_by_levelNum", curLevel);
+		//Entity all
+		result += entityAmount.ToString() + ", ";
+		result += $"&EntityMerged_arr_Level_{curLevel.ToString()}, ";
+		//Trigger
+		result += entityAmount.ToString() + ", ";
+		result += $"&Trigger_arr_Level_{curLevel.ToString()}, ";
+
+
+		//Closing entityAll_arr block
+		result += "};\n";
+
 		return result;
 	}
 
@@ -398,10 +443,14 @@ public class buidProject : Node
 	{
 		int curLevel = 0;
 		String levelCode = genLvlCode(curLevel);
-		String entityAllCode = genEntityAllCode(curLevel);
-		String result = "const LevelFull const LevelFull_arr[] = {";
+		String result = "";
+		result += genEntityMergedCode(curLevel);
+		result += genTriggerCode(curLevel);
+		result += genEntityAllCode(curLevel);
+
+		result += "const LevelFull const LevelFull_arr[] = {";
 		result += "{";
-		result += "{" + levelCode + "},{" + entityAllCode + "}}, ";
+		result += "{" + levelCode + "}," + $"&EntityAll_arr_Level_{curLevel.ToString()}" + "}, ";
 		/*
 		{ { &level_map, NULL, &level_tileset, NULL, &level_palette, NULL, { 74, 300}, collisionMap, { 768, 768}, { 48, 48},},{ 0} },};";
 		*/

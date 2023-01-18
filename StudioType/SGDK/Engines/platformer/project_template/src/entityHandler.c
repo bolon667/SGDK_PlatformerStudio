@@ -24,19 +24,20 @@ void showEntityMerged(EntityMerged* entity){
     s16 posX_OnCam = entity->posInt.x-cameraPosition.x;
 	s16 posY_OnCam = entity->posInt.y-cameraPosition.y;
 
-	KLog_S1("1: ", entity->posInt.x);
-	KLog_S1("2: ", posX_OnCam);
 	//$updatePosition_Entity_always$
 	if ((posX_OnCam < -entity->size.x) || (posX_OnCam > 320) || (posY_OnCam < -entity->size.y) || (posY_OnCam > 224)) {
+		if(entity->onScreen) {
+			if(entity->sprDef) SPR_releaseSprite(entity->spr);
+		}
 		entity->onScreen = FALSE;
 		
 	}
     else
     {
 		if(!entity->onScreen) {
-			entity->spr = SPR_addSpriteSafe(&spr_noSpr, posX_OnCam, posY_OnCam, TILE_ATTR(PAL0, 0, FALSE, FALSE));
+			if(entity->sprDef) entity->spr = SPR_addSprite(entity->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(PAL0, 0, FALSE, FALSE));
 		}
-        SPR_setPosition(entity->spr, posX_OnCam, posY_OnCam);
+        if(entity->sprDef) SPR_setPosition(entity->spr, posX_OnCam, posY_OnCam);
 		
 		entity->onScreen = TRUE;
     }

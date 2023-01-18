@@ -25,14 +25,46 @@ onready var temp_tile_map = $BGSprite/tempTileMap
 #onready var temp_tile_map = $tempTileMap
 
 onready var tile_map = $BGSprite/TileMap
-onready var entity_obj_list = $EntityList
+onready var entity_obj_list = $BGSprite/EntityList
 onready var start_pos_spr = $BGSprite/startPos
+
+onready var VBoxContainerRight: VBoxContainer = $"../CanvasLayer/ContainerRight/VBoxContainerRight"
+onready var ContainerRight: Control = $"../CanvasLayer/ContainerRight"
 
 onready var camera = get_parent().get_node("Camera2D")
 #onready var camera = $Camera2D
 
 onready var entity_obj_t = preload("res://Scenes/entityScene.tscn")
 
+func remove_fields_of_entity():
+	ContainerRight.visible = false
+	var children = VBoxContainerRight.get_children()
+	for n in children:
+		VBoxContainerRight.remove_child(n)
+		n.queue_free()
+
+#func load_entity_pics():
+	
+
+func change_cur_entity_pic(pic_path: String):
+	var children = $BGSprite/EntityList.get_children()
+	for entity_obj in children:
+		if entity_obj.entityInst_id == singleton.cur_entity_inst_ind:
+			var img1 = Image.new()
+			img1.load(pic_path)
+			var imgTex = ImageTexture.new()
+			imgTex.create_from_image(img1, 1)
+			entity_obj.get_node("Sprite").texture = imgTex;
+			
+			var temp_sprite_size = singleton.get_sprite_size_from_path(pic_path)
+			if temp_sprite_size:
+				entity_obj.sprite_size = temp_sprite_size
+				entity_obj.change_sprite_rect(Rect2(0,0,temp_sprite_size.x, temp_sprite_size.y))
+				entity_obj.get_node("CollisionShape2D").shape.extents = Vector2(temp_sprite_size.x/2, temp_sprite_size.y/2)
+			else:
+				entity_obj.sprite_size = entity_obj.get_node("Sprite").texture.get_size()
+				entity_obj.change_sprite_rect(Rect2(0,0,entity_obj.sprite_size.x, entity_obj.sprite_size.y))
+				entity_obj.get_node("CollisionShape2D").shape.extents = entity_obj.sprite_size
 
 # moves the map around just like in the editor
 func move_map_around():
@@ -57,11 +89,45 @@ func load_tileMap():
 func load_entities_on_scene():
 	var entity_instantes = singleton.get_entityInstances()
 	for entity_inst in entity_instantes:
+		var sprite_rect: Rect2
 		var entity_node = entity_obj_t.instance()
 		var entity_pos = entity_inst["px"]
 		entity_node.position = Vector2(entity_pos[0], entity_pos[1])
 		entity_node.entityInst_id = entity_inst["instId"]
+		
+		if len(entity_inst["__spritePath"]) > 0:
+			var img1 = Image.new()
+			img1.load(entity_inst["__spritePath"])
+			var imgTex = ImageTexture.new()
+			imgTex.create_from_image(img1, 1)
+			entity_node.get_node("Sprite").texture = imgTex;
+			
+			
+			print(entity_inst["__spritePath"])
+			#break
+			var sprite_name = entity_inst["__spritePath"].substr(entity_inst["__spritePath"].find_last("/"))
+			sprite_name = sprite_name.split(".")[0]
+			var temp_1 = sprite_name.split("-")
+			if len(temp_1) > 1:
+				var sprite_info = temp_1[1]
+				var info_arr = sprite_info.split("_")
+				var t_width: int = int(info_arr[0])
+				var t_height: int = int(info_arr[1])
+				var t_time: int = int(info_arr[2])
+				
+				var texture_size = entity_node.get_node("Sprite").texture.get_size()
+				#sprite_rect = Rect2(0,0,texture_size.x,texture_size.y)
+				sprite_rect = Rect2(0, 0, t_width*8, t_height*8)
+			else:
+				var texture_size = entity_node.get_node("Sprite").texture.get_size()
+				sprite_rect = Rect2(0,0,texture_size.x,texture_size.y)
+				#texture_size.x
+		entity_node.get_node("CollisionShape2D").shape.extents = Vector2(sprite_rect.size.x/2, sprite_rect.size.y/2)
+		entity_node.sprite_size = sprite_rect.size
 		entity_obj_list.add_child(entity_node)
+		
+		
+		entity_node.change_sprite_rect(sprite_rect)	
 
 func change_start_pos():
 	print("change start pos")
@@ -320,15 +386,22 @@ func entity_list_handler():
 	var entity_obj_node = entity_obj_t.instance()
 	
 	if(Input.is_action_just_pressed("mouse1") and singleton.can_create_entity_obj and singleton.cur_entity_type_ind != -1):
-		entity_obj_node.global_position = get_global_mouse_position()
+		var mouse_pos = get_global_mouse_position()
+		entity_obj_node.position = Vector2(mouse_pos.x - $BGSprite.position.x, mouse_pos.y - $BGSprite.position.y)
 		#Got uid for entityInst & Put entityInst in database
 		entity_obj_node.entityInst_id = singleton.add_cur_entityInstance()
+		var savePos = [entity_obj_node.position.x, entity_obj_node.position.y]
 		
-		singleton.save_entityInst_pos(entity_obj_node.entityInst_id, [entity_obj_node.position.x, entity_obj_node.position.y])
 		entity_obj_list.add_child(entity_obj_node)
 		
+		print("entity_obj_node.position: ", entity_obj_node.position)
+		print("BGSprite.position: ", $BGSprite.position)
+		
+		print("savePos: ", savePos)
+		singleton.save_entityInst_pos(entity_obj_node.entityInst_id, savePos)
+		
 	if(Input.is_action_pressed("mouse2")):
-		delete_all_highlighted_entity_objs()
+		remove_fields_of_entity()
 		
 		singleton.can_create_entity_obj = true
 		

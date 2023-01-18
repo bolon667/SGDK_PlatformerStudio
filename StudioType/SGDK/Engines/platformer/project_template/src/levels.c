@@ -5,6 +5,8 @@
 
 #include "../res/resources.h"
 #include "../res/gfx.h"
+#include "../res/sprites.h"
+
 
 u16 levelNum = 0;
 Level* curLvlData;

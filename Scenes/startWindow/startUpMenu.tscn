@@ -61,12 +61,13 @@ anchor_bottom = 1.0
 color = Color( 0.352941, 0.352941, 0.352941, 1 )
 
 [node name="ListContainer" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 margin_left = 4.0
-margin_right = 984.0
-margin_bottom = 222.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/Control/ListContainer"]
 margin_right = 980.0

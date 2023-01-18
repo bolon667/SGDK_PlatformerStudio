@@ -6,13 +6,14 @@
 script/source = "extends Area2D
 
 export var entity_name: String = \"testEntity\"
-onready var ContainerRight: Control = $\"../../../CanvasLayer/ContainerRight\"
-onready var VBoxContainerRight: VBoxContainer = $\"../../../CanvasLayer/ContainerRight/VBoxContainerRight\"
-onready var ContainerRightColorRect: ColorRect = $\"../../../CanvasLayer/ContainerRight/ColorRect\"
-onready var mainController = $\"../../../\"
+onready var ContainerRight: Control = $\"../../../../CanvasLayer/ContainerRight\"
+onready var VBoxContainerRight: VBoxContainer = $\"../../../../CanvasLayer/ContainerRight/VBoxContainerRight\"
+onready var ContainerRightColorRect: ColorRect = $\"../../....//CanvasLayer/ContainerRight/ColorRect\"
+onready var mainController = $\"../../../../\"
 onready var settings_field_t = preload(\"res://Scenes/Fields/string_field.tscn\")
+onready var settings_field_sprite_t = preload(\"res://Scenes/Fields/sprite_field.tscn\")
 onready var settings_head_t = preload(\"res://Scenes/Fields/settings_head.tscn\")
-onready var camera2D = $\"../../../Camera2D\"
+onready var camera2D = $\"../../../../Camera2D\"
 
 var entityInst_id = -1
 #var entity_definition: Dictionary = {
@@ -26,21 +27,27 @@ var fixed_toggle_point = Vector2.ZERO
 
 var highlight = false
 
+var sprite_size: Vector2
+
 func _ready():
 	pass # Replace with function body.
 	
 	print(\"chheck \",$CollisionShape2D.shape.extents)
 	print($Sprite.texture.get_size()/2)
-	$CollisionShape2D.shape.extents = $Sprite.texture.get_size()/2
+	#$Sprite.region_rect = Rect2(0, 0, 10,10)
+	sprite_size = $Sprite.texture.get_size()
+	$Sprite.region_rect = Rect2(Vector2(0, 0), sprite_size)
+	$CollisionShape2D.shape.extents = sprite_size/2
 	
 	fixed_toggle_point = get_viewport().get_mouse_position()
 	_draw()
-	
+
+func change_sprite_rect(rect: Rect2):
+	$Sprite.region_rect = rect
 	
 func _draw():
 	update()
 	if(highlight):
-		var sprite_size = $Sprite.texture.get_size()
 		var color = Color(0.5,0.5,0)
 		var line_thickness = 3
 		#line_thickness = stepify(line_thickness*camera2D.zoom,0)
@@ -65,10 +72,17 @@ func show_fields_of_entity():
 	
 	VBoxContainerRight.add_child(settings_head_node)
 	for field_inst in entity_definition[\"fieldInstances\"]:
-		var settings_field_node = settings_field_t.instance()
-		
-		settings_field_node.get_node(\"Label\").text = field_inst[\"__identifier\"]
-		settings_field_node.get_node(\"LineEdit\").text = field_inst[\"__value\"]
+		var settings_field_node
+		if field_inst[\"__type\"] == \"Sprite\":
+			settings_field_node = settings_field_sprite_t.instance()
+			settings_field_node.get_node(\"HBoxContainer/Label\").text = field_inst[\"__identifier\"]
+			settings_field_node.get_node(\"HBoxContainer/VBoxContainer/TextEdit\").text = field_inst[\"__value\"]
+		else:
+			settings_field_node = settings_field_t.instance()
+			
+			settings_field_node.get_node(\"Label\").text = field_inst[\"__identifier\"]
+			settings_field_node.get_node(\"LineEdit\").text = field_inst[\"__value\"]
+			
 		VBoxContainerRight.add_child(settings_field_node)
 	
 func remove_fields_of_entity():
@@ -84,19 +98,29 @@ func move_entity():
 	
 	var ref = get_viewport().get_mouse_position()
 	if(Input.is_action_just_pressed(\"mouse1\")):
+		remove_fields_of_entity()
+		show_fields_of_entity()
 		is_moving = true
+		singleton.cur_entity_inst_ind = entityInst_id
+		print(\"cur entity inst id: \", singleton.cur_entity_inst_ind)
 	if(is_moving):
 		global_position.x += (ref.x - fixed_toggle_point.x)*camera2D.zoom.x
 		global_position.y += (ref.y - fixed_toggle_point.y)*camera2D.zoom.y
 	if(Input.is_action_just_released(\"mouse1\")):
 		is_moving = false
+	if(Input.is_action_pressed(\"mouse2\") and highlight):
+		remove_fields_of_entity()
+		singleton.delete_entityInstance(entityInst_id)
+		singleton.can_create_entity_obj = true
+		queue_free()
+		
+		
 	fixed_toggle_point = ref
 
 
 func _on_Area2D_mouse_entered():
 	if(singleton.cur_editor_mode == singleton.EditorMode.ENTITY):
-		remove_fields_of_entity()
-		show_fields_of_entity()
+		
 		can_move = true
 		highlight = true
 		singleton.can_create_entity_obj = false
@@ -104,7 +128,6 @@ func _on_Area2D_mouse_entered():
 func _on_Area2D_mouse_exited():
 	if(!is_moving):
 		if(singleton.cur_editor_mode == singleton.EditorMode.ENTITY):
-			remove_fields_of_entity()
 			highlight = false
 			can_move = false
 			singleton.save_entityInst_pos(entityInst_id, [position.x, position.y])
@@ -114,14 +137,26 @@ func _on_Area2D_mouse_exited():
 [sub_resource type="RectangleShape2D" id=1]
 
 [node name="Area2D" type="Area2D"]
-position = Vector2( 629, 311 )
 script = SubResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="."]
 texture = ExtResource( 1 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 64, 64 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource( 1 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+modulate = Color( 0, 0.298039, 1, 0.501961 )
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -20.0
+margin_top = -20.0
+margin_right = 20.0
+margin_bottom = 20.0
 
 [connection signal="mouse_entered" from="." to="." method="_on_Area2D_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_Area2D_mouse_exited"]

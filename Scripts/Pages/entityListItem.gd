@@ -38,6 +38,7 @@ func _on_TextBtn_button_down():
 	singleton.cur_entity_type = $HBoxContainer/TextBtn.text
 	get_tree().call_group("entityMenu", "clear_field_properties")
 	get_tree().call_group("entityMenu", "load_entity_fields")
+	get_tree().call_group("entityMenu", "load_entity_pic")
 	
 	
 	

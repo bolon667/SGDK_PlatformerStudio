@@ -22,6 +22,7 @@ current = true
 editor_draw_screen = false
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 0
 
 [node name="SaveFile" type="FileDialog" parent="CanvasLayer"]
 margin_left = 472.0

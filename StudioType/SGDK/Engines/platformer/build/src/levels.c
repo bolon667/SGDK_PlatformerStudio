@@ -5,16 +5,25 @@
 
 #include "../res/resources.h"
 #include "../res/gfx.h"
+#include "../res/sprites.h"
+
 
 u16 levelNum = 0;
 Level* curLvlData;
 EntityAll* curEntityAll;
 
-const EntityMerged const EntityMerged_arr_Level_1[] = {{0, TRUE, {100, 100}, {FIX32(100), FIX32(100)}, {0, 0}, {32, 32}, FALSE, NULL,NULL, }, };
-const Trigger const Trigger_arr_Level_1[] = { {TRUE, {0,0}, {0,0}, 0, 0, 1, },};
-const EntityAll const EntityAll_arr_Level_1[] = {1, &EntityMerged_arr_Level_1, 1, &Trigger_arr_Level_1};
-//495
-const LevelFull const LevelFull_arr[] = {{{&Level_1_bga_map, NULL, &Level_1_bga_tileset, NULL, &Level_1_bga_pal, NULL, {115, 122}, collisionMap, {320, 224}, {20, 14}}, &EntityAll_arr_Level_1 }};
+//TODO remake entityAll code
+// const EntityMerged const EntityMerged_arr_Level_1[] = {{0, TRUE, {100, 100}, {FIX32(100), FIX32(100)}, {0, 0}, {32, 32}, FALSE, NULL,NULL, }, };
+// const Trigger const Trigger_arr_Level_1[] = { {TRUE, {0,0}, {0,0}, 0, 0, 1, },};
+// const EntityAll const EntityAll_arr_Level_1[] = {1, &EntityMerged_arr_Level_1, 1, &Trigger_arr_Level_1};
+// const LevelFull const LevelFull_arr[] = {{{&Level_1_bga_map, NULL, &Level_1_bga_tileset, NULL, &Level_1_bga_pal, NULL, {115, 122}, collisionMap, {320, 224}, {20, 14}}, &EntityAll_arr_Level_1 }};
+
+const EntityMerged const EntityMerged_arr_Level_0[] = {{0, TRUE, {146, 127}, {FIX32(146), FIX32(127)}, {0, 0}, {32, 32}, FALSE, NULL,&spr_enemy01, }, {0, TRUE, {232, 145}, {FIX32(232), FIX32(145)}, {0, 0}, {32, 32}, FALSE, NULL,&spr_noSpr, }, {0, TRUE, {76, 138}, {FIX32(76), FIX32(138)}, {0, 0}, {32, 32}, FALSE, NULL,&spr_enemy02, }, };
+const Trigger const Trigger_arr_Level_0[] = {{TRUE, {0,0}, {0,0}, 0, 0, 1, }, {TRUE, {0,0}, {0,0}, 0, 0, 1, }, {TRUE, {0,0}, {0,0}, 0, 0, 1, }, };
+const EntityAll const EntityAll_arr_Level_0[] = {3, &EntityMerged_arr_Level_0, 3, &Trigger_arr_Level_0, };
+const LevelFull const LevelFull_arr[] = {{{&Level_1_bga_map, NULL, &Level_1_bga_tileset, NULL, &Level_1_bga_pal, NULL, {160, 65}, collisionMap, {320, 224}, {20, 14}},&EntityAll_arr_Level_0}, };
+
+
 
 
 Vect2D_s16 getLevelStartPos() {

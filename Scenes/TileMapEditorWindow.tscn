@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Scripts/TileMapEditorWindow.gd" type="Script" id=1]
-[ext_resource path="res://1.png" type="Texture" id=2]
+[ext_resource path="res://Images/defaultBG.png" type="Texture" id=2]
 [ext_resource path="res://TileSets/pico8x8tileset2.tres" type="TileSet" id=3]
 [ext_resource path="res://Icons/startPos.png" type="Texture" id=4]
 
@@ -46,7 +46,7 @@ modulate = Color( 1, 1, 1, 0.529412 )
 position = Vector2( -340, -179 )
 texture = ExtResource( 4 )
 
-[node name="EntityList" type="Node2D" parent="."]
+[node name="EntityList" type="Node2D" parent="BGSprite"]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
