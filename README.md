@@ -4,9 +4,8 @@
 
 # About project
 
-For now it's in **Work In Progress** state, which means, there almost **nothing** done... sorry. Right now, it only have ability to create collision code and put entity with custom fields, if you already have your own onescreen platformer engine, use can use it.
+**SGDK Studio** 
 
-But, in near future, i hope, you will see easy to use studio to make one screen platformers for Sega Genesis.
 
 # What done:
 
