@@ -64,7 +64,7 @@ func change_cur_entity_pic(pic_path: String):
 			else:
 				entity_obj.sprite_size = entity_obj.get_node("Sprite").texture.get_size()
 				entity_obj.change_sprite_rect(Rect2(0,0,entity_obj.sprite_size.x, entity_obj.sprite_size.y))
-				entity_obj.get_node("CollisionShape2D").shape.extents = entity_obj.sprite_size
+				entity_obj.get_node("CollisionShape2D").shape.extents = entity_obj.sprite_size/2
 
 # moves the map around just like in the editor
 func move_map_around():
@@ -84,7 +84,10 @@ func load_tileMap():
 		for x in range(collision_map_size.x):
 			var tile_value: int = intGridCsv[x+(y*collision_map_size.x)]-1
 			tile_map.set_cell(x, y, tile_value) 
-	
+func clear_entities_on_scene():
+	var children = entity_obj_list.get_children()
+	for child in children:
+		child.queue_free()
 
 func load_entities_on_scene():
 	var entity_instantes = singleton.get_entityInstances()
@@ -94,6 +97,8 @@ func load_entities_on_scene():
 		var entity_pos = entity_inst["px"]
 		entity_node.position = Vector2(entity_pos[0], entity_pos[1])
 		entity_node.entityInst_id = entity_inst["instId"]
+		
+		entity_node.triggerAABB = entity_inst["triggerAABB"]
 		
 		if len(entity_inst["__spritePath"]) > 0:
 			var img1 = Image.new()
@@ -115,13 +120,13 @@ func load_entities_on_scene():
 				var t_height: int = int(info_arr[1])
 				var t_time: int = int(info_arr[2])
 				
-				var texture_size = entity_node.get_node("Sprite").texture.get_size()
-				#sprite_rect = Rect2(0,0,texture_size.x,texture_size.y)
-				sprite_rect = Rect2(0, 0, t_width*8, t_height*8)
+				sprite_rect = Rect2(0,0,t_width*8,t_height*8)
 			else:
 				var texture_size = entity_node.get_node("Sprite").texture.get_size()
 				sprite_rect = Rect2(0,0,texture_size.x,texture_size.y)
+				
 				#texture_size.x
+		#entity_node.get_node("ColorRect").rect_position = 
 		entity_node.get_node("CollisionShape2D").shape.extents = Vector2(sprite_rect.size.x/2, sprite_rect.size.y/2)
 		entity_node.sprite_size = sprite_rect.size
 		entity_obj_list.add_child(entity_node)
@@ -148,6 +153,13 @@ func _ready():
 	#Changing tilemap cell size
 	tile_map.cell_size = Vector2(singleton.cell_size, singleton.cell_size)
 	temp_tile_map.cell_size = tile_map.cell_size
+	
+	load_level()
+
+func load_level():
+	#clear all from scene
+	clean_tileMap()
+	clear_entities_on_scene()
 	#get image of level background
 	var bgRelPath: String = singleton.get_bgRelPath()
 	if bgRelPath:
@@ -228,6 +240,16 @@ func make_line_temp_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int):
 		line_positions.append({"x": pos0.x+x,"y": pos0.y+y})
 		v+=1
 	return 
+
+func change_entity_trigger_rect_by_instId(instId: int, rect: Rect2):
+	var children = entity_obj_list.get_children()
+	for entity_obj in children:
+		if entity_obj.entityInst_id == instId:
+			entity_obj.triggerAABB = [rect.position.x, rect.position.y, rect.size.x, rect.size.y]
+			entity_obj.get_node("ColorRect").rect_size = rect.size
+			entity_obj.get_node("ColorRect").rect_position = rect.position
+			break
+	pass
 
 func make_line_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int, tile_map):
 	var dx = pos1.x - pos0.x
@@ -339,7 +361,11 @@ func tile_map_handler(delta):
 		prev_cell_pos = cell_pos
 	
 	
-	
+
+func clean_tileMap():
+	var used_tile_positions = tile_map.get_used_cells()
+	for tile_pos in used_tile_positions:
+		tile_map.set_cell(tile_pos[0], tile_pos[1], -1)
 
 func clean_temp_tileMap():
 	var used_tile_positions = temp_tile_map.get_used_cells()

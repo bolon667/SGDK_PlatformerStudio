@@ -2,6 +2,7 @@
 
 #include "../inc/maps.h"
 #include "../inc/global.h"
+#include "../inc/player.h"
 
 #include "../res/resources.h"
 #include "../res/gfx.h"
@@ -36,9 +37,12 @@ void loadLevel(u16 levelNum) {
 	VDP_setPlaneSize(64,32,TRUE);
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 	SPR_reset();
+	VDPTilesFilled = TILE_USER_INDEX;
 	if(bga) MEM_free(bga);
 	//if(bgb) MEM_free(bgb);
 	
+	//playerBody.globalPosition = getLevelStartPos();
+	playerInit(); //janky solution, but who cares if it works... Me.. I will fix that later.
 	curLvlData = &LevelFull_arr[levelNum].lvl;
 
 	curEntityAll = MEM_alloc(sizeof(EntityAll));
@@ -64,7 +68,6 @@ void loadLevel(u16 levelNum) {
 	//Start play the level's song
 	XGM_startPlay(song);
 }
-
 
 u16 getTileValue(s16 x, s16 y) {
 	if (x >= curLvlData->sizeinTiles.x || x < 0 || y < 0 || y >= curLvlData->sizeinTiles.y)

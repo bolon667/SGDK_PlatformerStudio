@@ -8,6 +8,8 @@ onready var TileMapEditorWindow = $TileMapEditorWindow
 onready var TileMapEditorWindow_tileMap = $TileMapEditorWindow/BGSprite/TileMap
 onready var TileMapEditorWindow_bg_sprite = $TileMapEditorWindow/BGSprite/
 
+
+var level_count: int = 0
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
@@ -15,6 +17,10 @@ func _ready():
 	for tile_id in tile_ids:
 		var texture = TileMapEditorWindow_tileMap.tile_set.tile_get_texture(tile_id)
 		$CanvasLayer/VBoxContainer/ChangeTileMode.add_icon_item(texture, str(tile_id), tile_id)
+		
+	level_count = singleton.get_level_count()
+	for cur_level_ind in range(level_count):
+		$CanvasLayer/VBoxContainer/ChangeCurLevel.add_item("Level_"+str(cur_level_ind), cur_level_ind)
 
 func _process(delta):
 	if(Input.is_action_just_pressed("save_project")):
@@ -83,3 +89,20 @@ func _on_buildProjectBtn_pressed():
 func _on_Button_pressed():
 	print(singleton.get_entityInstanAmount_by_levelNum(0))
 	pass # Replace with function body.
+
+
+func _on_addNewLevelBtn_button_down():
+	pass # Replace with function body.
+	level_count+=1
+	singleton.add_level()
+	$CanvasLayer/VBoxContainer/ChangeCurLevel.add_item("Level_"+str(level_count-1), level_count-1)
+
+
+func _on_deleteCurLevelBtn_button_down():
+	pass # Replace with function body.
+
+
+func _on_ChangeCurLevel_item_selected(index):
+	pass # Replace with function body.
+	singleton.cur_level_ind = index
+	get_tree().call_group("tilemapEditorWindow", "load_level")

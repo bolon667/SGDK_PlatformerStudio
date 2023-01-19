@@ -33,25 +33,14 @@ typedef struct {
 
 typedef struct {
 	bool alive;
-	Vect2D_s16 firstPos;
-	Vect2D_s16 lastPos;
-	s8 trigger_type;
-	s8 trigger_value;
+	Vect2D_s16 pos;
+	AABB rect;
+	u8 type;
+	u8 value;
 	s16 triggerHp;
 } Trigger;
 
-typedef struct {
-  u16 entityType;
-  bool alive;
-  Vect2D_s16 posInt;
-  Vect2D_f32 pos;
-  Vect2D_f16 spd;
-  Vect2D_s16 size;
-  bool onScreen;
-  Sprite* spr;
-  SpriteDefinition* sprDef;
-} EntityMerged;
-
+//$entityMergedStruct$
 
 typedef struct {
     u16 EntityMerged_size;

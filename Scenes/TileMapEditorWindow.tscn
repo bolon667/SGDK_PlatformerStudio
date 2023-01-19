@@ -11,6 +11,12 @@ extents = Vector2( 523.5, 308 )
 [node name="TileMapEditorWindow" type="Node2D" groups=["tilemapEditorWindow"]]
 script = ExtResource( 1 )
 
+[node name="Node2D" type="Node2D" parent="."]
+
+[node name="Control" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+
 [node name="BGSprite" type="Sprite" parent="."]
 position = Vector2( 340, 179 )
 texture = ExtResource( 2 )

@@ -33,10 +33,10 @@ typedef struct {
 
 typedef struct {
 	bool alive;
-	Vect2D_s16 firstPos;
-	Vect2D_s16 lastPos;
-	s8 trigger_type;
-	s8 trigger_value;
+	Vect2D_s16 pos;
+	AABB rect;
+	u8 type;
+	u8 value;
 	s16 triggerHp;
 } Trigger;
 

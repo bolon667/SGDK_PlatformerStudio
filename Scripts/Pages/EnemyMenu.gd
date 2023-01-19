@@ -118,6 +118,7 @@ func _on_AddNewEntityBtn_button_down():
 				break
 			i+=1
 	
+	singleton.cur_entity_type_ind = entity_list_container.get_child_count()
 	#Add entity to database
 	singleton.add_entity_def(final_entity_name)
 	

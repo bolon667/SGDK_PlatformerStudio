@@ -17,5 +17,15 @@ func _ready():
 
 
 func _on_LineEdit_text_changed(new_text):
+	if($Label.text == "Trigger type"):
+		print("change trigger type")
+		singleton.change_entityInst_by_instId(singleton.cur_entity_inst_ind, "triggerType", int(new_text))
+		
+		pass
+	elif($Label.text == "Trigger value"):
+		print("change trigger value")
+		singleton.change_entityInst_by_instId(singleton.cur_entity_inst_ind, "triggerValue", int(new_text))
+		pass
+		#trigger_type
 	singleton.change_fiendInst_by_instId($Label.text, new_text)
 	pass # Replace with function body.

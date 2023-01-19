@@ -8,7 +8,31 @@
 #include "../res/sprites.h"
 #include "../inc/camera.h"
 
+void checkTriggerForPlayer(Trigger* trigger){
+	AABB triggerBounds = newAABB(
+		trigger->pos.x + trigger->rect.min.x,
+		trigger->pos.x + trigger->rect.max.x,
+		trigger->pos.y + trigger->rect.min.y,
+		trigger->pos.y + trigger->rect.max.y
+	);
+	if((playerBounds.min.x > triggerBounds.min.x) && (playerBounds.max.x < triggerBounds.max.x)){
+		if((playerBounds.min.y > triggerBounds.min.y) && (playerBounds.max.y < triggerBounds.max.y)){
+			KLog_S1("trigger->type: ", trigger->type);
+			KLog_S1("trigger->value: ", trigger->value);
+			switch(trigger->type) {
+				case 0:
+					loadLevel(trigger->value);
+					break;
+			}
+		}
+	}
+}
+
+
 void showEntityAll(){
+	for(u16 i=0; i<curEntityAll->Trigger_size; i++){
+		checkTriggerForPlayer(&curEntityAll->Trigger_arr[i]);
+	}
 	for(u16 i=0; i<curEntityAll->EntityMerged_size; i++){
 		showEntityMerged(&curEntityAll->EntityMerged_arr[i]);
 	}

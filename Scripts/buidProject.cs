@@ -80,10 +80,14 @@ public class buidProject : Node
 		result += "  Vect2D_s16 size;\n";
 		result += "  bool onScreen;\n";
 		result += "  Sprite* spr;\n";
+		result += "  Trigger* trigger;\n";
 
 		foreach (Godot.Collections.Dictionary field in mergedFieldDef_arr)
 		{
-
+			if(!(bool)field["hasStruct"])
+			{
+				continue;
+			}
 			String fieldName = (String)field["identifier"];
 			String fieldType = (String)field["inCodeType"];
 			result += $"  {fieldType} {fieldName};\n";
@@ -287,7 +291,7 @@ public class buidProject : Node
 
 		//Opening EntityMerged_arr block
 		result += "{";
-
+		int curEntityInd = 0;
 		foreach (Godot.Collections.Dictionary entityInst in entityInstances)
 		{
 
@@ -307,14 +311,17 @@ public class buidProject : Node
 
 			/*****---> Struct reminder <---*****
 			 
-				result += "  u16 entityType;\n";
-				result += "  bool alive;\n";
-				result += "  Vect2D_s16 posInt;\n";
-				result += "  Vect2D_f32 pos;\n";
-				result += "  Vect2D_f16 spd;\n";
-				result += "  Vect2D_s16 size;\n";
-				result += "  bool onScreen;\n";
-				result += "  Sprite* spr;\n";
+				typedef struct {
+				  u16 entityType;
+				  bool alive;
+				  Vect2D_s16 posInt;
+				  Vect2D_f32 pos;
+				  Vect2D_f16 spd;
+				  Vect2D_s16 size;
+				  bool onScreen;
+				  Sprite* spr;
+				  Trigger* trigger;
+				} EntityMerged;
 
 			**********************************/
 
@@ -326,6 +333,7 @@ public class buidProject : Node
 			result += "{" + width.ToString() + ", " + height.ToString() + "}, "; //size
 			result += "FALSE, "; //onScreen
 			result += "NULL,"; //spr
+			result += $"&Trigger_arr_Level_{curLevel}[{curEntityInd}],"; //trigger
 
 			//Checking every field
 			Godot.Collections.Array fieldInstances = (Godot.Collections.Array)entityInst["fieldInstances"];
@@ -333,10 +341,18 @@ public class buidProject : Node
 			foreach (Godot.Collections.Dictionary field in fieldInstances)
 			{
 				//String inCodeType = (String)field["__inCodeType"];
+				if (!(bool)field["__hasStruct"])
+				{
+					continue;
+				}
+				
 				String value = (String)field["__value"];
 				result += value + ", ";
+				
+				
 			}
 
+			curEntityInd++;
 			//Closing entityMerged block
 			result += "}, ";
 
@@ -367,8 +383,29 @@ public class buidProject : Node
 			String entityName = (String)entityInst["__identifier"];
 			int mergedId = (int)mergedIdsDict[entityName];
 			Godot.Collections.Array pos = (Godot.Collections.Array)entityInst["px"];
-			float width = (float)entityInst["width"];
-			float height = (float)entityInst["height"];
+			Godot.Collections.Array triggerAABB = new Godot.Collections.Array();
+			if (entityInst.Contains("triggerAABB"))
+			{
+				triggerAABB = (Godot.Collections.Array)entityInst["triggerAABB"];
+			} else
+			{
+				triggerAABB.Add(0);
+				triggerAABB.Add(0);
+				triggerAABB.Add(0);
+				triggerAABB.Add(0);
+
+			}
+			float triggerType = 0;
+			if (entityInst.Contains("triggerType")) {
+				triggerType = (float)entityInst["triggerType"];
+
+			}
+			float triggerValue = 0;
+			if (entityInst.Contains("triggerType")) {
+				triggerValue = (float)entityInst["triggerValue"];
+
+			}
+
 			int[] spd = { 0, 0 };
 
 			//Opening Trigger block
@@ -390,10 +427,10 @@ public class buidProject : Node
 			**********************************/
 
 			result += "TRUE, "; //alive
-			result += "{0,0}, "; //firstPos
-			result += "{0,0}, "; //lastPos
-			result += "0, "; //triggerType
-			result += "0, "; //triggerValue
+			result += "{" + $"{pos[0]}, {pos[1]}" + "}, "; //pos
+			result += "{" + $"{triggerAABB[0]}, {triggerAABB[1]}, {triggerAABB[2]}, {triggerAABB[3]}" + "}, "; //triggerRect
+			result += $"{triggerType}, "; //triggerType
+			result += $"{triggerValue}, "; //triggerValue
 			result += "1, "; //triggerHp
 
 			//Closing Trigger block
@@ -441,30 +478,44 @@ public class buidProject : Node
 
 	private String genLevelFulArr_Code()
 	{
-		int curLevel = 0;
-		String levelCode = genLvlCode(curLevel);
 		String result = "";
-		result += genEntityMergedCode(curLevel);
-		result += genTriggerCode(curLevel);
-		result += genEntityAllCode(curLevel);
+		Node singleton = (Node)GetNode("/root/singleton");
+		int amountOfLevel = (int)singleton.Call("get_level_count");
 
+		
+		
+		for (int curLevel = 0; curLevel < amountOfLevel; curLevel++)
+		{
+			result += genTriggerCode(curLevel);
+			result += genEntityMergedCode(curLevel);
+			result += genEntityAllCode(curLevel);
+		}
+		//return result;
 		result += "const LevelFull const LevelFull_arr[] = {";
-		result += "{";
-		result += "{" + levelCode + "}," + $"&EntityAll_arr_Level_{curLevel.ToString()}" + "}, ";
-		/*
-		{ { &level_map, NULL, &level_tileset, NULL, &level_palette, NULL, { 74, 300}, collisionMap, { 768, 768}, { 48, 48},},{ 0} },};";
-		*/
+		for (int curLevel = 0; curLevel < amountOfLevel; curLevel++)
+		{
+			result += "{";
+			String levelCode = genLvlCode(curLevel);
+			result += "{" + levelCode + "}," + $"&EntityAll_arr_Level_{curLevel.ToString()}" + "}, ";
+		}
 		result += "};\n";
-		GD.Print(result);
+
 		return result;
+
 	}
 
 	//System.IO.File.WriteAllText(path, code);
 	private void mapsC_CodeReplacer()
 	{
+		Node singleton = (Node)GetNode("/root/singleton");
+		int amountOfLevel = (int)singleton.Call("get_level_count");
 		String mapsC_path = engineRootPath + "/build/src/maps.c";
 		String mapsCode = System.IO.File.ReadAllText(mapsC_path);
-		String collisionCode = genCollisionArrayCode(0);
+		String collisionCode = "";
+		for (int curLevel = 0; curLevel < amountOfLevel; curLevel++)
+		{
+			collisionCode += genCollisionArrayCode(curLevel);
+		}
 		mapsCode = mapsCode.Replace("//$collisionMaps$", collisionCode);
 		System.IO.File.WriteAllText(mapsC_path, mapsCode);
 		GD.Print("maps.c code replaced");
@@ -473,12 +524,18 @@ public class buidProject : Node
 
 	private void mapsH_CodeReplacer()
 	{
+		Node singleton = (Node)GetNode("/root/singleton");
+		int amountOfLevel = (int)singleton.Call("get_level_count");
+
 		String mapsH_path = engineRootPath + "/build/inc/maps.h";
 		String mapsCode = System.IO.File.ReadAllText(mapsH_path);
 
-		int curLevel = 0;
+		String collisionDefCode = "";
 
-		String collisionDefCode = genCollisionDefinitionCode(curLevel);
+		for (int curLevel = 0; curLevel < amountOfLevel; curLevel++)
+		{
+			collisionDefCode += genCollisionDefinitionCode(curLevel);
+		}
 
 		mapsCode = mapsCode.Replace("//$collisionMaps$", collisionDefCode);
 		System.IO.File.WriteAllText(mapsH_path, mapsCode);
@@ -511,14 +568,19 @@ public class buidProject : Node
 
 	private String genCollisionArrayCode(int levelNum)
 	{
-		
+		Node singleton = (Node)GetNode("/root/singleton");
+		Godot.Collections.Array collisionMap = (Godot.Collections.Array)singleton.Call("get_collisionMapForLevel", levelNum);
+
+
+
 		TileMap tileMap = (TileMap)GetNode("/root/Control/TileMapEditorWindow/BGSprite/TileMap");
 		Sprite bgSprite = (Sprite)GetNode("/root/Control/TileMapEditorWindow/BGSprite");
 
 		Vector2 cellSize = tileMap.CellSize;
 
-		Vector2 bgSpriteSize = bgSprite.Texture.GetSize();
-		Vector2 bgSpriteSizeInCells = new Vector2(bgSpriteSize.x / cellSize.x, bgSpriteSize.y / cellSize.y);
+		//New level requires level size pxWei pxHei
+		Vector2 levelSize = (Vector2)singleton.Call("get_level_size", levelNum); 
+		Vector2 bgSpriteSizeInCells = new Vector2(levelSize.x / cellSize.x, levelSize.y / cellSize.y);
 
 		String levelNumText = "";
 		if(levelNum > 0)
@@ -529,13 +591,18 @@ public class buidProject : Node
 
 		String resultCode = "const u8 const collisionMap" + levelNumText + "[" + bgSpriteSizeInCells.y + "][" + bgSpriteSizeInCells.x + "] = {\n";
 
-		for (int curY = 0; curY < (int)bgSpriteSizeInCells.y; curY++)
+		int curX = 0;
+		int curY = 0;
+		while (curY < (int)bgSpriteSizeInCells.y)
 		{
 			resultCode += "{";
-			for (int curX = 0; curX < (int)bgSpriteSizeInCells.x; curX++)
+			while (curX < (int)bgSpriteSizeInCells.x)
 			{
-				resultCode += (tileMap.GetCell(curX, curY) + 1).ToString() + ", ";
+				resultCode += (collisionMap[curX+(curY* (int)bgSpriteSizeInCells.x)]).ToString() + ", ";
+				curX++;
 			}
+			curX = 0;
+			curY++;
 			resultCode += "}, \n";
 		}
 		resultCode += "};\n";

@@ -82,7 +82,7 @@ visible = false
 margin_top = 24.0
 margin_right = 250.0
 margin_bottom = 44.0
-text = "Build project"
+text = "Gen Collision Code"
 script = ExtResource( 3 )
 
 [node name="buildProjectBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
@@ -92,16 +92,35 @@ margin_bottom = 44.0
 text = "Build project"
 script = ExtResource( 5 )
 
+[node name="addNewLevelBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
+margin_top = 48.0
+margin_right = 250.0
+margin_bottom = 68.0
+text = "Add New Level"
+
+[node name="deleteCurLevelBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
+margin_top = 72.0
+margin_right = 250.0
+margin_bottom = 92.0
+text = "Delete Current Level"
+
+[node name="ChangeCurLevel" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
+margin_top = 96.0
+margin_right = 250.0
+margin_bottom = 116.0
+text = "Change Current Level"
+
 [node name="Button" type="Button" parent="CanvasLayer/VBoxContainer"]
+visible = false
 margin_top = 48.0
 margin_right = 250.0
 margin_bottom = 68.0
 text = "Test Button"
 
 [node name="ChangeTileMode" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
-margin_top = 72.0
+margin_top = 120.0
 margin_right = 250.0
-margin_bottom = 92.0
+margin_bottom = 140.0
 group = SubResource( 1 )
 
 [node name="LeftContainer" parent="CanvasLayer" instance=ExtResource( 4 )]
@@ -112,5 +131,8 @@ mouse_filter = 0
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/LoadBackgroundBtn" to="." method="_on_LoadBackgroundBtn_button_down"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/GenCodeBtn" to="." method="_on_GenCodeBtn_button_down"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/buildProjectBtn" to="." method="_on_buildProjectBtn_pressed"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/addNewLevelBtn" to="." method="_on_addNewLevelBtn_button_down"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/deleteCurLevelBtn" to="." method="_on_deleteCurLevelBtn_button_down"]
+[connection signal="item_selected" from="CanvasLayer/VBoxContainer/ChangeCurLevel" to="." method="_on_ChangeCurLevel_item_selected"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/Button" to="." method="_on_Button_pressed"]
 [connection signal="item_selected" from="CanvasLayer/VBoxContainer/ChangeTileMode" to="." method="_on_ChangeTileMode_item_selected"]

@@ -2,6 +2,7 @@
 
 #include "../inc/maps.h"
 #include "../inc/global.h"
+#include "../inc/player.h"
 
 #include "../res/resources.h"
 #include "../res/gfx.h"
@@ -18,11 +19,7 @@ EntityAll* curEntityAll;
 // const EntityAll const EntityAll_arr_Level_1[] = {1, &EntityMerged_arr_Level_1, 1, &Trigger_arr_Level_1};
 // const LevelFull const LevelFull_arr[] = {{{&Level_1_bga_map, NULL, &Level_1_bga_tileset, NULL, &Level_1_bga_pal, NULL, {115, 122}, collisionMap, {320, 224}, {20, 14}}, &EntityAll_arr_Level_1 }};
 
-const EntityMerged const EntityMerged_arr_Level_0[] = {{0, TRUE, {146, 127}, {FIX32(146), FIX32(127)}, {0, 0}, {32, 32}, FALSE, NULL,&spr_enemy01, }, {0, TRUE, {232, 145}, {FIX32(232), FIX32(145)}, {0, 0}, {32, 32}, FALSE, NULL,&spr_noSpr, }, {0, TRUE, {76, 138}, {FIX32(76), FIX32(138)}, {0, 0}, {32, 32}, FALSE, NULL,&spr_enemy02, }, };
-const Trigger const Trigger_arr_Level_0[] = {{TRUE, {0,0}, {0,0}, 0, 0, 1, }, {TRUE, {0,0}, {0,0}, 0, 0, 1, }, {TRUE, {0,0}, {0,0}, 0, 0, 1, }, };
-const EntityAll const EntityAll_arr_Level_0[] = {3, &EntityMerged_arr_Level_0, 3, &Trigger_arr_Level_0, };
-const LevelFull const LevelFull_arr[] = {{{&Level_1_bga_map, NULL, &Level_1_bga_tileset, NULL, &Level_1_bga_pal, NULL, {160, 65}, collisionMap, {320, 224}, {20, 14}},&EntityAll_arr_Level_0}, };
-
+//$levelFullArr$
 
 
 
@@ -40,9 +37,12 @@ void loadLevel(u16 levelNum) {
 	VDP_setPlaneSize(64,32,TRUE);
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 	SPR_reset();
+	VDPTilesFilled = TILE_USER_INDEX;
 	if(bga) MEM_free(bga);
 	//if(bgb) MEM_free(bgb);
 	
+	//playerBody.globalPosition = getLevelStartPos();
+	playerInit(); //janky solution, but who cares if it works... Me.. I will fix that later.
 	curLvlData = &LevelFull_arr[levelNum].lvl;
 
 	curEntityAll = MEM_alloc(sizeof(EntityAll));
@@ -68,7 +68,6 @@ void loadLevel(u16 levelNum) {
 	//Start play the level's song
 	XGM_startPlay(song);
 }
-
 
 u16 getTileValue(s16 x, s16 y) {
 	if (x >= curLvlData->sizeinTiles.x || x < 0 || y < 0 || y >= curLvlData->sizeinTiles.y)

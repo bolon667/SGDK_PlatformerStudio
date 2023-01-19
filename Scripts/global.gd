@@ -69,6 +69,7 @@ const field_def_template = {
 	"canBeNull": true,
 	"defaultValue": "0",
 	"canBeDeleted": true,
+	"hasStruct": true,
 }
 
 const field_def_spriteDef = {	
@@ -79,7 +80,42 @@ const field_def_spriteDef = {
 	"canBeNull": true,
 	"defaultValue": "NULL",
 	"canBeDeleted": false,
+	"hasStruct": true,
 }
+
+const field_def_triggerRectDef = {	
+	"identifier": "Trigger rect",
+	"__type": "AABB",
+	"inCodeType": "AABB",
+	"fieldId": -1,
+	"canBeNull": true,
+	"defaultValue": "{0, 0, 0, 0}",
+	"canBeDeleted": false,
+	"hasStruct": false,
+}
+
+const field_def_triggerType = {	
+	"identifier": "Trigger type",
+	"__type": "Integer",
+	"inCodeType": "u8",
+	"fieldId": -1,
+	"canBeNull": true,
+	"defaultValue": "0",
+	"canBeDeleted": false,
+	"hasStruct": false,
+}
+
+const field_def_triggerValue = {	
+	"identifier": "Trigger value",
+	"__type": "Integer",
+	"inCodeType": "u8",
+	"fieldId": -1,
+	"canBeNull": true,
+	"defaultValue": "0",
+	"canBeDeleted": false,
+	"hasStruct": false,
+}
+
 
 const entity_def_template = {
 	"identifier": "testEntity",
@@ -89,6 +125,9 @@ const entity_def_template = {
 	"height": 16,
 	"show": true,
 	"spritePath": "",
+	"triggerAABB": [0,0,8,8],
+	"triggerType": 0,
+	"triggerValue": 0,
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
 	#entity name or field name in entity menu.
 	"color": "#0048FF",
@@ -156,6 +195,7 @@ const entity_inst_template = {
 	"width": 32,
 	"height": 32,
 	"px": [0,0],
+	"triggerAABB": [0,0,8,8],
 	"instId": -1, #id of entity instance, to quicly find in databse
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
 	#entity name or field name in entity menu.
@@ -172,7 +212,7 @@ const field_inst_template = {
 	"__inCodeType": "string",
 	"__sprite": "",
 	"fieldId": -1,
-	
+	"__hasStruct": true,
 }
 
 
@@ -294,8 +334,8 @@ func get_start_pos():
 	return entity_types["levels"][cur_level_ind]["startPos"]
 
 func change_level_size(size: Vector2):
-	entity_types["levels"][cur_level_ind]["pxWid"] = size.x;
-	entity_types["levels"][cur_level_ind]["pxHei"] = size.y;
+	entity_types["levels"][cur_level_ind]["pxWid"] = size.x
+	entity_types["levels"][cur_level_ind]["pxHei"] = size.y
 	
 func get_level_size():
 	return Vector2(entity_types["levels"][cur_level_ind]["pxWid"], entity_types["levels"][cur_level_ind]["pxHei"]);
@@ -305,6 +345,9 @@ func change_bgRelPath(new_bg_path: String):
 
 func get_bgRelPath():
 	return entity_types["levels"][cur_level_ind]["bgRelPath"]
+	
+func get_bgRelPathForLevel(levelNum:int):
+	return entity_types["levels"][levelNum]["bgRelPath"]
 
 func get_collisionMap():
 	var collision_layer_ind: int = 0
@@ -314,6 +357,24 @@ func get_collisionMap():
 			break
 		collision_layer_ind += 1
 	return entity_types["levels"][cur_level_ind]["layerInstances"][collision_layer_ind]["intGridCsv"]
+
+func get_collisionMapForLevel(levelNum:int):
+	var collision_layer_ind: int = 0
+	#find collision_layer index in array
+	for layer_inst in entity_types["levels"][levelNum]["layerInstances"]:
+		if(layer_inst["__type"] == "Collision"):
+			break
+		collision_layer_ind += 1
+	return entity_types["levels"][levelNum]["layerInstances"][collision_layer_ind]["intGridCsv"]
+
+
+func change_cur_entityInst(key: String, val):
+	var entity_layer_ind: int = 0
+	for layer_inst in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if(layer_inst["__type"] == "Entity"):
+			break
+		entity_layer_ind += 1
+	entity_types["levels"][cur_level_ind]["layerInstances"][entity_layer_ind]["entityInstances"][cur_entity_inst_ind][key] = val
 
 func change_entityInstName_by_defId(entity_name: String, defId: int):
 	var entity_layer_ind: int = 0
@@ -376,8 +437,25 @@ func save_entityInst_pos(instId: int, posPx: Array):
 		if entity_inst["instId"] == instId:
 			entity_inst["px"] = [int(posPx[0]), int(posPx[1])]
 
+func get_level_count():
+	var level_count: int = 0
+	for level in entity_types["levels"]:
+		level_count += 1
+	return level_count
 func get_entityInstances():
 	return entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]
+
+func change_entityInst_by_instId(instId: int, key:String, val):
+	var cur_InstInd:int = 0
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+		if entity_inst["instId"] == instId:
+			print("instId found")
+			print(val)
+			print(key)
+			entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_InstInd][key] = val
+			print(entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_InstInd])
+			break
+		cur_InstInd+=1
 
 
 func get_entityInst_by_instId(instId: int):
@@ -577,7 +655,6 @@ func get_cur_entityInstance_t():
 	var entity_inst = entity_inst_template.duplicate()
 	entity_inst["__identifier"] = def["identifier"]
 	entity_inst["defId"] = def["defId"]
-	#entity_inst["fieldId"] = def["fieldId"]
 	entity_inst["instId"] = get_unique_entity_instId()
 	var filed_inst_arr = []
 	#Get all fields from entityDef, and copy name,value to fields in entityInstance
@@ -589,6 +666,7 @@ func get_cur_entityInstance_t():
 		field_inst["__value"] = field["defaultValue"]
 		field_inst["__type"] = field["__type"]
 		field_inst["fieldId"] = field["fieldId"]
+		field_inst["__hasStruct"] = field["hasStruct"]
 		filed_inst_arr.append(field_inst)
 	entity_inst["fieldInstances"] = filed_inst_arr
 	return entity_inst
@@ -633,6 +711,9 @@ func add_entity_def(entity_name: String):
 	entity_types["defs"]["entities"].append(entity_def_data)
 	
 	add_fieldDef_to_entity(field_def_spriteDef)
+	add_fieldDef_to_entity(field_def_triggerRectDef)
+	add_fieldDef_to_entity(field_def_triggerType)
+	add_fieldDef_to_entity(field_def_triggerValue)
 	
 	print(entity_def_data)
 	
