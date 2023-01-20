@@ -79,8 +79,10 @@ public class buidProject : Node
 		result += "  Vect2D_f16 spd;\n";
 		result += "  Vect2D_s16 size;\n";
 		result += "  bool onScreen;\n";
-		result += "  Sprite* spr;\n";
 		result += "  Trigger* trigger;\n";
+		result += "  u16 triggerInd;\n";
+		result += "  Sprite* spr;\n";
+
 
 		foreach (Godot.Collections.Dictionary field in mergedFieldDef_arr)
 		{
@@ -111,9 +113,11 @@ public class buidProject : Node
 	{
 		
 		makeNewProjectFromTemplate();
+		
 		copyRes();
+		
 		codeReplacer();
-
+		//return;
 		//System.Threading.Thread.Sleep(3000);
 		compileProject();
 		runProject();
@@ -121,6 +125,7 @@ public class buidProject : Node
 
 	private void genResCode()
 	{
+		GD.Print("Gen res code");
 		Process iStartProcess = new Process();
 		iStartProcess.StartInfo.FileName = fullEngineResPath + "/sgdkrescodegen.exe";
 		iStartProcess.StartInfo.WorkingDirectory = fullEngineResPath;
@@ -132,17 +137,25 @@ public class buidProject : Node
 	private void copyRes()
 	{
 		Node singleton = (Node)GetNode("/root/singleton");
-		Dictionary levelDict = (Dictionary)singleton.Call("get_cur_level");
-		String bgaPath = (String)levelDict["bgRelPath"];
-		String levelName = (String)levelDict["identifier"];
-		if (bgaPath.Length > 0)
+		int levelCount = (int)singleton.Call("get_level_count");
+		int curLevel = 0;
+		while(curLevel < levelCount)
 		{
-			String fileExtension = bgaPath.Substring(bgaPath.FindLast("."));
+			Dictionary levelDict = (Dictionary)singleton.Call("get_level", curLevel);
+			String bgaPath = (String)levelDict["bgRelPath"];
+			String levelName = (String)levelDict["identifier"];
+			if (bgaPath.Length > 0)
+			{
+				String fileExtension = bgaPath.Substring(bgaPath.FindLast("."));
 
-			String toPath = fullEngineResPath + "/gfx/" + levelName + "_bga" + fileExtension;
-			GD.Print(toPath);
-			System.IO.File.Copy(bgaPath, toPath, true);
+				String toPath = fullEngineResPath + "/gfx/" + levelName + "_bga" + fileExtension;
+				GD.Print(toPath);
+				System.IO.File.Copy(bgaPath, toPath, true);
+			}
+			curLevel++;
 		}
+		
+		GD.Print("bgA and bgB copied");
 	}
 
 	private void compileProject()
@@ -179,8 +192,11 @@ public class buidProject : Node
 	private void codeReplacer()
 	{
 		genResCode();
+		
 		mapsC_CodeReplacer();
+		
 		mapsH_CodeReplacer();
+		
 		levelsC_CodeReplacer();
 		typesH_CodeReplacer();
 		
@@ -214,10 +230,11 @@ public class buidProject : Node
 
 	private String genLvlCode(int curLevel)
 	{
+
 		Node singleton = (Node)GetNode("/root/singleton");
-		Dictionary levelDict = (Dictionary)singleton.Call("get_cur_level");
+		Dictionary levelDict = (Dictionary)singleton.Call("get_level", curLevel);
 		int cellSize = (int)singleton.Call("get_cell_size");
-		Vector2 levelSizePx = (Vector2)singleton.Call("get_level_size");
+		Vector2 levelSizePx = (Vector2)singleton.Call("get_level_size", curLevel);
 		String levelSizePxText = "{" + levelSizePx.x.ToString() + ", " + levelSizePx.y.ToString() + "}";
 		Vector2 levelSizeTiles = new Vector2();
 		levelSizeTiles.x = (int)levelSizePx.x / cellSize;
@@ -319,8 +336,9 @@ public class buidProject : Node
 				  Vect2D_f16 spd;
 				  Vect2D_s16 size;
 				  bool onScreen;
-				  Sprite* spr;
 				  Trigger* trigger;
+				  u16 triggerInd;
+				  Sprite* spr;
 				} EntityMerged;
 
 			**********************************/
@@ -332,8 +350,10 @@ public class buidProject : Node
 			result += "{" + spd[0].ToString() + ", " + spd[1].ToString() + "}, "; //spd
 			result += "{" + width.ToString() + ", " + height.ToString() + "}, "; //size
 			result += "FALSE, "; //onScreen
-			result += "NULL,"; //spr
 			result += $"&Trigger_arr_Level_{curLevel}[{curEntityInd}],"; //trigger
+			result += $"{curEntityInd},"; //triggerInd = curEntityInd, since all entity have trigger, which is not good for preformance reasons
+			result += "NULL,"; //spr
+
 
 			//Checking every field
 			Godot.Collections.Array fieldInstances = (Godot.Collections.Array)entityInst["fieldInstances"];
@@ -401,7 +421,7 @@ public class buidProject : Node
 
 			}
 			float triggerValue = 0;
-			if (entityInst.Contains("triggerType")) {
+			if (entityInst.Contains("triggerValue")) {
 				triggerValue = (float)entityInst["triggerValue"];
 
 			}
@@ -545,14 +565,15 @@ public class buidProject : Node
 
 	private String genCollisionDefinitionCode(int levelNum)
 	{
+		Node singleton = (Node)GetNode("/root/singleton");
+		Godot.Collections.Array collisionMap = (Godot.Collections.Array)singleton.Call("get_collisionMapForLevel", levelNum);
 
-		TileMap tileMap = (TileMap)GetNode("/root/Control/TileMapEditorWindow/BGSprite/TileMap");
-		Sprite bgSprite = (Sprite)GetNode("/root/Control/TileMapEditorWindow/BGSprite");
+		int cellSize = (int)singleton.Call("get_cell_size");
 
-		Vector2 cellSize = tileMap.CellSize;
+		//New level requires level size pxWei pxHei
+		Vector2 levelSize = (Vector2)singleton.Call("get_level_size", levelNum);
 
-		Vector2 bgSpriteSize = bgSprite.Texture.GetSize();
-		Vector2 bgSpriteSizeInCells = new Vector2(bgSpriteSize.x / cellSize.x, bgSpriteSize.y / cellSize.y);
+		Vector2 bgSpriteSizeInCells = new Vector2(levelSize.x / cellSize, levelSize.y / cellSize);
 
 		String levelNumText = "";
 		if (levelNum > 0)
@@ -571,17 +592,15 @@ public class buidProject : Node
 		Node singleton = (Node)GetNode("/root/singleton");
 		Godot.Collections.Array collisionMap = (Godot.Collections.Array)singleton.Call("get_collisionMapForLevel", levelNum);
 
+		int cellSize = (int)singleton.Call("get_cell_size");
 
-
-		TileMap tileMap = (TileMap)GetNode("/root/Control/TileMapEditorWindow/BGSprite/TileMap");
-		Sprite bgSprite = (Sprite)GetNode("/root/Control/TileMapEditorWindow/BGSprite");
-
-		Vector2 cellSize = tileMap.CellSize;
-
+		
 		//New level requires level size pxWei pxHei
-		Vector2 levelSize = (Vector2)singleton.Call("get_level_size", levelNum); 
-		Vector2 bgSpriteSizeInCells = new Vector2(levelSize.x / cellSize.x, levelSize.y / cellSize.y);
+		Vector2 levelSize = (Vector2)singleton.Call("get_level_size", levelNum);
+		
+		Vector2 bgSpriteSizeInCells = new Vector2(levelSize.x / cellSize, levelSize.y / cellSize);
 
+		
 		String levelNumText = "";
 		if(levelNum > 0)
 		{

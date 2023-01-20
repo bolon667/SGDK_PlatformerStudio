@@ -45,12 +45,23 @@ void loadLevel(u16 levelNum) {
 	playerInit(); //janky solution, but who cares if it works... Me.. I will fix that later.
 	curLvlData = &LevelFull_arr[levelNum].lvl;
 
+	//duplicate entityAll
 	curEntityAll = MEM_alloc(sizeof(EntityAll));
 	memcpy(curEntityAll, LevelFull_arr[levelNum].entityAll_arr, sizeof(EntityAll));
 
+	//duplicate entityMerged_arr for entityAll
 	curEntityAll->EntityMerged_arr = MEM_alloc(sizeof(EntityMerged)*LevelFull_arr[levelNum].entityAll_arr->EntityMerged_size);
 	memcpy(curEntityAll->EntityMerged_arr, LevelFull_arr[levelNum].entityAll_arr->EntityMerged_arr, sizeof(EntityMerged)*LevelFull_arr[levelNum].entityAll_arr->EntityMerged_size);
 
+	//duplicate Trigger_arr for entityAll
+	curEntityAll->Trigger_arr = MEM_alloc(sizeof(Trigger)*LevelFull_arr[levelNum].entityAll_arr->Trigger_size);
+	memcpy(curEntityAll->Trigger_arr, LevelFull_arr[levelNum].entityAll_arr->Trigger_arr, sizeof(Trigger)*LevelFull_arr[levelNum].entityAll_arr->Trigger_size);
+
+	//update trigger reference in entityMerged_arr
+	for(u16 i=0 ; i < curEntityAll->EntityMerged_size; i++){
+		KLog_S1("test: ", &curEntityAll->Trigger_arr[curEntityAll->EntityMerged_arr[i].triggerInd]);
+		curEntityAll->EntityMerged_arr[i].trigger =  &curEntityAll->Trigger_arr[curEntityAll->EntityMerged_arr[i].triggerInd];
+	}
 	
 	//LevelFull_arr[levelNum].entityAll_arr->EntityMerged_size
 	//KLog_S1("test1: ", curEntityMerged[0].posInt.x);

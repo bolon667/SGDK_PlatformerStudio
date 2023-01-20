@@ -40,7 +40,20 @@ typedef struct {
 	s16 triggerHp;
 } Trigger;
 
-//$entityMergedStruct$
+typedef struct {
+  u16 entityType;
+  bool alive;
+  Vect2D_s16 posInt;
+  Vect2D_f32 pos;
+  Vect2D_f16 spd;
+  Vect2D_s16 size;
+  bool onScreen;
+  Trigger* trigger;
+  u16 triggerInd;
+  Sprite* spr;
+  SpriteDefinition* sprDef;
+} EntityMerged;
+
 
 typedef struct {
     u16 EntityMerged_size;

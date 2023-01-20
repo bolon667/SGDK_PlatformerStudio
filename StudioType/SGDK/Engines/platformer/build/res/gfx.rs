@@ -744,3 +744,81 @@ Level_1_bga_map:
     dc.l    Level_1_bga_map_mapBlockIndexes
     dc.l    Level_1_bga_map_mapBlockRowOffsets
 
+    .align 2
+    .global Level_2_bga_pal
+Level_2_bga_pal:
+    dc.w    64
+    dc.l    Level_1_pal_data
+
+    .align 2
+    .global Level_2_bga_tileset
+Level_2_bga_tileset:
+    dc.w    1
+    dc.w    216
+    dc.l    Level_1_tileset_data
+
+    .align 2
+    .global Level_2_bga_map
+Level_2_bga_map:
+    dc.w    6, 6
+    dc.w    6
+    dc.w    16
+    dc.w    81
+    dc.w    30
+    dc.l    Level_1_map_metatiles
+    dc.l    Level_1_map_mapBlocks
+    dc.l    Level_1_map_mapBlockIndexes
+    dc.l    Level_1_map_mapBlockRowOffsets
+
+    .align 2
+    .global Level_3_bga_pal
+Level_3_bga_pal:
+    dc.w    16
+    dc.l    Level_1_bga_pal_data
+
+    .align 2
+    .global Level_3_bga_tileset
+Level_3_bga_tileset:
+    dc.w    1
+    dc.w    391
+    dc.l    Level_1_bga_tileset_data
+
+    .align 2
+    .global Level_3_bga_map
+Level_3_bga_map:
+    dc.w    3, 2
+    dc.w    2
+    dc.w    17
+    dc.w    156
+    dc.w    6
+    dc.l    Level_1_bga_map_metatiles
+    dc.l    Level_1_bga_map_mapBlocks
+    dc.l    Level_1_bga_map_mapBlockIndexes
+    dc.l    Level_1_bga_map_mapBlockRowOffsets
+
+    .align 2
+    .global Level_4_bga_pal
+Level_4_bga_pal:
+    dc.w    16
+    dc.l    Level_1_bga_pal_data
+
+    .align 2
+    .global Level_4_bga_tileset
+Level_4_bga_tileset:
+    dc.w    1
+    dc.w    391
+    dc.l    Level_1_bga_tileset_data
+
+    .align 2
+    .global Level_4_bga_map
+Level_4_bga_map:
+    dc.w    3, 2
+    dc.w    2
+    dc.w    17
+    dc.w    156
+    dc.w    6
+    dc.l    Level_1_bga_map_metatiles
+    dc.l    Level_1_bga_map_mapBlocks
+    dc.l    Level_1_bga_map_mapBlockIndexes
+    dc.l    Level_1_bga_map_mapBlockRowOffsets
+

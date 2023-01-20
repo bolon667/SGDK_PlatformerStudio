@@ -337,8 +337,8 @@ func change_level_size(size: Vector2):
 	entity_types["levels"][cur_level_ind]["pxWid"] = size.x
 	entity_types["levels"][cur_level_ind]["pxHei"] = size.y
 	
-func get_level_size():
-	return Vector2(entity_types["levels"][cur_level_ind]["pxWid"], entity_types["levels"][cur_level_ind]["pxHei"]);
+func get_level_size(levelNum):
+	return Vector2(entity_types["levels"][levelNum]["pxWid"], entity_types["levels"][levelNum]["pxHei"]);
 
 func change_bgRelPath(new_bg_path: String):
 	entity_types["levels"][cur_level_ind]["bgRelPath"] = new_bg_path
@@ -498,9 +498,20 @@ func add_level_layer(level_num: int, layer_name: String, layer_type: String):
 	entity_types["levels"][level_num]["layerInstances"].append(level_layer_data)
 
 func add_level():
+	
+	
 	var level_data = level_template.duplicate()
-	level_data["identifier"] = "Level_" + str(cur_level)
+	level_data["identifier"] = "Level_" + str(cur_level_ind)
+	if len(entity_types["levels"]) > 0:
+		var prev_level = entity_types["levels"][cur_level_ind]
+		level_data["pxHei"] = prev_level["pxHei"]
+		level_data["pxWid"] = prev_level["pxWid"]
+		level_data["bgRelPath"] = prev_level["bgRelPath"]
+		level_data["bgRelPath2"] = prev_level["bgRelPath2"]
+	
 	entity_types["levels"].append(level_data)
+	
+	#cur_level_ind += 1
 	cur_level += 1
 
 func change_cur_field(field_property_name: String, field_property_value: String):
@@ -533,7 +544,10 @@ func get_cur_level_layer_names():
 
 func get_cur_level_layers():
 	return entity_types["levels"][cur_level_ind]["layerInstances"]
-	
+
+func get_level(curLevel: int):
+	return entity_types["levels"][curLevel]
+
 func get_cur_level():
 	return entity_types["levels"][cur_level_ind]
 

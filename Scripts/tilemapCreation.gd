@@ -5,8 +5,9 @@ var id_of_current_entity = 0
 onready var entity_menu_t = preload("res://Scenes/Pages/EntityMenu.tscn")
 
 onready var TileMapEditorWindow = $TileMapEditorWindow
-onready var TileMapEditorWindow_tileMap = $TileMapEditorWindow/BGSprite/TileMap
-onready var TileMapEditorWindow_bg_sprite = $TileMapEditorWindow/BGSprite/
+onready var TileMapEditorWindow_tileMap = $TileMapEditorWindow/roomSize/TileMap
+onready var TileMapEditorWindow_roomSize = $TileMapEditorWindow/roomSize
+onready var TileMapEditorWindow_bgA = $TileMapEditorWindow/roomSize/bgA
 
 
 var level_count: int = 0
@@ -24,7 +25,7 @@ func _ready():
 
 func _process(delta):
 	if(Input.is_action_just_pressed("save_project")):
-		var texture_size = TileMapEditorWindow_bg_sprite.texture.get_size()
+		var texture_size = TileMapEditorWindow_bgA.texture.get_size()
 		var collision_map_size = Vector2(texture_size.x/singleton.cell_size, texture_size.y/singleton.cell_size)
 		singleton.save_collisionMap(TileMapEditorWindow_tileMap, collision_map_size)
 		singleton.save_project()
@@ -47,12 +48,10 @@ func _on_LoadBGFile_file_selected(path):
 	var imgTex = ImageTexture.new()
 	imgTex.create_from_image(bgImage, 1)
 	
-	$TileMapEditorWindow/BGSprite.texture = imgTex;
-	var level_size = $TileMapEditorWindow/BGSprite.texture.get_size()
+	TileMapEditorWindow_bgA.texture = imgTex;
+	var level_size = TileMapEditorWindow_bgA.texture.get_size()
 	singleton.change_level_size(level_size);
 	
-	
-
 	
 
 func _on_GenCodeBtn_button_down():

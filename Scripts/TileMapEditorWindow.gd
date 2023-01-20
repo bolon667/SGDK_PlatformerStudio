@@ -21,12 +21,15 @@ var map_size_px:Vector2
 var map_size_tiles:Vector2
 
 
-onready var temp_tile_map = $BGSprite/tempTileMap
+onready var temp_tile_map = $roomSize/tempTileMap
 #onready var temp_tile_map = $tempTileMap
 
-onready var tile_map = $BGSprite/TileMap
-onready var entity_obj_list = $BGSprite/EntityList
-onready var start_pos_spr = $BGSprite/startPos
+onready var tile_map = $roomSize/TileMap
+onready var entity_obj_list = $roomSize/EntityList
+onready var start_pos_spr = $roomSize/startPos
+
+onready var bgA_spr = $roomSize/bgA
+onready var bgB_spr = $roomSize/bgB
 
 onready var VBoxContainerRight: VBoxContainer = $"../CanvasLayer/ContainerRight/VBoxContainerRight"
 onready var ContainerRight: Control = $"../CanvasLayer/ContainerRight"
@@ -47,7 +50,7 @@ func remove_fields_of_entity():
 	
 
 func change_cur_entity_pic(pic_path: String):
-	var children = $BGSprite/EntityList.get_children()
+	var children = entity_obj_list.get_children()
 	for entity_obj in children:
 		if entity_obj.entityInst_id == singleton.cur_entity_inst_ind:
 			var img1 = Image.new()
@@ -75,7 +78,7 @@ func move_map_around():
 
 
 func load_tileMap():
-	var texture_size = $BGSprite.texture.get_size()
+	var texture_size = bgA_spr.texture.get_size()
 	var collision_map_size = Vector2(texture_size.x/singleton.cell_size, texture_size.y/singleton.cell_size)
 	var intGridCsv:Array = singleton.get_collisionMap()
 	if len(intGridCsv) == 0:
@@ -163,7 +166,7 @@ func load_level():
 	#get image of level background
 	var bgRelPath: String = singleton.get_bgRelPath()
 	if bgRelPath:
-		$BGSprite.texture = load(bgRelPath)
+		bgA_spr.texture = load(bgRelPath)
 	#add entities on scene from database (singleton.entity_types)
 	load_entities_on_scene()
 	#Fill tilemap with data from json (singleton.entity_types)
@@ -329,9 +332,9 @@ func move_camera(delta):
 
 func tile_map_handler(delta):
 	
-	var bg_sprite_size = $BGSprite.texture.get_size()
-	map_size_px = bg_sprite_size
-	map_size_tiles = Vector2(bg_sprite_size.x/singleton.cell_size, bg_sprite_size.y/singleton.cell_size)
+	var bg_sprite_size = bgA_spr.texture.get_size()
+	map_size_px = singleton.get_level_size(singleton.cur_level_ind)
+	map_size_tiles = Vector2(map_size_px.x/singleton.cell_size, map_size_px.y/singleton.cell_size)
 	#if(local_mouse_pos.x < 0 or local_mouse_pos.y < 0):
 	#	return
 	#if(local_mouse_pos.x > bg_sprite_size.x or local_mouse_pos.y > bg_sprite_size.y):
@@ -375,7 +378,7 @@ func clean_temp_tileMap():
 func temp_tile_map_handler(delta):
 	clean_temp_tileMap()
 
-	var bg_sprite_size = $BGSprite.texture.get_size()
+	#var bg_sprite_size = bgA_spr.texture.get_size()
 	#if(local_mouse_pos.x < 0 or local_mouse_pos.y < 0):
 	#	return
 	#if(local_mouse_pos.x > bg_sprite_size.x or local_mouse_pos.y > bg_sprite_size.y):
@@ -413,7 +416,7 @@ func entity_list_handler():
 	
 	if(Input.is_action_just_pressed("mouse1") and singleton.can_create_entity_obj and singleton.cur_entity_type_ind != -1):
 		var mouse_pos = get_global_mouse_position()
-		entity_obj_node.position = Vector2(mouse_pos.x - $BGSprite.position.x, mouse_pos.y - $BGSprite.position.y)
+		entity_obj_node.position = Vector2(mouse_pos.x - $roomSize.rect_position.x, mouse_pos.y - $roomSize.rect_position.y)
 		#Got uid for entityInst & Put entityInst in database
 		entity_obj_node.entityInst_id = singleton.add_cur_entityInstance()
 		var savePos = [entity_obj_node.position.x, entity_obj_node.position.y]
@@ -421,7 +424,7 @@ func entity_list_handler():
 		entity_obj_list.add_child(entity_obj_node)
 		
 		print("entity_obj_node.position: ", entity_obj_node.position)
-		print("BGSprite.position: ", $BGSprite.position)
+		print("roomSize.position: ", $roomSize.rect_position)
 		
 		print("savePos: ", savePos)
 		singleton.save_entityInst_pos(entity_obj_node.entityInst_id, savePos)
@@ -437,7 +440,7 @@ func entity_list_handler():
 func _physics_process(delta):
 	area2d_follow_camera()
 	if(focused_editor_window):
-		local_mouse_pos = $BGSprite.get_local_mouse_position()
+		local_mouse_pos = $roomSize.get_local_mouse_position()
 		move_camera(delta)
 		if(singleton.cur_editor_mode == singleton.EditorMode.ENTITY):
 			entity_list_handler()
