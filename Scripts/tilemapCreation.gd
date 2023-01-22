@@ -8,6 +8,10 @@ onready var TileMapEditorWindow = $TileMapEditorWindow
 onready var TileMapEditorWindow_tileMap = $TileMapEditorWindow/roomSize/TileMap
 onready var TileMapEditorWindow_roomSize = $TileMapEditorWindow/roomSize
 onready var TileMapEditorWindow_bgA = $TileMapEditorWindow/roomSize/bgA
+onready var TileMapEditorWindow_bgB = $TileMapEditorWindow/roomSize/bgB
+
+
+var load_mode: int = 0
 
 
 var level_count: int = 0
@@ -25,13 +29,15 @@ func _ready():
 
 func _process(delta):
 	if(Input.is_action_just_pressed("save_project")):
-		var texture_size = TileMapEditorWindow_bgA.texture.get_size()
+		
+		var texture_size = singleton.get_level_size(singleton.cur_level_ind)
 		var collision_map_size = Vector2(texture_size.x/singleton.cell_size, texture_size.y/singleton.cell_size)
 		singleton.save_collisionMap(TileMapEditorWindow_tileMap, collision_map_size)
 		singleton.save_project()
 		
 
 func _on_LoadBackgroundBtn_button_down():
+	load_mode = 0
 	$CanvasLayer/LoadBGFile.popup_centered()
 
 
@@ -41,15 +47,22 @@ func _on_LoadBGFile_file_selected(path):
 	if(!(ext in ['png', 'jpg', 'bmp'])):
 		return
 	print(ext)
-	singleton.change_bgRelPath(path)
-	
+	print(path)
 	var bgImage = Image.new()
 	bgImage.load(path)
 	var imgTex = ImageTexture.new()
 	imgTex.create_from_image(bgImage, 1)
+	var level_size
+	match load_mode:
+		0:
+			singleton.change_bgRelPath(path)
+			TileMapEditorWindow_bgA.texture = imgTex;
+			level_size = TileMapEditorWindow_bgA.texture.get_size()
+		1:
+			singleton.change_bgRelPath2(path)
+			TileMapEditorWindow_bgB.texture = imgTex;
+			level_size = TileMapEditorWindow_bgB.texture.get_size()
 	
-	TileMapEditorWindow_bgA.texture = imgTex;
-	var level_size = TileMapEditorWindow_bgA.texture.get_size()
 	singleton.change_level_size(level_size);
 	
 	
@@ -86,7 +99,9 @@ func _on_buildProjectBtn_pressed():
 
 
 func _on_Button_pressed():
-	print(singleton.get_entityInstanAmount_by_levelNum(0))
+	#for field in singleton.get_merged_fieldDef():
+	#	print(field["identifier"])
+	print(singleton.get_merged_fieldDef())
 	pass # Replace with function body.
 
 
@@ -105,3 +120,31 @@ func _on_ChangeCurLevel_item_selected(index):
 	pass # Replace with function body.
 	singleton.cur_level_ind = index
 	get_tree().call_group("tilemapEditorWindow", "load_level")
+
+
+func _on_ChangeCellSize_item_selected(index):
+	match index:
+		0:
+			print("changed to 8x8 cell size")
+			singleton.cell_size = 8
+			get_tree().call_group("tilemapEditorWindow", "update_tilemap_cell_size", Vector2(singleton.cell_size, singleton.cell_size))
+		1:
+			print("changed to 16x16 cell size")
+			singleton.cell_size = 16
+			get_tree().call_group("tilemapEditorWindow", "update_tilemap_cell_size", Vector2(singleton.cell_size, singleton.cell_size))
+
+
+func _on_LoadBackgroundBtn2_button_down():
+	load_mode = 1
+	$CanvasLayer/LoadBGFile.popup_centered()
+
+
+func _on_DeleteBgABtn_button_down():
+	TileMapEditorWindow_bgA.texture = null;
+	singleton.change_bgRelPath("");
+	pass # Replace with function body.
+
+
+func _on_DeleteBgBBtn_button_down():
+	TileMapEditorWindow_bgB.texture = null;
+	singleton.change_bgRelPath2("");

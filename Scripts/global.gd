@@ -7,7 +7,7 @@ enum EditorMode {
   START_POS,
 }
 
-var cell_size: int = 16
+var cell_size: int = 8
 
 var cur_engine: String = "platformer"
 
@@ -27,6 +27,8 @@ var cur_level_layer_ind: int = 0
 var entity_names_len: int = 0
 
 var cur_level: int = 1
+
+var mergedFieldArr: Array
 
 var can_create_entity_obj: bool = true
 
@@ -67,7 +69,7 @@ const field_def_template = {
 	"inCodeType": "s16",
 	"fieldId": -1,
 	"canBeNull": true,
-	"defaultValue": "0",
+	"defaultValue": "1",
 	"canBeDeleted": true,
 	"hasStruct": true,
 }
@@ -332,6 +334,9 @@ func change_start_pos(start_pos_coord: Vector2):
 
 func get_start_pos():
 	return entity_types["levels"][cur_level_ind]["startPos"]
+	
+func get_start_pos_for_level(l_ind: int):
+	return entity_types["levels"][l_ind]["startPos"]
 
 func change_level_size(size: Vector2):
 	entity_types["levels"][cur_level_ind]["pxWid"] = size.x
@@ -342,9 +347,14 @@ func get_level_size(levelNum):
 
 func change_bgRelPath(new_bg_path: String):
 	entity_types["levels"][cur_level_ind]["bgRelPath"] = new_bg_path
+	
+func change_bgRelPath2(new_bg_path: String):
+	entity_types["levels"][cur_level_ind]["bgRelPath2"] = new_bg_path
 
 func get_bgRelPath():
 	return entity_types["levels"][cur_level_ind]["bgRelPath"]
+func get_bgRelPath2():
+	return entity_types["levels"][cur_level_ind]["bgRelPath2"]
 	
 func get_bgRelPathForLevel(levelNum:int):
 	return entity_types["levels"][levelNum]["bgRelPath"]
@@ -377,15 +387,17 @@ func change_cur_entityInst(key: String, val):
 	entity_types["levels"][cur_level_ind]["layerInstances"][entity_layer_ind]["entityInstances"][cur_entity_inst_ind][key] = val
 
 func change_entityInstName_by_defId(entity_name: String, defId: int):
-	var entity_layer_ind: int = 0
-	for layer_inst in entity_types["levels"][cur_level_ind]["layerInstances"]:
-		if(layer_inst["__type"] == "Entity"):
-			break
-		entity_layer_ind += 1
-	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][entity_layer_ind]["entityInstances"]:
-		if entity_inst["defId"] == defId:
-			entity_inst["__identifier"] = entity_name
-		continue
+	var amount_of_levels = len(entity_types["levels"])
+	for level_ind in range(amount_of_levels):
+		var entity_layer_ind: int = 0
+		for layer_inst in entity_types["levels"][level_ind]["layerInstances"]:
+			if(layer_inst["__type"] == "Entity"):
+				break
+			entity_layer_ind += 1
+		for entity_inst in entity_types["levels"][level_ind]["layerInstances"][entity_layer_ind]["entityInstances"]:
+			if entity_inst["defId"] == defId:
+				entity_inst["__identifier"] = entity_name
+			continue
 
 func change_entityInstFieldName_by_fieldId(field_name: String, fieldId: int):
 	print(entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"])
@@ -496,6 +508,9 @@ func add_level_layer(level_num: int, layer_name: String, layer_type: String):
 	level_layer_data["__identifier"] = layer_name
 	level_layer_data["__type"] = layer_type
 	entity_types["levels"][level_num]["layerInstances"].append(level_layer_data)
+
+func get_level_name(level_num: int):
+	return entity_types["levels"][level_num]["identifier"]
 
 func add_level():
 	
@@ -689,6 +704,9 @@ func get_cur_entityInstance_t():
 func get_entityDef_by_ind(entity_ind: int):
 	return entity_types["defs"]["entities"][entity_ind]
 
+func get_entity_defs():
+	return entity_types["defs"]["entities"]
+
 func get_entityDef(entity_name: String):
 	var ind = 0
 	for entity in entity_types["defs"]["entities"]:
@@ -764,8 +782,9 @@ func get_merged_fieldDef():
 				mergedFieldDef_arr.append(field)
 				mergedFieldDef_names.append(fieldDef_name)
 				pass
+	mergedFieldArr = mergedFieldDef_arr
 	return mergedFieldDef_arr
-		
+
 
 func delete_fieldDef(field_ind: int):
 	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"].remove(field_ind)

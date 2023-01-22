@@ -6,7 +6,7 @@
 
 #define TILEMAP_PLANE BG_A
 
-#define PLAYER_PALETTE PAL1
+#define PLAYER_PALETTE PAL3
 #define LEVEL_PALETTE PAL0
 
 #define GROUND_TILE 1
@@ -22,6 +22,7 @@ struct {
 }input;
 
 extern Map* bga;
+extern Map* bgb;
 
 extern AABB roomSize;
 extern AABB playerBounds;

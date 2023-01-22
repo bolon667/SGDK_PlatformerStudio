@@ -13,15 +13,7 @@ u16 levelNum = 0;
 Level* curLvlData;
 EntityAll* curEntityAll;
 
-//TODO remake entityAll code
-// const EntityMerged const EntityMerged_arr_Level_1[] = {{0, TRUE, {100, 100}, {FIX32(100), FIX32(100)}, {0, 0}, {32, 32}, FALSE, NULL,NULL, }, };
-// const Trigger const Trigger_arr_Level_1[] = { {TRUE, {0,0}, {0,0}, 0, 0, 1, },};
-// const EntityAll const EntityAll_arr_Level_1[] = {1, &EntityMerged_arr_Level_1, 1, &Trigger_arr_Level_1};
-// const LevelFull const LevelFull_arr[] = {{{&Level_1_bga_map, NULL, &Level_1_bga_tileset, NULL, &Level_1_bga_pal, NULL, {115, 122}, collisionMap, {320, 224}, {20, 14}}, &EntityAll_arr_Level_1 }};
-
 //$levelFullArr$
-
-
 
 Vect2D_s16 getLevelStartPos() {
 	return curLvlData->startPos;
@@ -37,13 +29,20 @@ void loadLevel(u16 levelNum) {
 	VDP_setPlaneSize(64,32,TRUE);
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 	SPR_reset();
+
+	//Deallocate prev entityData to avoid memory leak
+	MEM_free(curEntityAll->EntityMerged_arr);
+	MEM_free(curEntityAll->Trigger_arr);
+	MEM_free(curEntityAll);
+
+	MEM_free(bga);
+	MEM_free(bgb);
+
 	VDPTilesFilled = TILE_USER_INDEX;
-	if(bga) MEM_free(bga);
-	//if(bgb) MEM_free(bgb);
 	
 	//playerBody.globalPosition = getLevelStartPos();
 	playerInit(); //janky solution, but who cares if it works... Me.. I will fix that later.
-	curLvlData = &LevelFull_arr[levelNum].lvl;
+	curLvlData = LevelFull_arr[levelNum].lvl;
 
 	//duplicate entityAll
 	curEntityAll = MEM_alloc(sizeof(EntityAll));
@@ -59,17 +58,28 @@ void loadLevel(u16 levelNum) {
 
 	//update trigger reference in entityMerged_arr
 	for(u16 i=0 ; i < curEntityAll->EntityMerged_size; i++){
-		KLog_S1("test: ", &curEntityAll->Trigger_arr[curEntityAll->EntityMerged_arr[i].triggerInd]);
 		curEntityAll->EntityMerged_arr[i].trigger =  &curEntityAll->Trigger_arr[curEntityAll->EntityMerged_arr[i].triggerInd];
 	}
 	
-	//LevelFull_arr[levelNum].entityAll_arr->EntityMerged_size
-	//KLog_S1("test1: ", curEntityMerged[0].posInt.x);
-
-
-	PAL_setPalette(PAL0, curLvlData->foregroundPallete->data, DMA);
-	VDP_loadTileSet(curLvlData->foregroundTileset, VDPTilesFilled, DMA);
-	bga = MAP_create(curLvlData->foregroundMap, BG_A, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, VDPTilesFilled));
+	
+	if(curLvlData->foregroundTileset != NULL){
+		PAL_setPalette(PAL1, curLvlData->foregroundPallete->data, DMA);
+		VDP_loadTileSet(curLvlData->foregroundTileset, VDPTilesFilled, DMA);
+		bga = MAP_create(curLvlData->foregroundMap, BG_A, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, VDPTilesFilled));
+		VDPTilesFilled += curLvlData->foregroundTileset->numTile;
+	} else {
+		bga = NULL;
+	}
+	
+	if(curLvlData->backgroundTileset != NULL){
+		PAL_setPalette(PAL0, curLvlData->backgroundPallete->data, DMA);
+		VDP_loadTileSet(curLvlData->backgroundTileset, VDPTilesFilled, DMA);
+		bgb = MAP_create(curLvlData->backgroundMap, BG_B, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, VDPTilesFilled));
+		VDPTilesFilled += curLvlData->backgroundTileset->numTile;
+	} else {
+		bgb = NULL;
+	}
+	
 
 	//Update the number of tiles filled in order to avoid overlaping them when loading more
 	VDPTilesFilled += level_tileset.numTile;

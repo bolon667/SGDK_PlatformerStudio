@@ -3,6 +3,8 @@
 
 #define clamp01(X)   (min(max((X), (0)), (1)))
 
+//$definesCode$
+
 typedef struct {
 	u8 x;
 	u8 y;
@@ -50,7 +52,7 @@ typedef struct {
 } EntityAll;
 
 typedef struct {
-    Level lvl;
+    Level* lvl;
     EntityAll* entityAll_arr;
 } LevelFull;
 

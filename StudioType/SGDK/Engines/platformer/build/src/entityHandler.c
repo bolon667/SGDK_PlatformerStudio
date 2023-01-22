@@ -28,23 +28,10 @@ void checkTriggerForPlayer(Trigger* trigger){
 	}
 }
 
-
-void showEntityAll(){
-	for(u16 i=0; i<curEntityAll->Trigger_size; i++){
-		checkTriggerForPlayer(&curEntityAll->Trigger_arr[i]);
-	}
-	for(u16 i=0; i<curEntityAll->EntityMerged_size; i++){
-		showEntityMerged(&curEntityAll->EntityMerged_arr[i]);
-	}
-}
-
-void showEntityMerged(EntityMerged* entity){
-	if(!entity->alive){
+void showEntitySimple(EntityMerged* entity){
+    if(!entity->alive){
 		return;
 	}
-    // clip out of screen sprites
-	
-
     s16 posX_OnCam = entity->posInt.x-cameraPosition.x;
 	s16 posY_OnCam = entity->posInt.y-cameraPosition.y;
 
@@ -65,5 +52,95 @@ void showEntityMerged(EntityMerged* entity){
 		
 		entity->onScreen = TRUE;
     }
-
 }
+void showCoin(EntityMerged* entity){
+    if(!entity->alive){
+		return;
+	}
+    s16 posX_OnCam = entity->posInt.x-cameraPosition.x;
+	s16 posY_OnCam = entity->posInt.y-cameraPosition.y;
+
+	//$updatePosition_Entity_always$
+	if ((posX_OnCam < -entity->size.x) || (posX_OnCam > 320) || (posY_OnCam < -entity->size.y) || (posY_OnCam > 224)) {
+		if(entity->onScreen) {
+			if(entity->sprDef) SPR_releaseSprite(entity->spr);
+		}
+		entity->onScreen = FALSE;
+		
+	}
+    else
+    {
+		if(!entity->onScreen) {
+			if(entity->sprDef) entity->spr = SPR_addSprite(entity->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(PAL0, 0, FALSE, FALSE));
+		}
+        if(entity->sprDef) SPR_setPosition(entity->spr, posX_OnCam, posY_OnCam);
+		
+		entity->onScreen = TRUE;
+    }
+}
+void showCar(EntityMerged* entity){
+    if(!entity->alive){
+		return;
+	}
+    s16 posX_OnCam = entity->posInt.x-cameraPosition.x;
+	s16 posY_OnCam = entity->posInt.y-cameraPosition.y;
+
+	//$updatePosition_Entity_always$
+	if ((posX_OnCam < -entity->size.x) || (posX_OnCam > 320) || (posY_OnCam < -entity->size.y) || (posY_OnCam > 224)) {
+		if(entity->onScreen) {
+			if(entity->sprDef) SPR_releaseSprite(entity->spr);
+		}
+		entity->onScreen = FALSE;
+		
+	}
+    else
+    {
+		if(!entity->onScreen) {
+			if(entity->sprDef) entity->spr = SPR_addSprite(entity->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(PAL0, 0, FALSE, FALSE));
+		}
+        if(entity->sprDef) SPR_setPosition(entity->spr, posX_OnCam, posY_OnCam);
+		
+		entity->onScreen = TRUE;
+    }
+}
+void showOctopus(EntityMerged* entity){
+    if(!entity->alive){
+		return;
+	}
+    s16 posX_OnCam = entity->posInt.x-cameraPosition.x;
+	s16 posY_OnCam = entity->posInt.y-cameraPosition.y;
+
+	//$updatePosition_Entity_always$
+	if ((posX_OnCam < -entity->size.x) || (posX_OnCam > 320) || (posY_OnCam < -entity->size.y) || (posY_OnCam > 224)) {
+		if(entity->onScreen) {
+			if(entity->sprDef) SPR_releaseSprite(entity->spr);
+		}
+		entity->onScreen = FALSE;
+		
+	}
+    else
+    {
+		if(!entity->onScreen) {
+			if(entity->sprDef) entity->spr = SPR_addSprite(entity->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(PAL0, 0, FALSE, FALSE));
+		}
+        if(entity->sprDef) SPR_setPosition(entity->spr, posX_OnCam, posY_OnCam);
+		
+		entity->onScreen = TRUE;
+    }
+}
+void(* showEntityFuncArr[])(EntityMerged*) = {showEntitySimple, showCoin, showCar, showOctopus, };
+
+
+void showEntityMerged(EntityMerged* entity){
+	showEntityFuncArr[entity->entityType](entity);
+}
+
+void showEntityAll(){
+	for(u16 i=0; i<curEntityAll->Trigger_size; i++){
+		checkTriggerForPlayer(&curEntityAll->Trigger_arr[i]);
+	}
+	for(u16 i=0; i<curEntityAll->EntityMerged_size; i++){
+		showEntityMerged(&curEntityAll->EntityMerged_arr[i]);
+	}
+}
+

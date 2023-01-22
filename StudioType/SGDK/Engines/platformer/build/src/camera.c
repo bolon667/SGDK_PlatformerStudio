@@ -16,9 +16,13 @@ void setupCamera(Vect2D_u16 deadZoneCenter, u16 deadZoneWidth, u16 deadZoneHeigh
 	cameraDeadzone.max.y = deadZoneCenter.y + (deadZoneHeight >> 1);
 
 	updateCamera();
-
+	SYS_doVBlankProcess();
 	//We force to update the whole layer in order to prevent wrong tile being loaded depending on the position
-	MAP_scrollToEx(bga, cameraPosition.x, cameraPosition.y, TRUE);
+	if(bga) MAP_scrollToEx(bga, cameraPosition.x, cameraPosition.y, TRUE);
+	SYS_doVBlankProcess();
+	if(bgb) MAP_scrollToEx(bgb, cameraPosition.x, cameraPosition.y, TRUE);
+
+	SYS_doVBlankProcess();
 }
 
 void updateCamera() {
@@ -43,5 +47,6 @@ void updateCamera() {
 	cameraPosition.x = clamp(cameraPosition.x, 0, maxCameraPosX); // 768 - 320 = 448 (level width - screen width)
 	cameraPosition.y = clamp(cameraPosition.y, 0, maxCameraPosY); // 768 - 224 = 544 (level height - screen height)
 
-	MAP_scrollTo(bga, cameraPosition.x, cameraPosition.y);
+	if(bga) MAP_scrollTo(bga, cameraPosition.x, cameraPosition.y);
+	if(bgb) MAP_scrollTo(bgb, cameraPosition.x, cameraPosition.y);
 }

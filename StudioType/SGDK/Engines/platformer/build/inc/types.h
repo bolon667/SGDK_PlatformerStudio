@@ -3,6 +3,10 @@
 
 #define clamp01(X)   (min(max((X), (0)), (1)))
 
+#define TILE_SHIFT_LEFT_VALUE 3
+#define CELL_SIZE 8
+
+
 typedef struct {
 	u8 x;
 	u8 y;
@@ -52,6 +56,8 @@ typedef struct {
   u16 triggerInd;
   Sprite* spr;
   SpriteDefinition* sprDef;
+  s16 Field;
+  s16 val1;
 } EntityMerged;
 
 
@@ -63,7 +69,7 @@ typedef struct {
 } EntityAll;
 
 typedef struct {
-    Level lvl;
+    Level* lvl;
     EntityAll* entityAll_arr;
 } LevelFull;
 

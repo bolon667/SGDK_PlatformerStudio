@@ -17,6 +17,8 @@ var prev_cell_pos_temp = Vector2.ZERO
 
 var local_mouse_pos
 
+var level_size
+
 var map_size_px:Vector2
 var map_size_tiles:Vector2
 
@@ -28,6 +30,7 @@ onready var tile_map = $roomSize/TileMap
 onready var entity_obj_list = $roomSize/EntityList
 onready var start_pos_spr = $roomSize/startPos
 
+onready var roomSize = $roomSize
 onready var bgA_spr = $roomSize/bgA
 onready var bgB_spr = $roomSize/bgB
 
@@ -76,15 +79,22 @@ func move_map_around():
 	camera.global_position.y -= (ref.y - fixed_toggle_point.y)*camera.zoom.y
 	fixed_toggle_point = ref
 
+func update_tilemap_cell_size(cell_size: Vector2):
+	tile_map.cell_size = cell_size
+	temp_tile_map.cell_size = cell_size
 
 func load_tileMap():
-	var texture_size = bgA_spr.texture.get_size()
-	var collision_map_size = Vector2(texture_size.x/singleton.cell_size, texture_size.y/singleton.cell_size)
+	var level_size = singleton.get_level_size(singleton.cur_level_ind)
+	print("level_size: ", level_size)
+	var collision_map_size = Vector2(level_size.x/singleton.cell_size, level_size.y/singleton.cell_size)
 	var intGridCsv:Array = singleton.get_collisionMap()
+	var intGridCsvLen = len(intGridCsv)
 	if len(intGridCsv) == 0:
 		return
 	for y in range(collision_map_size.y):
 		for x in range(collision_map_size.x):
+			if(x+(y*collision_map_size.x) > intGridCsvLen-1):
+				break
 			var tile_value: int = intGridCsv[x+(y*collision_map_size.x)]-1
 			tile_map.set_cell(x, y, tile_value) 
 func clear_entities_on_scene():
@@ -167,6 +177,9 @@ func load_level():
 	var bgRelPath: String = singleton.get_bgRelPath()
 	if bgRelPath:
 		bgA_spr.texture = load(bgRelPath)
+	var bgRelPath2: String = singleton.get_bgRelPath2()
+	if bgRelPath2:
+		bgB_spr.texture = load(bgRelPath2)
 	#add entities on scene from database (singleton.entity_types)
 	load_entities_on_scene()
 	#Fill tilemap with data from json (singleton.entity_types)
@@ -332,7 +345,7 @@ func move_camera(delta):
 
 func tile_map_handler(delta):
 	
-	var bg_sprite_size = bgA_spr.texture.get_size()
+	#var bg_sprite_size = bgA_spr.texture.get_size()
 	map_size_px = singleton.get_level_size(singleton.cur_level_ind)
 	map_size_tiles = Vector2(map_size_px.x/singleton.cell_size, map_size_px.y/singleton.cell_size)
 	#if(local_mouse_pos.x < 0 or local_mouse_pos.y < 0):

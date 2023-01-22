@@ -3,8 +3,10 @@
 //Global constant that could be used in other files
 const fix16 gravityScale = FIX16(0.5);
 
-//Level tilemap
+//Level tilemap bga
 Map* bga;
+//Level tilemap bgb
+Map* bgb;
 
 //Size in pixels of the room
 AABB roomSize;

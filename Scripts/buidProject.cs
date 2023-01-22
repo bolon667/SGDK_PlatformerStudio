@@ -63,6 +63,20 @@ public class buidProject : Node
 		String typesCode = System.IO.File.ReadAllText(typesH_path);
 		String mergedStructCode = genMergedStructCode(mergedFieldDef_arr);
 		typesCode = typesCode.Replace("//$entityMergedStruct$", mergedStructCode);
+
+		int cellSize = (int)singleton.Call("get_cell_size");
+		int shiftVal = 3;
+		if (cellSize == 16)
+		{
+			shiftVal = 4;
+		}
+		String definesCode = "";
+		definesCode += "#define TILE_SHIFT_LEFT_VALUE " + shiftVal.ToString() + "\n";
+		definesCode += "#define CELL_SIZE " + cellSize.ToString() + "\n";
+
+		typesCode = typesCode.Replace("//$definesCode$", definesCode);
+
+		
 		System.IO.File.WriteAllText(typesH_path, typesCode);
 		GD.Print("types.h code replaced");
 	}
@@ -111,16 +125,23 @@ public class buidProject : Node
 
 	public void buildProject()
 	{
+		try
+		{
+			makeNewProjectFromTemplate();
+
+			copyRes();
+
+
+			codeReplacer();
+			//return;
+			//System.Threading.Thread.Sleep(3000);
+			compileProject();
+			runProject();
+		} catch(Exception ex)
+		{
+			GD.Print(ex);
+		}
 		
-		makeNewProjectFromTemplate();
-		
-		copyRes();
-		
-		codeReplacer();
-		//return;
-		//System.Threading.Thread.Sleep(3000);
-		compileProject();
-		runProject();
 	}
 
 	private void genResCode()
@@ -139,18 +160,27 @@ public class buidProject : Node
 		Node singleton = (Node)GetNode("/root/singleton");
 		int levelCount = (int)singleton.Call("get_level_count");
 		int curLevel = 0;
+		
 		while(curLevel < levelCount)
 		{
 			Dictionary levelDict = (Dictionary)singleton.Call("get_level", curLevel);
 			String bgaPath = (String)levelDict["bgRelPath"];
+			String bgbPath = (String)levelDict["bgRelPath2"];
 			String levelName = (String)levelDict["identifier"];
 			if (bgaPath.Length > 0)
 			{
 				String fileExtension = bgaPath.Substring(bgaPath.FindLast("."));
 
-				String toPath = fullEngineResPath + "/gfx/" + levelName + "_bga" + fileExtension;
+				String toPath = fullEngineResPath + $"/gfx/Level_{curLevel.ToString()}_bga" + fileExtension;
 				GD.Print(toPath);
 				System.IO.File.Copy(bgaPath, toPath, true);
+			}
+			if (bgbPath.Length > 0)
+			{
+				String fileExtension = bgbPath.Substring(bgbPath.FindLast("."));
+
+				String toPath = fullEngineResPath + $"/gfx/Level_{curLevel.ToString()}_bgb" + fileExtension;
+				System.IO.File.Copy(bgbPath, toPath, true);
 			}
 			curLevel++;
 		}
@@ -199,7 +229,46 @@ public class buidProject : Node
 		
 		levelsC_CodeReplacer();
 		typesH_CodeReplacer();
-		
+
+		entityHandlerC_CodeReplacer();
+
+	}
+
+	private void entityHandlerC_CodeReplacer()
+	{
+		String entityHandlerC_path = engineRootPath + "/build/src/entityHandler.c";
+		String entityHandlerCode = System.IO.File.ReadAllText(entityHandlerC_path);
+		String finalCode = entityHandlerCode.Replace("//$showEntityFuncs$", genShowEntityCodeAll());
+		System.IO.File.WriteAllText(entityHandlerC_path, finalCode);
+		GD.Print("entityHandler.c code replaced");
+	}
+
+	private String genShowEntityCodeAll()
+	{
+		String result = "";
+		Node singleton = (Node)GetNode("/root/singleton");
+		Godot.Collections.Array entityNames = (Godot.Collections.Array)singleton.Call("get_entity_names");
+		//Generating funcs
+		foreach(String entityName in entityNames)
+		{
+			String checkPath = engineRootPath + "/code_template/showEntity/show" + entityName + ".c";
+			if (System.IO.File.Exists(checkPath))
+			{
+				String insertData = System.IO.File.ReadAllText(checkPath);
+				insertData = insertData.Replace("$entityName$", entityName);
+				insertData = insertData.Replace("$entityType$", "EntityMerged");
+				result += insertData + "\n";
+			}
+		}
+
+		//Putting this funcs in arr
+		result += "void(* showEntityFuncArr[])(EntityMerged*) = {";
+		foreach (String entityName in entityNames)
+		{
+			result += "show" + entityName + ", ";
+		}
+		result += "};\n";
+		return result;
 	}
 
 	private void levelsC_CodeReplacer()
@@ -230,7 +299,6 @@ public class buidProject : Node
 
 	private String genLvlCode(int curLevel)
 	{
-
 		Node singleton = (Node)GetNode("/root/singleton");
 		Dictionary levelDict = (Dictionary)singleton.Call("get_level", curLevel);
 		int cellSize = (int)singleton.Call("get_cell_size");
@@ -245,12 +313,12 @@ public class buidProject : Node
 
 		String levelName = (String)levelDict["identifier"];
 
-		Godot.Collections.Array startPos = (Godot.Collections.Array)singleton.Call("get_start_pos");
+		Godot.Collections.Array startPos = (Godot.Collections.Array)singleton.Call("get_start_pos_for_level", curLevel);
 		String startPosText = "{" + startPos[0].ToString() + ", " + startPos[1].ToString() + "}";
 
 		
-		String bgaResName = levelName + "_bga";
-		String bgbResName = levelName + "_bgb";
+		String bgaResName = $"Level_{curLevel.ToString()}_bga";
+		String bgbResName = $"Level_{curLevel.ToString()}_bgb";
 		String bgaMapResName;
 		String bgaTilesetResName;
 		String bgaPalResName;
@@ -290,13 +358,16 @@ public class buidProject : Node
 
 		}
 
-		String levelCode = $"{bgaMapResName}, {bgbMapResName}, {bgaTilesetResName}, {bgbTilesetResName}, {bgaPalResName}, {bgbPalResName}, {startPosText}, {collMapName}, {levelSizePxText}, {levelSizeTilesText}";
+		String levelCode = $"const Level const lvl_Level_{curLevel.ToString()} = {{{bgaMapResName}, {bgbMapResName}, {bgaTilesetResName}, {bgbTilesetResName}, {bgaPalResName}, {bgbPalResName}, {startPosText}, {collMapName}, {levelSizePxText}, {levelSizeTilesText}}};\n";
 		return levelCode;
 	}
+
+
 
 	private String genEntityMergedCode(int curLevel)
 	{
 		Node singleton = (Node)GetNode("/root/singleton");
+		Godot.Collections.Array mergedFieldDef_arr = (Godot.Collections.Array)singleton.Call("get_merged_fieldDef");
 
 		String result = "";;
 		//Getting "entity_name: mergedId" pairs
@@ -311,8 +382,6 @@ public class buidProject : Node
 		int curEntityInd = 0;
 		foreach (Godot.Collections.Dictionary entityInst in entityInstances)
 		{
-
-
 			//Getting useful data about entity
 			String entityName = (String)entityInst["__identifier"];
 			int mergedId = (int)mergedIdsDict[entityName];
@@ -358,15 +427,35 @@ public class buidProject : Node
 			//Checking every field
 			Godot.Collections.Array fieldInstances = (Godot.Collections.Array)entityInst["fieldInstances"];
 
-			foreach (Godot.Collections.Dictionary field in fieldInstances)
+
+			foreach (Godot.Collections.Dictionary fieldDef in mergedFieldDef_arr)
 			{
 				//String inCodeType = (String)field["__inCodeType"];
-				if (!(bool)field["__hasStruct"])
+				if (!(bool)fieldDef["hasStruct"])
 				{
 					continue;
 				}
 				
-				String value = (String)field["__value"];
+				//finding value of this fieldName, why? Because in struct order is nessesary
+				String value = "";
+				foreach (Godot.Collections.Dictionary fieldInst in fieldInstances)
+				{
+					//if names of fieldDef and fieldInstance are equal
+					if((String)fieldInst["__identifier"] == (String)fieldDef["identifier"])
+					{
+						//Then value is found
+						value = (String)fieldInst["__value"];
+						break;
+					}
+
+				}
+				//In most caces entity doesn't have every possible field, so, we are using default value
+				
+				if(value.Length == 0)
+				{
+					value = (String)fieldDef["defaultValue"];
+
+				}
 				result += value + ", ";
 				
 				
@@ -467,7 +556,9 @@ public class buidProject : Node
 	private String genEntityAllCode(int curLevel)
 	{
 		Node singleton = (Node)GetNode("/root/singleton");
+
 		
+
 		String result = "";
 		result += $"const EntityAll const EntityAll_arr_Level_{curLevel}[] = ";
 		//Getting "entity_name: mergedId" pairs
@@ -509,14 +600,13 @@ public class buidProject : Node
 			result += genTriggerCode(curLevel);
 			result += genEntityMergedCode(curLevel);
 			result += genEntityAllCode(curLevel);
+			result += genLvlCode(curLevel);
 		}
 		//return result;
 		result += "const LevelFull const LevelFull_arr[] = {";
 		for (int curLevel = 0; curLevel < amountOfLevel; curLevel++)
 		{
-			result += "{";
-			String levelCode = genLvlCode(curLevel);
-			result += "{" + levelCode + "}," + $"&EntityAll_arr_Level_{curLevel.ToString()}" + "}, ";
+			result += "{" + $"&lvl_Level_{curLevel.ToString()}, &EntityAll_arr_Level_{curLevel.ToString()}" + "}, ";
 		}
 		result += "};\n";
 
@@ -535,6 +625,7 @@ public class buidProject : Node
 		for (int curLevel = 0; curLevel < amountOfLevel; curLevel++)
 		{
 			collisionCode += genCollisionArrayCode(curLevel);
+			//break;
 		}
 		mapsCode = mapsCode.Replace("//$collisionMaps$", collisionCode);
 		System.IO.File.WriteAllText(mapsC_path, mapsCode);
@@ -617,6 +708,7 @@ public class buidProject : Node
 			resultCode += "{";
 			while (curX < (int)bgSpriteSizeInCells.x)
 			{
+
 				resultCode += (collisionMap[curX+(curY* (int)bgSpriteSizeInCells.x)]).ToString() + ", ";
 				curX++;
 			}

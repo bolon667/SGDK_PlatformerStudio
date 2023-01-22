@@ -40,6 +40,7 @@ margin_bottom = 413.0
 window_title = "Открыть файл"
 mode = 0
 access = 2
+filters = PoolStringArray( "*.png", "*.bmp" )
 
 [node name="ContainerRight" type="Control" parent="CanvasLayer"]
 visible = false
@@ -72,10 +73,38 @@ margin_left = -250.0
 margin_bottom = 68.0
 alignment = 2
 
-[node name="LoadBackgroundBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
 margin_right = 250.0
 margin_bottom = 20.0
-text = "Import Image"
+
+[node name="DeleteBgABtn" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+margin_right = 28.0
+margin_bottom = 20.0
+text = " X "
+
+[node name="LoadBackgroundBtn" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+margin_left = 32.0
+margin_right = 250.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+text = "Import bgA"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
+margin_top = 24.0
+margin_right = 250.0
+margin_bottom = 44.0
+
+[node name="DeleteBgBBtn" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
+margin_right = 28.0
+margin_bottom = 20.0
+text = " X "
+
+[node name="LoadBackgroundBtn2" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
+margin_left = 32.0
+margin_right = 250.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+text = "Import bgB"
 
 [node name="GenCodeBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
 visible = false
@@ -86,53 +115,66 @@ text = "Gen Collision Code"
 script = ExtResource( 3 )
 
 [node name="buildProjectBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
-margin_top = 24.0
+margin_top = 48.0
 margin_right = 250.0
-margin_bottom = 44.0
+margin_bottom = 68.0
 text = "Build project"
 script = ExtResource( 5 )
 
 [node name="addNewLevelBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
-margin_top = 48.0
-margin_right = 250.0
-margin_bottom = 68.0
-text = "Add New Level"
-
-[node name="deleteCurLevelBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
 margin_top = 72.0
 margin_right = 250.0
 margin_bottom = 92.0
-text = "Delete Current Level"
+text = "Add New Level"
 
-[node name="ChangeCurLevel" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
+[node name="deleteCurLevelBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
 margin_top = 96.0
 margin_right = 250.0
 margin_bottom = 116.0
-text = "Change Current Level"
+text = "Delete Current Level"
 
-[node name="Button" type="Button" parent="CanvasLayer/VBoxContainer"]
-visible = false
-margin_top = 48.0
-margin_right = 250.0
-margin_bottom = 68.0
-text = "Test Button"
-
-[node name="ChangeTileMode" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
+[node name="ChangeCurLevel" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
 margin_top = 120.0
 margin_right = 250.0
 margin_bottom = 140.0
+text = "Change Current Level"
+
+[node name="ChangeCellSize" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
+margin_top = 144.0
+margin_right = 250.0
+margin_bottom = 164.0
 group = SubResource( 1 )
+text = "8x8 px size"
+items = [ "8x8 px size", null, false, 0, null, "16x16 px size", null, false, 1, null ]
+selected = 0
+
+[node name="Button" type="Button" parent="CanvasLayer/VBoxContainer"]
+margin_top = 168.0
+margin_right = 250.0
+margin_bottom = 188.0
+text = "Test Button"
+
+[node name="ChangeTileMode" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
+margin_top = 192.0
+margin_right = 250.0
+margin_bottom = 212.0
+group = SubResource( 1 )
+text = "Cur tile"
 
 [node name="LeftContainer" parent="CanvasLayer" instance=ExtResource( 4 )]
 mouse_filter = 0
 
 [connection signal="file_selected" from="CanvasLayer/SaveFile" to="." method="_on_LoadBGFile_file_selected"]
 [connection signal="file_selected" from="CanvasLayer/LoadBGFile" to="." method="_on_LoadBGFile_file_selected"]
-[connection signal="button_down" from="CanvasLayer/VBoxContainer/LoadBackgroundBtn" to="." method="_on_LoadBackgroundBtn_button_down"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer/DeleteBgABtn" to="." method="_on_DeleteBgABtn_button_down"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer/LoadBackgroundBtn" to="." method="_on_LoadBackgroundBtn_button_down"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer2/DeleteBgBBtn" to="." method="_on_DeleteBgBBtn_button_down"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer2/LoadBackgroundBtn2" to="." method="_on_LoadBackgroundBtn2_button_down"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/GenCodeBtn" to="." method="_on_GenCodeBtn_button_down"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/buildProjectBtn" to="." method="_on_buildProjectBtn_pressed"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/addNewLevelBtn" to="." method="_on_addNewLevelBtn_button_down"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/deleteCurLevelBtn" to="." method="_on_deleteCurLevelBtn_button_down"]
 [connection signal="item_selected" from="CanvasLayer/VBoxContainer/ChangeCurLevel" to="." method="_on_ChangeCurLevel_item_selected"]
+[connection signal="item_selected" from="CanvasLayer/VBoxContainer/ChangeCellSize" to="." method="_on_ChangeCellSize_item_selected"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/Button" to="." method="_on_Button_pressed"]
 [connection signal="item_selected" from="CanvasLayer/VBoxContainer/ChangeTileMode" to="." method="_on_ChangeTileMode_item_selected"]
