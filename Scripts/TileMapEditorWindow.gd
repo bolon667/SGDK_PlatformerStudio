@@ -120,8 +120,6 @@ func load_entities_on_scene():
 			imgTex.create_from_image(img1, 1)
 			entity_node.get_node("Sprite").texture = imgTex;
 			
-			
-			print(entity_inst["__spritePath"])
 			#break
 			var sprite_name = entity_inst["__spritePath"].substr(entity_inst["__spritePath"].find_last("/"))
 			sprite_name = sprite_name.split(".")[0]
@@ -140,6 +138,7 @@ func load_entities_on_scene():
 				
 				#texture_size.x
 		#entity_node.get_node("ColorRect").rect_position = 
+		entity_node.get_node("CollisionShape2D").shape = RectangleShape2D.new()
 		entity_node.get_node("CollisionShape2D").shape.extents = Vector2(sprite_rect.size.x/2, sprite_rect.size.y/2)
 		entity_node.sprite_size = sprite_rect.size
 		entity_obj_list.add_child(entity_node)
@@ -430,17 +429,39 @@ func entity_list_handler():
 	if(Input.is_action_just_pressed("mouse1") and singleton.can_create_entity_obj and singleton.cur_entity_type_ind != -1):
 		var mouse_pos = get_global_mouse_position()
 		entity_obj_node.position = Vector2(mouse_pos.x - $roomSize.rect_position.x, mouse_pos.y - $roomSize.rect_position.y)
-		#Got uid for entityInst & Put entityInst in database
-		entity_obj_node.entityInst_id = singleton.add_cur_entityInstance()
+		#Got uid for entityInst
+		var entity_inst = singleton.add_cur_entityInstance()
+		#Put entityInst in database
+		entity_obj_node.entityInst_id = entity_inst["instId"]
+		
+		#singleton.change_entityInst_by_instId(entity_obj_node.entityInst_id, "triggerType", int(new_text))
+		#singleton.change_entityInst_by_instId(entity_obj_node.entityInst_id, "triggerValue", int(new_text))
+
 		var savePos = [entity_obj_node.position.x, entity_obj_node.position.y]
 		
 		entity_obj_list.add_child(entity_obj_node)
 		
-		print("entity_obj_node.position: ", entity_obj_node.position)
-		print("roomSize.position: ", $roomSize.rect_position)
-		
-		print("savePos: ", savePos)
 		singleton.save_entityInst_pos(entity_obj_node.entityInst_id, savePos)
+		
+		#If sprite path, not null, than changing sprite of new entity obj
+		if len(entity_inst["__spritePath"]) > 0:
+			var pic_path = entity_inst["__spritePath"]
+			var img1 = Image.new()
+			img1.load(pic_path)
+			var imgTex = ImageTexture.new()
+			imgTex.create_from_image(img1, 1)
+			entity_obj_node.get_node("Sprite").texture = imgTex;
+			
+			var temp_sprite_size = singleton.get_sprite_size_from_path(pic_path)
+			if temp_sprite_size:
+				entity_obj_node.sprite_size = temp_sprite_size
+				entity_obj_node.change_sprite_rect(Rect2(0,0,temp_sprite_size.x, temp_sprite_size.y))
+				entity_obj_node.get_node("CollisionShape2D").shape.extents = Vector2(temp_sprite_size.x/2, temp_sprite_size.y/2)
+			else:
+				entity_obj_node.sprite_size = entity_obj_node.get_node("Sprite").texture.get_size()
+				entity_obj_node.change_sprite_rect(Rect2(0,0,entity_obj_node.sprite_size.x, entity_obj_node.sprite_size.y))
+				entity_obj_node.get_node("CollisionShape2D").shape.extents = entity_obj_node.sprite_size/2
+		#Pretty long block
 		
 	if(Input.is_action_pressed("mouse2")):
 		remove_fields_of_entity()

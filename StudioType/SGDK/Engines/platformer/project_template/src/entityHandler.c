@@ -15,13 +15,16 @@ void checkTriggerForPlayer(Trigger* trigger){
 		trigger->pos.y + trigger->rect.min.y,
 		trigger->pos.y + trigger->rect.max.y
 	);
-	if((playerBounds.min.x > triggerBounds.min.x) && (playerBounds.max.x < triggerBounds.max.x)){
-		if((playerBounds.min.y > triggerBounds.min.y) && (playerBounds.max.y < triggerBounds.max.y)){
+	if((playerBounds.min.x < triggerBounds.max.x) && (playerBounds.max.x > triggerBounds.min.x)){
+		if((playerBounds.min.y < triggerBounds.max.y) && (playerBounds.max.y > triggerBounds.min.y)){
 			KLog_S1("trigger->type: ", trigger->type);
 			KLog_S1("trigger->value: ", trigger->value);
 			switch(trigger->type) {
 				case 0:
 					loadLevel(trigger->value);
+					break;
+				case 1:
+					trigger->alive = FALSE;
 					break;
 			}
 		}

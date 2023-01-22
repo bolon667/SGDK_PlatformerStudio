@@ -11,6 +11,8 @@ var cur_aabb:Array =  [0,0,0,0]
 func _ready():
 	pass # Replace with function body.
 	load_aabb()
+	#update_trigger_rect()
+	
 
 func load_aabb():
 	pass

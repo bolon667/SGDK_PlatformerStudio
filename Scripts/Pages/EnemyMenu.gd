@@ -4,6 +4,7 @@ extends Control
 onready var entity_item_t = preload("res://Scenes/Pages/entityListItem.tscn")
 onready var entity_field_t = preload("res://Scenes/Pages/entityFieldItem.tscn")
 onready var field_property_string_t = preload("res://Scenes/Pages/entityFieldItemPropertyString.tscn")
+onready var field_property_sprite_t = preload("res://Scenes/Pages/entityFieldItemSprite.tscn")
 
 
 onready var entity_field_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/ScrollContainer/ContainerChooseField 
@@ -35,14 +36,27 @@ func load_field_properties(entity_name: String, field_name: String):
 	
 	clear_field_properties()
 	var field_data = singleton.get_cur_entity_one_field()
-	for key in field_data:
-		if key == "fieldId":
-			continue
-		var val = field_data[key]
-		var field_property_node = field_property_string_t.instance()
-		field_property_node.get_node("Label").text = key
-		field_property_node.get_node("TextEdit").text = str(val)
-		field_properties_container.add_child(field_property_node)
+	match field_data["identifier"]:
+		"sprDef":
+			var key
+			var val
+			var field_property_node
+			
+			key = "defaultValue"
+			val = field_data[key]
+			field_property_node = field_property_sprite_t.instance()
+			field_property_node.get_node("HBoxContainer/Label").text = key
+			field_property_node.get_node("HBoxContainer/VBoxContainer/TextEdit").text = str(val)
+			field_properties_container.add_child(field_property_node)
+		_:
+			for key in field_data:
+				if key == "fieldId":
+					continue
+				var val = field_data[key]
+				var field_property_node = field_property_string_t.instance()
+				field_property_node.get_node("Label").text = key
+				field_property_node.get_node("TextEdit").text = str(val)
+				field_properties_container.add_child(field_property_node)
 	pass
 
 func load_list_of_entity():

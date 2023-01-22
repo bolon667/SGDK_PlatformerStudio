@@ -58,6 +58,7 @@ typedef struct {
   SpriteDefinition* sprDef;
   s16 Field;
   s16 val1;
+  s16 val2;
 } EntityMerged;
 
 

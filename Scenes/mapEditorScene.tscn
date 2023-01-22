@@ -149,15 +149,16 @@ items = [ "8x8 px size", null, false, 0, null, "16x16 px size", null, false, 1, 
 selected = 0
 
 [node name="Button" type="Button" parent="CanvasLayer/VBoxContainer"]
+visible = false
 margin_top = 168.0
 margin_right = 250.0
 margin_bottom = 188.0
 text = "Test Button"
 
 [node name="ChangeTileMode" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
-margin_top = 192.0
+margin_top = 168.0
 margin_right = 250.0
-margin_bottom = 212.0
+margin_bottom = 188.0
 group = SubResource( 1 )
 text = "Cur tile"
 

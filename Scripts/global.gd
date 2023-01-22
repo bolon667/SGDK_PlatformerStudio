@@ -13,12 +13,13 @@ var cur_engine: String = "platformer"
 
 var cur_project_path: String = ""
 
-var cur_editor_mode: int = EditorMode.COLLISION
-var prev_editor_mode: int = EditorMode.COLLISION
+var cur_editor_mode: int = EditorMode.NONE
+var prev_editor_mode: int = EditorMode.NONE
 
 var cur_entity_type: String
 var cur_entity_type_ind: int = -1
 var cur_entity_field_ind: int
+var cur_entity_field_def_ind: int
 var cur_entity_inst_ind: int
 
 var cur_level_ind: int = 0
@@ -128,8 +129,8 @@ const entity_def_template = {
 	"show": true,
 	"spritePath": "",
 	"triggerAABB": [0,0,8,8],
-	"triggerType": 0,
-	"triggerValue": 0,
+	"triggerType": 1,
+	"triggerValue": 1,
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
 	#entity name or field name in entity menu.
 	"color": "#0048FF",
@@ -146,6 +147,7 @@ const startPos_def_template = {
 	"width": 16,
 	"height": 16,
 	"show": true,
+	"spritePath": "",
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
 	#entity name or field name in entity menu.
 	"color": "#0048FF",
@@ -197,6 +199,8 @@ const entity_inst_template = {
 	"width": 32,
 	"height": 32,
 	"px": [0,0],
+	"triggerType": 1,
+	"triggerValue": 1,
 	"triggerAABB": [0,0,8,8],
 	"instId": -1, #id of entity instance, to quicly find in databse
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
@@ -474,7 +478,9 @@ func get_entityInst_by_instId(instId: int):
 	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
 		if entity_inst["instId"] == instId:
 			return entity_inst
-			
+
+
+
 func change_fiendInst_by_instId(fieldName: String, fieldValue):
 	var instId = cur_entity_inst_ind
 	var cur_inst_ind: int = 0
@@ -501,7 +507,7 @@ func change_sprite_by_instId(spritePath: String):
 func add_cur_entityInstance():
 	var entity_instance = get_cur_entityInstance_t()
 	entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"].append(entity_instance)
-	return entity_instance["instId"]
+	return entity_instance
 
 func add_level_layer(level_num: int, layer_name: String, layer_type: String):
 	var level_layer_data = level_layer_template.duplicate()
@@ -532,6 +538,9 @@ func add_level():
 func change_cur_field(field_property_name: String, field_property_value: String):
 	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind][field_property_name] = field_property_value
 	pass
+
+func get_cur_fieldDef_name():
+	return entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind]["identifier"]
 
 func change_name_of_cur_fieldDef(text: String):
 	
@@ -683,6 +692,13 @@ func get_cur_entityInstance_t():
 	var def = entity_types["defs"]["entities"][cur_entity_type_ind]
 	var entity_inst = entity_inst_template.duplicate()
 	entity_inst["__identifier"] = def["identifier"]
+	entity_inst["triggerAABB"] = def["triggerAABB"]
+	entity_inst["triggerType"] = def["triggerType"]
+	entity_inst["triggerValue"] = def["triggerValue"]
+	
+	#Loading sprite path
+	entity_inst["__spritePath"] = def["spritePath"]
+	
 	entity_inst["defId"] = def["defId"]
 	entity_inst["instId"] = get_unique_entity_instId()
 	var filed_inst_arr = []

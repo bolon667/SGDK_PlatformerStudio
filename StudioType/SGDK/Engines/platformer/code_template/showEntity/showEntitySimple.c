@@ -16,7 +16,7 @@ void show$entityName$($entityType$* entity){
     else
     {
 		if(!entity->onScreen) {
-			if(entity->sprDef) entity->spr = SPR_addSprite(entity->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(PAL0, 0, FALSE, FALSE));
+			if(entity->sprDef) entity->spr = SPR_addSprite(entity->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(ENEMY_PALETTE, 0, FALSE, FALSE));
 		}
         if(entity->sprDef) SPR_setPosition(entity->spr, posX_OnCam, posY_OnCam);
 		

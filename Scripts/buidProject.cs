@@ -368,13 +368,13 @@ public class buidProject : Node
 	{
 		Node singleton = (Node)GetNode("/root/singleton");
 		Godot.Collections.Array mergedFieldDef_arr = (Godot.Collections.Array)singleton.Call("get_merged_fieldDef");
-
+		GD.Print(1);
 		String result = "";;
 		//Getting "entity_name: mergedId" pairs
 		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict");
 		//Getting entityInstances in curLevel
 		Godot.Collections.Array entityInstances = (Godot.Collections.Array)singleton.Call("get_entityInstances_by_levelNum", curLevel);
-
+		GD.Print(2);
 		result += $"const EntityMerged const EntityMerged_arr_Level_{curLevel.ToString()}[] = ";
 
 		//Opening EntityMerged_arr block
@@ -386,8 +386,14 @@ public class buidProject : Node
 			String entityName = (String)entityInst["__identifier"];
 			int mergedId = (int)mergedIdsDict[entityName];
 			Godot.Collections.Array pos = (Godot.Collections.Array)entityInst["px"];
-			float width = (float)entityInst["width"];
-			float height = (float)entityInst["height"];
+			int width = 0;
+			int height = 0;
+			GD.Print(0.4);
+			width = (int)int.Parse(entityInst["width"].ToString());
+			GD.Print(0.5);
+			//Studio crashes if you don't do proper conversion.
+			height = (int)int.Parse(entityInst["height"].ToString());
+
 			int[] spd = { 0, 0 };
 
 			//Opening entityMerged block
@@ -423,7 +429,6 @@ public class buidProject : Node
 			result += $"{curEntityInd},"; //triggerInd = curEntityInd, since all entity have trigger, which is not good for preformance reasons
 			result += "NULL,"; //spr
 
-
 			//Checking every field
 			Godot.Collections.Array fieldInstances = (Godot.Collections.Array)entityInst["fieldInstances"];
 
@@ -437,14 +442,15 @@ public class buidProject : Node
 				}
 				
 				//finding value of this fieldName, why? Because in struct order is nessesary
-				String value = "";
+				var value = "";
 				foreach (Godot.Collections.Dictionary fieldInst in fieldInstances)
 				{
 					//if names of fieldDef and fieldInstance are equal
 					if((String)fieldInst["__identifier"] == (String)fieldDef["identifier"])
 					{
+						GD.Print(fieldInst["__identifier"]);
 						//Then value is found
-						value = (String)fieldInst["__value"];
+						value = fieldInst["__value"].ToString();
 						break;
 					}
 
@@ -453,8 +459,7 @@ public class buidProject : Node
 				
 				if(value.Length == 0)
 				{
-					value = (String)fieldDef["defaultValue"];
-
+					value = fieldDef["defaultValue"].ToString();
 				}
 				result += value + ", ";
 				
@@ -464,7 +469,6 @@ public class buidProject : Node
 			curEntityInd++;
 			//Closing entityMerged block
 			result += "}, ";
-
 		}
 		//Closing EntityMerged_arr block
 		result += "};\n";
@@ -473,26 +477,33 @@ public class buidProject : Node
 
 	private String genTriggerCode(int curLevel)
 	{
+		GD.Print("curLevel: ", curLevel);
+		
 		Node singleton = (Node)GetNode("/root/singleton");
 
 		String result = ""; ;
 		//Getting "entity_name: mergedId" pairs
 		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict");
+		
 		//Getting entityInstances in curLevel
 		Godot.Collections.Array entityInstances = (Godot.Collections.Array)singleton.Call("get_entityInstances_by_levelNum", curLevel);
-
+		
 		result += $"const Trigger const Trigger_arr_Level_{curLevel.ToString()}[] = ";
 
 		//Opening Trigger_arr block
 		result += "{";
-
+		
 		foreach (Godot.Collections.Dictionary entityInst in entityInstances)
 		{
 			//Getting useful data about entity
 			String entityName = (String)entityInst["__identifier"];
+			
 			int mergedId = (int)mergedIdsDict[entityName];
+			
 			Godot.Collections.Array pos = (Godot.Collections.Array)entityInst["px"];
+			
 			Godot.Collections.Array triggerAABB = new Godot.Collections.Array();
+			
 			if (entityInst.Contains("triggerAABB"))
 			{
 				triggerAABB = (Godot.Collections.Array)entityInst["triggerAABB"];
@@ -504,17 +515,19 @@ public class buidProject : Node
 				triggerAABB.Add(0);
 
 			}
+			
 			float triggerType = 0;
 			if (entityInst.Contains("triggerType")) {
 				triggerType = (float)entityInst["triggerType"];
 
 			}
+			
 			float triggerValue = 0;
 			if (entityInst.Contains("triggerValue")) {
 				triggerValue = (float)entityInst["triggerValue"];
 
 			}
-
+			
 			int[] spd = { 0, 0 };
 
 			//Opening Trigger block
@@ -544,6 +557,7 @@ public class buidProject : Node
 
 			//Closing Trigger block
 			result += "}, ";
+			
 
 		}
 

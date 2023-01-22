@@ -4,6 +4,7 @@
 #include "../inc/maps.h"
 
 #include "../res/resources.h"
+#include "../res/sprites.h"
 
 struct pBody playerBody;
 
@@ -31,6 +32,7 @@ void playerInit() {
 	Vect2D_s16 levelStartPos = getLevelStartPos();
 	playerBody.sprite = SPR_addSprite(&player_sprite, levelStartPos.x, levelStartPos.y, TILE_ATTR(PLAYER_PALETTE, FALSE, FALSE, FALSE));
 	PAL_setPalette(PLAYER_PALETTE, player_sprite.palette->data, DMA);
+	PAL_setPalette(ENEMY_PALETTE, spr_coin.palette->data, DMA);
 
 	//Set the global position of the player, the local position will be updated once we are in the main loop
 	playerBody.globalPosition = levelStartPos;
