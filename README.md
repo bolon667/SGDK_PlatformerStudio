@@ -4,8 +4,9 @@
 
 # About project
 
-**SGDK Studio** 
+TODO
 
+**SGDK Studio** 
 
 # What done:
 
@@ -22,10 +23,9 @@
 
 # What should be done:
 
-- Change project structure to be able do more, than 1 game.
 - Add messaging system
 - Add Enums
 - Fix broken 16x16 tile mode
-- Add Bullets, and bullet detect options to entity
-- Fix broken save fieldDefs (if you deleted fieldDef, than all entity shoud souldn't have this field, same with adding)
+- Add Bullets, and bullet detect option to entity (Key feature, this must be done, to be able kill an enemy)
+- Fix broken save fieldDefs (if you deleted fieldDef, than all entity souldn't have this field, similar with adding)
 - and more...
