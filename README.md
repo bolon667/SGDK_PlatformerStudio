@@ -25,6 +25,7 @@
 - Change project structure to be able do more, than 1 game.
 - Add messaging system
 - Add Enums
+- Fix broken 16x16 tile mode
 - Add Bullets, and bullet detect options to entity
 - Fix broken save fieldDefs (if you deleted fieldDef, than all entity shoud souldn't have this field, same with adding)
 - and more...
