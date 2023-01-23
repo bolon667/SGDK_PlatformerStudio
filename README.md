@@ -6,8 +6,6 @@
 
 TODO
 
-**SGDK Studio** 
-
 # What done:
 
 - Collision Map Editor
