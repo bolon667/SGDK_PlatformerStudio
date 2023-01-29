@@ -4,7 +4,7 @@ enum EditorMode {
   NONE,
   COLLISION,
   ENTITY,
-  START_POS,
+  POSITION,
 }
 
 var cell_size: int = 8
@@ -12,6 +12,7 @@ var cell_size: int = 8
 var cur_engine: String = "platformer"
 
 var cur_project_path: String = ""
+var cur_project_folder_path: String = ""
 
 var cur_editor_mode: int = EditorMode.NONE
 var prev_editor_mode: int = EditorMode.NONE
@@ -45,23 +46,40 @@ var entity_types = {
 	},
 	"jsonVersion": "1.0.0",
 	"engineRootPath": "./StudioType/SGDK/Engines/platformer",
-	"isOneScreen": true,
+	"isOneScreen": false, #mb, i will delete that
 	"defaultGridSize": 16,
 	"defs": 
 	{
+		"layers":
+			[
+				
+			],
 		"entities": 
-		[
+			[
 
-		]
+			],
+		"enums":
+			[
+				
+			],
+		"tilesets":
+			[
+				
+			],
+		"messagePacks":
+			[
+				
+			],
+		"levelFields":
+			[
+				
+			],
 	},
 	"levels": 
 		[
 			
 		],
-	"messagePacks":
-		[
-			
-		],
+	
 }
 
 const field_def_template = {	
@@ -119,6 +137,38 @@ const field_def_triggerValue = {
 	"hasStruct": false,
 }
 
+const field_def_triggerValue2 = {	
+	"identifier": "Trigger value2",
+	"__type": "Integer",
+	"inCodeType": "u8",
+	"fieldId": -1,
+	"canBeNull": true,
+	"defaultValue": "0",
+	"canBeDeleted": false,
+	"hasStruct": false,
+}
+
+const field_def_triggerValue3 = {	
+	"identifier": "Trigger value3",
+	"__type": "Integer",
+	"inCodeType": "u8",
+	"fieldId": -1,
+	"canBeNull": true,
+	"defaultValue": "0",
+	"canBeDeleted": false,
+	"hasStruct": false,
+}
+
+const field_def_hp = {	
+	"identifier": "hp",
+	"__type": "Integer",
+	"inCodeType": "s16",
+	"fieldId": -1,
+	"canBeNull": true,
+	"defaultValue": "1",
+	"canBeDeleted": false,
+	"hasStruct": true,
+}
 
 const entity_def_template = {
 	"identifier": "testEntity",
@@ -127,10 +177,13 @@ const entity_def_template = {
 	"width": 16,
 	"height": 16,
 	"show": true,
+	"isMerged": true,
 	"spritePath": "",
 	"triggerAABB": [0,0,8,8],
 	"triggerType": 1,
 	"triggerValue": 1,
+	"triggerValue2": 1,
+	"triggerValue3": 1,
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
 	#entity name or field name in entity menu.
 	"color": "#0048FF",
@@ -198,9 +251,12 @@ const entity_inst_template = {
 	"__smartColor": "#FF9801",
 	"width": 32,
 	"height": 32,
+	"isMerged": true,
 	"px": [0,0],
 	"triggerType": 1,
 	"triggerValue": 1,
+	"triggerValue2": 1,
+	"triggerValue3": 1,
 	"triggerAABB": [0,0,8,8],
 	"instId": -1, #id of entity instance, to quicly find in databse
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
@@ -222,6 +278,8 @@ const field_inst_template = {
 }
 
 
+func get_project_folder_path():
+	return cur_project_folder_path
 
 func get_engine_root_path():
 	return entity_types["engineRootPath"]
@@ -231,10 +289,33 @@ func get_cell_size():
 
 func _ready():
 	add_level()
-	add_level_layer(cur_level_ind, "EntityLayer", "Entity")
-	add_level_layer(cur_level_ind, "CollisionLayer", "Collision")
+	add_level_layer(cur_level_ind, "Entity", "Entity")
+	add_level_layer(cur_level_ind, "Positions", "Position")
+	add_level_layer(cur_level_ind, "Collision", "Collision")
 
+func is_level_layer_exists(level_num: int, layer_type):
+	for layer in entity_types["levels"][level_num]["layerInstances"]:
+		if layer_type == layer["__type"]:
+			return true
+	
+	return false
 
+func project_update():
+	var layer_name_arr = [
+		{"name": "Entity", "type": "Entity"},
+		{"name": "Positions", "type": "Position"},
+		{"name": "Collision", "type": "Collision"},
+		]
+	var amount_of_levels = get_amount_of_levels()
+	for level_ind in range(amount_of_levels):
+		for layer_info in layer_name_arr:
+			if(!is_level_layer_exists(level_ind, layer_info["type"])):
+				add_level_layer(level_ind, layer_info["name"], layer_info["type"])
+	
+	pass
+	#Do checks to update json structure if nessesary
+	
+	#if entity_types[""]
 
 func load_project(projectPath: String):
 	var dict = {}
@@ -247,7 +328,10 @@ func load_project(projectPath: String):
 	if data_parse.error != OK:
 		return
 	
-	singleton.entity_types = data_parse.result
+	entity_types = data_parse.result
+	project_update()
+	cell_size = entity_types["defaultGridSize"]
+	
 
 func get_sprite_size_from_path(path:String):
 	var result
@@ -302,7 +386,11 @@ func save_project_last_paths():
 		return
 	var paths_dict =  data_parse.result
 	#Add new one
-	paths_dict["last_project_paths"].append(cur_project_path)
+	var project_name:String = cur_project_folder_path.substr(cur_project_folder_path.rfind("/")+1)
+	if(project_name == ""):
+		return
+	if(!paths_dict["last_project_paths"].has(project_name)):
+		paths_dict["last_project_paths"].append(project_name)
 	#Save
 	var file2 = File.new()
 	file2.open(file_path, file2.WRITE)
@@ -310,7 +398,7 @@ func save_project_last_paths():
 	file2.close()
 
 func save_project():
-	
+	entity_types["defaultGridSize"] = cell_size
 	print("saving project")
 	print("cur_path ", cur_project_path)
 	var file = File.new()
@@ -390,8 +478,11 @@ func change_cur_entityInst(key: String, val):
 		entity_layer_ind += 1
 	entity_types["levels"][cur_level_ind]["layerInstances"][entity_layer_ind]["entityInstances"][cur_entity_inst_ind][key] = val
 
+func get_amount_of_levels():
+	return len(entity_types["levels"])
+
 func change_entityInstName_by_defId(entity_name: String, defId: int):
-	var amount_of_levels = len(entity_types["levels"])
+	var amount_of_levels = get_amount_of_levels()
 	for level_ind in range(amount_of_levels):
 		var entity_layer_ind: int = 0
 		for layer_inst in entity_types["levels"][level_ind]["layerInstances"]:
@@ -458,8 +549,30 @@ func get_level_count():
 	for level in entity_types["levels"]:
 		level_count += 1
 	return level_count
+
+
+func get_positionInstances():
+	#Finding entity layer
+	var temp_cur_ind:int = 0
+	var cur_ind: int = -1
+	for val in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if val["__type"] == "Position":
+			cur_ind = temp_cur_ind
+			break
+		temp_cur_ind += 1
+	if cur_ind == -1:
+		return []
+		
+	return entity_types["levels"][cur_level_ind]["layerInstances"][cur_ind]["entityInstances"]
+
 func get_entityInstances():
-	return entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]
+	#Finding entity layer
+	var cur_ind: int = 0
+	for val in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if val["__type"] == "Entity":
+			break
+		cur_ind += 1
+	return entity_types["levels"][cur_level_ind]["layerInstances"][cur_ind]["entityInstances"]
 
 func change_entityInst_by_instId(instId: int, key:String, val):
 	var cur_InstInd:int = 0
@@ -475,7 +588,13 @@ func change_entityInst_by_instId(instId: int, key:String, val):
 
 
 func get_entityInst_by_instId(instId: int):
-	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+	#Getting entity layer
+	var cur_ind: int = 0
+	for layer in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if layer["__type"] == "Entity":
+			break
+		cur_ind += 1
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_ind]["entityInstances"]:
 		if entity_inst["instId"] == instId:
 			return entity_inst
 
@@ -503,6 +622,12 @@ func change_sprite_by_instId(spritePath: String):
 			entity_inst["__spritePath"] = spritePath
 			break
 		cur_inst_ind += 1
+
+func add_positionInstance():
+	var entity_instance = {"px": [0,0], "instId": -1}
+	entity_instance["instId"] = get_unique_entity_instId()
+	entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"].append(entity_instance)
+	return entity_instance
 
 func add_cur_entityInstance():
 	var entity_instance = get_cur_entityInstance_t()
@@ -592,6 +717,34 @@ func get_entityInstanAmount_by_levelNum(level_num: int):
 	if entity_layer_ind < 0:
 		return
 	return len(entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["entityInstances"])
+
+func get_positionInstances_by_levelNum(level_num: int):
+	var temp_entity_layer_ind: int = 0
+	var entity_layer_ind: int = -1
+	for layer in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if layer["__type"] == "Position":
+			entity_layer_ind = temp_entity_layer_ind
+			break
+		temp_entity_layer_ind += 1
+	if entity_layer_ind < 0:
+		return
+	
+	return entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["entityInstances"]
+
+func get_positionInstancesAmount_by_levelNum(level_num: int):
+	var temp_entity_layer_ind: int = 0
+	var entity_layer_ind: int = -1
+	for layer in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if layer["__type"] == "Position":
+			entity_layer_ind = temp_entity_layer_ind
+			break
+		temp_entity_layer_ind += 1
+	if entity_layer_ind < 0:
+		return
+	
+	return len(entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["entityInstances"])
+
+
 	
 func get_entityInstances_by_levelNum(level_num: int):
 	var temp_entity_layer_ind: int = 0
@@ -695,6 +848,12 @@ func get_cur_entityInstance_t():
 	entity_inst["triggerAABB"] = def["triggerAABB"]
 	entity_inst["triggerType"] = def["triggerType"]
 	entity_inst["triggerValue"] = def["triggerValue"]
+	if(!def.has("triggerValue2")):
+		def["triggerValue2"] = 0
+	entity_inst["triggerValue2"] = def["triggerValue2"]
+	if(!def.has("triggerValue3")):
+		def["triggerValue3"] = 0
+	entity_inst["triggerValue3"] = def["triggerValue3"]
 	
 	#Loading sprite path
 	entity_inst["__spritePath"] = def["spritePath"]
@@ -762,6 +921,9 @@ func add_entity_def(entity_name: String):
 	add_fieldDef_to_entity(field_def_triggerRectDef)
 	add_fieldDef_to_entity(field_def_triggerType)
 	add_fieldDef_to_entity(field_def_triggerValue)
+	add_fieldDef_to_entity(field_def_triggerValue2)
+	add_fieldDef_to_entity(field_def_triggerValue3)
+	add_fieldDef_to_entity(field_def_hp)
 	
 	print(entity_def_data)
 	

@@ -92,11 +92,11 @@ size_flags_horizontal = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_right = 808.0
-margin_bottom = 40.0
+margin_bottom = 84.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 margin_right = 402.0
-margin_bottom = 40.0
+margin_bottom = 84.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -118,22 +118,41 @@ rect_min_size = Vector2( 300, 40 )
 size_flags_horizontal = 3
 text = "dsfsdfsdf"
 
+[node name="HBoxContainer4" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 44.0
+margin_right = 402.0
+margin_bottom = 84.0
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer4"]
+margin_top = 13.0
+margin_right = 93.0
+margin_bottom = 27.0
+text = "Entity merged:"
+
+[node name="entityMergedActive" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer4"]
+margin_left = 97.0
+margin_right = 137.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 40, 40 )
+toggle_mode = true
+text = "On"
+
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 margin_left = 406.0
 margin_right = 808.0
-margin_bottom = 40.0
+margin_bottom = 84.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer"]
-margin_top = 44.0
+margin_top = 88.0
 margin_right = 808.0
 margin_bottom = 546.0
 size_flags_vertical = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
 margin_right = 250.0
-margin_bottom = 502.0
+margin_bottom = 458.0
 
 [node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer"]
 margin_right = 250.0
@@ -152,32 +171,33 @@ margin_bottom = 68.0
 [node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer"]
 margin_top = 72.0
 margin_right = 250.0
-margin_bottom = 502.0
+margin_bottom = 458.0
 rect_min_size = Vector2( 250, 0 )
 size_flags_vertical = 3
 scroll_horizontal_enabled = false
 
 [node name="ContainerChooseField" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/ScrollContainer"]
 margin_right = 250.0
-margin_bottom = 430.0
+margin_bottom = 386.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
 margin_left = 254.0
 margin_right = 808.0
-margin_bottom = 502.0
+margin_bottom = 458.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 scroll_horizontal_enabled = false
 
 [node name="ContainerFieldProperties" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer"]
 margin_right = 554.0
-margin_bottom = 502.0
+margin_bottom = 458.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer2/ExitBtn" to="." method="_on_ExitBtn_button_down"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/VBoxContainer/AddNewEntityBtn" to="." method="_on_AddNewEntityBtn_button_down"]
 [connection signal="text_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3/EntityNameEdit" to="." method="_on_EntityNameEdit_text_changed"]
+[connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer4/entityMergedActive" to="." method="_on_entityMergedActive_toggled"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/AddNewEntityField" to="." method="_on_AddNewEntityField_button_down"]

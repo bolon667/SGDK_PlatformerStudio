@@ -1,8 +1,7 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Scripts/TileMapEditorWindow.gd" type="Script" id=1]
 [ext_resource path="res://TileSets/pico8x8tileset2.tres" type="TileSet" id=3]
-[ext_resource path="res://Icons/startPos.png" type="Texture" id=4]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 523.5, 308 )
@@ -48,10 +47,7 @@ __meta__ = {
 
 [node name="EntityList" type="Node2D" parent="roomSize"]
 
-[node name="startPos" type="Sprite" parent="roomSize"]
-modulate = Color( 1, 1, 1, 0.529412 )
-position = Vector2( -340, -179 )
-texture = ExtResource( 4 )
+[node name="PositionList" type="Node2D" parent="roomSize"]
 
 [node name="Camera2D" type="Camera2D" parent="."]
 anchor_mode = 0
@@ -62,6 +58,7 @@ __meta__ = {
 }
 
 [node name="Area2D" type="Area2D" parent="."]
+collision_mask = 0
 __meta__ = {
 "_edit_group_": true,
 "_edit_lock_": true

@@ -28,7 +28,7 @@ onready var temp_tile_map = $roomSize/tempTileMap
 
 onready var tile_map = $roomSize/TileMap
 onready var entity_obj_list = $roomSize/EntityList
-onready var start_pos_spr = $roomSize/startPos
+onready var position_obj_list = $roomSize/PositionList
 
 onready var roomSize = $roomSize
 onready var bgA_spr = $roomSize/bgA
@@ -41,6 +41,7 @@ onready var camera = get_parent().get_node("Camera2D")
 #onready var camera = $Camera2D
 
 onready var entity_obj_t = preload("res://Scenes/entityScene.tscn")
+onready var position_obj_t = preload("res://Scenes/positionScene.tscn")
 
 func remove_fields_of_entity():
 	ContainerRight.visible = false
@@ -97,6 +98,27 @@ func load_tileMap():
 				break
 			var tile_value: int = intGridCsv[x+(y*collision_map_size.x)]-1
 			tile_map.set_cell(x, y, tile_value) 
+
+func clear_positions_on_scene():
+	var children = position_obj_list.get_children()
+	for child in children:
+		child.queue_free()
+		
+func load_positions_on_scene():
+	var entity_instantes = singleton.get_positionInstances()
+	print("AMOUNT: ", len(entity_instantes))
+	for entity_inst in entity_instantes:
+		var entity_node = position_obj_t.instance()
+		var entity_pos = entity_inst["px"]
+		entity_node.position = Vector2(entity_pos[0], entity_pos[1])
+		entity_node.entityInst_id = entity_inst["instId"]
+		
+		entity_node.get_node("CollisionShape2D").shape = RectangleShape2D.new()
+		var draggableShape: Vector2 = Vector2(16,16)
+
+		entity_node.get_node("CollisionShape2D").shape.extents = draggableShape
+		position_obj_list.add_child(entity_node)
+
 func clear_entities_on_scene():
 	var children = entity_obj_list.get_children()
 	for child in children:
@@ -139,23 +161,17 @@ func load_entities_on_scene():
 				#texture_size.x
 		#entity_node.get_node("ColorRect").rect_position = 
 		entity_node.get_node("CollisionShape2D").shape = RectangleShape2D.new()
-		entity_node.get_node("CollisionShape2D").shape.extents = Vector2(sprite_rect.size.x/2, sprite_rect.size.y/2)
+		var draggableShape: Vector2 = Vector2(8,8);
+		if(sprite_rect.size.x > 8):
+			draggableShape.x = sprite_rect.size.x/2
+		if(sprite_rect.size.y > 8):
+			draggableShape.y = sprite_rect.size.y/2
+		entity_node.get_node("CollisionShape2D").shape.extents = draggableShape
 		entity_node.sprite_size = sprite_rect.size
 		entity_obj_list.add_child(entity_node)
 		
 		
 		entity_node.change_sprite_rect(sprite_rect)	
-
-func change_start_pos():
-	print("change start pos")
-	start_pos_spr.global_position = get_global_mouse_position()
-	
-	if start_pos_spr.position.x < 0:
-		start_pos_spr.position.x = 0
-	if start_pos_spr.position.y < 0:
-		start_pos_spr.position.y = 0
-	singleton.change_start_pos(start_pos_spr.position)
-	print("New start pos: ", start_pos_spr.position)
 
 func _ready():
 	var window_size = get_viewport_rect().size
@@ -172,6 +188,7 @@ func load_level():
 	#clear all from scene
 	clean_tileMap()
 	clear_entities_on_scene()
+	clear_positions_on_scene()
 	#get image of level background
 	var bgRelPath: String = singleton.get_bgRelPath()
 	if bgRelPath:
@@ -179,21 +196,15 @@ func load_level():
 	var bgRelPath2: String = singleton.get_bgRelPath2()
 	if bgRelPath2:
 		bgB_spr.texture = load(bgRelPath2)
+		
+	load_positions_on_scene()
 	#add entities on scene from database (singleton.entity_types)
 	load_entities_on_scene()
 	#Fill tilemap with data from json (singleton.entity_types)
 	load_tileMap()
-	#Move start pos
-	load_start_pos()
-
-func load_start_pos():
-	var start_position = singleton.get_start_pos()
-	start_pos_spr.position = Vector2(start_position[0], start_position[1])
 
 func area2d_follow_camera():
 	$Area2D.global_position = camera.global_position
-
-
 
 func make_rect_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int, tileMap: TileMap):
 	var startPosX: int
@@ -423,6 +434,26 @@ func delete_all_highlighted_entity_objs():
 			singleton.delete_entityInstance(child.entityInst_id)
 			child.queue_free()
 
+func position_list_handler():
+	var position_obj_node = position_obj_t.instance()
+	
+	if(Input.is_action_just_pressed("mouse1") and singleton.can_create_entity_obj):
+		var mouse_pos = get_global_mouse_position()
+		position_obj_node.position = Vector2(mouse_pos.x - $roomSize.rect_position.x, mouse_pos.y - $roomSize.rect_position.y)
+		#Got uid for entityInst
+		var entity_inst = singleton.add_positionInstance()
+		#Put entityInst in database
+		position_obj_node.entityInst_id = entity_inst["instId"]
+		
+		var savePos = [position_obj_node.position.x, position_obj_node.position.y]
+		
+		position_obj_list.add_child(position_obj_node)
+		
+		singleton.save_entityInst_pos(position_obj_node.entityInst_id, savePos)
+		
+	if(Input.is_action_pressed("mouse2")):
+		singleton.can_create_entity_obj = true
+
 func entity_list_handler():
 	var entity_obj_node = entity_obj_t.instance()
 	
@@ -434,9 +465,6 @@ func entity_list_handler():
 		#Put entityInst in database
 		entity_obj_node.entityInst_id = entity_inst["instId"]
 		
-		#singleton.change_entityInst_by_instId(entity_obj_node.entityInst_id, "triggerType", int(new_text))
-		#singleton.change_entityInst_by_instId(entity_obj_node.entityInst_id, "triggerValue", int(new_text))
-
 		var savePos = [entity_obj_node.position.x, entity_obj_node.position.y]
 		
 		entity_obj_list.add_child(entity_obj_node)
@@ -478,6 +506,8 @@ func _physics_process(delta):
 		move_camera(delta)
 		if(singleton.cur_editor_mode == singleton.EditorMode.ENTITY):
 			entity_list_handler()
+		if(singleton.cur_editor_mode == singleton.EditorMode.POSITION):
+			position_list_handler()
 		if(singleton.cur_editor_mode == singleton.EditorMode.COLLISION):
 			temp_tile_map_handler(delta)
 			tile_map_handler(delta)

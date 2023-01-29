@@ -16,6 +16,8 @@ public class buidProject : Node
 	private String fullEngineRootPath = "";
 	private String fullEngineResPath = "";
 
+	private String fullTemplatePath = "";
+
 	private String fullEmulatorPath = "";
 
 
@@ -28,16 +30,18 @@ public class buidProject : Node
 	private void getEngineRootPath()
 	{
 		Node singleton = (Node)GetNode("/root/singleton");
-		engineRootPath = (String)singleton.Call("get_engine_root_path");
+		engineRootPath = (String)singleton.Call("get_project_folder_path");
 		String workingDir = System.IO.Directory.GetCurrentDirectory();
-		fullEngineRootPath = workingDir + engineRootPath.Substring(1);
+		//fullEngineRootPath = workingDir + engineRootPath.Substring(1);
+		fullEngineRootPath = engineRootPath;
+
 		fullEngineRootPath = fullEngineRootPath.Replace("\\", "/");
 
 		fullEngineResPath = fullEngineRootPath + "/build/res";
 		fullEmulatorPath = workingDir + "/Emulators/BlastEm/blastem.exe";
-	}
 
-	
+		fullTemplatePath = workingDir + "/StudioType/SGDK/Engines/platformer";
+	}
 
 	private static void CopyFilesRecursively(string sourcePath, string targetPath)
 	{
@@ -116,7 +120,9 @@ public class buidProject : Node
 
 	private void makeNewProjectFromTemplate()
 	{
-		String fromFolder = engineRootPath + "/project_template";
+		//String fromFolder = engineRootPath + "/project_template";
+		String fromFolder = fullTemplatePath;
+		
 		String toFolder = engineRootPath + "/build";
 
 		CopyFilesRecursively(fromFolder, toFolder);
@@ -224,9 +230,9 @@ public class buidProject : Node
 		genResCode();
 		
 		mapsC_CodeReplacer();
-		
 		mapsH_CodeReplacer();
-		
+		playerC_CodeReplacer();
+
 		levelsC_CodeReplacer();
 		typesH_CodeReplacer();
 
@@ -313,9 +319,13 @@ public class buidProject : Node
 
 		String levelName = (String)levelDict["identifier"];
 
-		Godot.Collections.Array startPos = (Godot.Collections.Array)singleton.Call("get_start_pos_for_level", curLevel);
-		String startPosText = "{" + startPos[0].ToString() + ", " + startPos[1].ToString() + "}";
+		GD.Print(9);
+		String posArrText = $"&Position_arr_Level_{curLevel.ToString()}";
+		GD.Print(9.5);
+		//(int)int.Parse(entityInst["width"].ToString());
 
+		String posAmountText = singleton.Call("get_positionInstancesAmount_by_levelNum", curLevel).ToString();
+		GD.Print(10);
 		
 		String bgaResName = $"Level_{curLevel.ToString()}_bga";
 		String bgbResName = $"Level_{curLevel.ToString()}_bgb";
@@ -358,11 +368,34 @@ public class buidProject : Node
 
 		}
 
-		String levelCode = $"const Level const lvl_Level_{curLevel.ToString()} = {{{bgaMapResName}, {bgbMapResName}, {bgaTilesetResName}, {bgbTilesetResName}, {bgaPalResName}, {bgbPalResName}, {startPosText}, {collMapName}, {levelSizePxText}, {levelSizeTilesText}}};\n";
+		String levelCode = $"const Level const lvl_Level_{curLevel.ToString()} = {{{bgaMapResName}, {bgbMapResName}, {bgaTilesetResName}, {bgbTilesetResName}, {bgaPalResName}, {bgbPalResName}, {posArrText}, {posAmountText}, {collMapName}, {levelSizePxText}, {levelSizeTilesText}}};\n";
 		return levelCode;
 	}
 
+	private String genPositionsCode(int curLevel)
+	{
+		Node singleton = (Node)GetNode("/root/singleton");
+		String result = ""; ;
+		Godot.Collections.Array positionInstances = (Godot.Collections.Array)singleton.Call("get_positionInstances_by_levelNum", curLevel);
+		result += $"const Vect2D_s16 const Position_arr_Level_{curLevel.ToString()}[] = ";
 
+		//Opening Position_arr block
+		result += "{";
+		foreach (Godot.Collections.Dictionary positionInst in positionInstances)
+		{
+			Godot.Collections.Array px = (Godot.Collections.Array)positionInst["px"];
+			//Opening Position block
+			result += "{";
+			result += px[0] + ", ";
+			result += px[1];
+
+			//Closing Position block
+			result += "}, ";
+		}
+		//Closing Position_arr block
+		result += "};\n";
+		return result;
+	}
 
 	private String genEntityMergedCode(int curLevel)
 	{
@@ -523,11 +556,22 @@ public class buidProject : Node
 			}
 			
 			float triggerValue = 0;
-			if (entityInst.Contains("triggerValue")) {
+			float triggerValue2 = 0;
+			float triggerValue3 = 0;
+			if (entityInst.Contains("triggerValue"))
+			{
 				triggerValue = (float)entityInst["triggerValue"];
-
 			}
-			
+			if (entityInst.Contains("triggerValue2"))
+			{
+				triggerValue2 = (float)entityInst["triggerValue2"];
+			}
+
+			if (entityInst.Contains("triggerValue3"))
+			{
+				triggerValue3 = (float)entityInst["triggerValue3"];
+			}
+
 			int[] spd = { 0, 0 };
 
 			//Opening Trigger block
@@ -553,6 +597,8 @@ public class buidProject : Node
 			result += "{" + $"{triggerAABB[0]}, {triggerAABB[1]}, {triggerAABB[2]}, {triggerAABB[3]}" + "}, "; //triggerRect
 			result += $"{triggerType}, "; //triggerType
 			result += $"{triggerValue}, "; //triggerValue
+			result += $"{triggerValue2}, "; //triggerValue2
+			result += $"{triggerValue3}, "; //triggerValue3
 			result += "1, "; //triggerHp
 
 			//Closing Trigger block
@@ -584,8 +630,13 @@ public class buidProject : Node
 		//Opening entityAll_arr block
 		result += "{";
 
+		//Bullet count
+		int bulletAmount = 10;
 		//Entity count
 		int entityAmount = (int)singleton.Call("get_entityInstanAmount_by_levelNum", curLevel);
+		//Bullet
+		result += bulletAmount.ToString() + ", ";
+		result += "NULL, ";
 		//Entity all
 		result += entityAmount.ToString() + ", ";
 		result += $"&EntityMerged_arr_Level_{curLevel.ToString()}, ";
@@ -611,6 +662,7 @@ public class buidProject : Node
 		
 		for (int curLevel = 0; curLevel < amountOfLevel; curLevel++)
 		{
+			result += genPositionsCode(curLevel);
 			result += genTriggerCode(curLevel);
 			result += genEntityMergedCode(curLevel);
 			result += genEntityAllCode(curLevel);
@@ -666,6 +718,21 @@ public class buidProject : Node
 		System.IO.File.WriteAllText(mapsH_path, mapsCode);
 		GD.Print("maps.h code replaced");
 
+	}
+
+	private void playerC_CodeReplacer()
+	{
+		String playerCReplace_path = engineRootPath + "/code_template/player/player.c";
+		String playerCode_path = engineRootPath + "/build/src/player.c";
+		//String playerCode = System.IO.File.ReadAllText(playerCode_path);
+		String playerCReplaceCode = System.IO.File.ReadAllText(playerCReplace_path);
+		//playerCode = playerCode.Replace(@"//$updateAnimations$", updateAnimationsCode);
+
+
+
+
+		System.IO.File.WriteAllText(playerCode_path, playerCReplaceCode);
+		GD.Print("player.c code replaced");
 	}
 
 	private String genCollisionDefinitionCode(int levelNum)

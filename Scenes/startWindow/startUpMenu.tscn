@@ -31,14 +31,14 @@ margin_right = 984.0
 margin_bottom = 266.0
 
 [node name="NewProjBtn" type="Button" parent="VBoxContainer/ContainerButtons"]
-margin_right = 89.0
+margin_right = 132.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 0, 50 )
-text = "New project"
+text = "New project TODO"
 
 [node name="LoadProjBtn" type="Button" parent="VBoxContainer/ContainerButtons"]
-margin_left = 93.0
-margin_right = 184.0
+margin_left = 136.0
+margin_right = 227.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 0, 50 )
 text = "Load project"
@@ -123,11 +123,11 @@ margin_left = -246.0
 margin_top = -164.0
 margin_right = 248.0
 margin_bottom = 167.0
-window_title = "Открыть файл"
-mode = 0
+window_title = "Открыть каталог"
+mode = 2
 access = 2
 
 [connection signal="button_down" from="VBoxContainer/ContainerButtons/NewProjBtn" to="." method="_on_NewProjBtn_button_down"]
 [connection signal="button_down" from="VBoxContainer/ContainerButtons/LoadProjBtn" to="." method="_on_LoadProjBtn_button_down"]
 [connection signal="file_selected" from="createProjectDialog" to="." method="_on_createProjectDialog_file_selected"]
-[connection signal="file_selected" from="loadProjectDialog" to="." method="_on_loadProjectDialog_file_selected"]
+[connection signal="dir_selected" from="loadProjectDialog" to="." method="_on_loadProjectDialog_dir_selected"]

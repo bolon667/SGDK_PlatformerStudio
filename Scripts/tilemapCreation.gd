@@ -22,7 +22,11 @@ func _ready():
 	for tile_id in tile_ids:
 		var texture = TileMapEditorWindow_tileMap.tile_set.tile_get_texture(tile_id)
 		$CanvasLayer/VBoxContainer/ChangeTileMode.add_icon_item(texture, str(tile_id), tile_id)
-		
+	
+	var cell_ind: int = 0
+	if(singleton.cell_size == 16):
+		cell_ind = 1
+	$CanvasLayer/VBoxContainer/ChangeCellSize.select(cell_ind)
 	level_count = singleton.get_level_count()
 	for cur_level_ind in range(level_count):
 		$CanvasLayer/VBoxContainer/ChangeCurLevel.add_item("Level_"+str(cur_level_ind), cur_level_ind)

@@ -184,3 +184,7 @@ func _on_ExitBtn_button_down():
 	singleton.cur_entity_type_ind = -1
 	get_tree().call_group("leftContainer", "clear_layer_values")
 	queue_free()
+
+
+func _on_entityMergedActive_toggled(button_pressed):
+	pass # Replace with function body.

@@ -8,12 +8,12 @@ extends Control
 var root_path: String
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$FileDialog.current_path = "./StudioType/SGDK/Engines/" + singleton.cur_engine + "/build/res/sprites/"
+	print(singleton.cur_project_folder_path)
+	$FileDialog.current_path = singleton.cur_project_folder_path + "/build/res/sprites/"
 	root_path = $FileDialog.current_path
 	pass # Replace with function body.
 	
 	var cur_entityDef = singleton.get_cur_entityDef()
-	print(cur_entityDef)
 	#return
 	if(len(cur_entityDef["spritePath"]) > 0):
 		change_spr_by_path(cur_entityDef["spritePath"])
@@ -26,6 +26,7 @@ func _ready():
 
 
 func _on_changeSpriteBtn_button_down():
+	print($FileDialog.current_path)
 	$FileDialog.popup_centered()
 
 func change_spr_by_path(path: String):
