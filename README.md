@@ -18,12 +18,13 @@ TODO
 - Link between Levels
 - Compile & Run button in BlastEm
 - Working triggers with easy to use trigger rects
+- Working bullets (sorta)
+- Positions layer (useful for metroidvania games)
 
 # What should be done:
 
 - Add messaging system
 - Add Enums
 - Fix broken 16x16 tile mode
-- Add Bullets, and bullet detect option to entity (Key feature, this must be done, to be able kill an enemy)
 - Fix broken save fieldDefs (if you deleted fieldDef, than all entity souldn't have this field, similar with adding)
 - and more...
