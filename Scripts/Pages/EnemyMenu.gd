@@ -59,18 +59,26 @@ func load_field_properties(entity_name: String, field_name: String):
 				field_properties_container.add_child(field_property_node)
 	pass
 
+func enitity_name_edit_readonly(is_on: bool):
+	entity_name_edit.readonly = is_on
+
 func load_list_of_entity():
 	var entity_names = singleton.get_def_entity_names()
 	var entity_names_len = len(entity_names)
 	singleton.entity_names_len = entity_names_len
-	print(entity_names)
 	print("entity_names_len: ", entity_names_len)
+	print(singleton.cur_entity_type_ind)
+	
 	if(entity_names_len == 0):
 		entity_name_edit.readonly = true
 		add_new_field_btn.disabled = true
 	else:
 		entity_name_edit.readonly = false
 		add_new_field_btn.disabled = false
+	if(singleton.cur_entity_type_ind == -1):
+		print("readonly")
+		entity_name_edit.readonly = true
+	
 	for entity_name in entity_names:
 		var entity_item = entity_item_t.instance()
 		entity_item.get_node("HBoxContainer/TextBtn").text = entity_name
@@ -132,7 +140,7 @@ func _on_AddNewEntityBtn_button_down():
 				break
 			i+=1
 	
-	singleton.cur_entity_type_ind = entity_list_container.get_child_count()
+	
 	#Add entity to database
 	singleton.add_entity_def(final_entity_name)
 	
@@ -169,6 +177,7 @@ func _on_AddNewEntityField_button_down():
 func _on_EntityNameEdit_text_changed():
 	print("singleton.cur_entity_type_ind: ", singleton.cur_entity_type_ind)
 	print("singleton.cur_entity_type: ", singleton.cur_entity_type)
+	
 	#TODO: filter not ASCII symbols
 	var text = entity_name_edit.text
 	var defId = singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["defId"]
@@ -183,6 +192,8 @@ func _on_EntityNameEdit_text_changed():
 func _on_ExitBtn_button_down():
 	singleton.cur_entity_type_ind = -1
 	get_tree().call_group("leftContainer", "clear_layer_values")
+	get_tree().call_group("tilemapEditorWindow", "load_entities_on_scene")
+	
 	queue_free()
 
 

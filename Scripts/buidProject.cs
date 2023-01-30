@@ -178,7 +178,7 @@ public class buidProject : Node
 				String fileExtension = bgaPath.Substring(bgaPath.FindLast("."));
 
 				String toPath = fullEngineResPath + $"/gfx/Level_{curLevel.ToString()}_bga" + fileExtension;
-				GD.Print(toPath);
+				//GD.Print(toPath);
 				System.IO.File.Copy(bgaPath, toPath, true);
 			}
 			if (bgbPath.Length > 0)

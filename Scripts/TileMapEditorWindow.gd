@@ -85,6 +85,8 @@ func update_tilemap_cell_size(cell_size: Vector2):
 	temp_tile_map.cell_size = cell_size
 
 func load_tileMap():
+	#clear all from scene
+	clean_tileMap()
 	var level_size = singleton.get_level_size(singleton.cur_level_ind)
 	print("level_size: ", level_size)
 	var collision_map_size = Vector2(level_size.x/singleton.cell_size, level_size.y/singleton.cell_size)
@@ -105,6 +107,7 @@ func clear_positions_on_scene():
 		child.queue_free()
 		
 func load_positions_on_scene():
+	clear_positions_on_scene()
 	var entity_instantes = singleton.get_positionInstances()
 	print("AMOUNT: ", len(entity_instantes))
 	for entity_inst in entity_instantes:
@@ -125,6 +128,7 @@ func clear_entities_on_scene():
 		child.queue_free()
 
 func load_entities_on_scene():
+	clear_entities_on_scene()
 	var entity_instantes = singleton.get_entityInstances()
 	for entity_inst in entity_instantes:
 		var sprite_rect: Rect2
@@ -133,6 +137,8 @@ func load_entities_on_scene():
 		entity_node.position = Vector2(entity_pos[0], entity_pos[1])
 		entity_node.entityInst_id = entity_inst["instId"]
 		
+		if(!entity_inst.has("triggerAABB")):
+			continue
 		entity_node.triggerAABB = entity_inst["triggerAABB"]
 		
 		if len(entity_inst["__spritePath"]) > 0:
@@ -185,17 +191,20 @@ func _ready():
 	load_level()
 
 func load_level():
-	#clear all from scene
-	clean_tileMap()
-	clear_entities_on_scene()
-	clear_positions_on_scene()
+	
+	
+	
 	#get image of level background
 	var bgRelPath: String = singleton.get_bgRelPath()
 	if bgRelPath:
 		bgA_spr.texture = load(bgRelPath)
+	else:
+		bgA_spr.texture = null
 	var bgRelPath2: String = singleton.get_bgRelPath2()
 	if bgRelPath2:
 		bgB_spr.texture = load(bgRelPath2)
+	else:
+		bgB_spr.texture = null
 		
 	load_positions_on_scene()
 	#add entities on scene from database (singleton.entity_types)

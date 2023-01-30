@@ -29,6 +29,7 @@ func _on_ConfirmationDialogDelete_confirmed():
 	get_tree().call_group("entityMenu", "clear_field_properties")
 	
 	get_tree().call_group("entityMenu", "get_entity_list")
+	get_tree().call_group("entityMenu", "enitity_name_edit_readonly", true)
 	queue_free()
 
 
@@ -39,6 +40,7 @@ func _on_TextBtn_button_down():
 	get_tree().call_group("entityMenu", "clear_field_properties")
 	get_tree().call_group("entityMenu", "load_entity_fields")
 	get_tree().call_group("entityMenu", "load_entity_pic")
+	get_tree().call_group("entityMenu", "enitity_name_edit_readonly", false)
 	
 	
 	

@@ -22,6 +22,8 @@ var cur_entity_type_ind: int = -1
 var cur_entity_field_ind: int
 var cur_entity_field_def_ind: int
 var cur_entity_inst_ind: int
+var cur_messagePack_ind: int = -1
+var cur_message_ind: int = -1
 
 var cur_level_ind: int = 0
 var cur_level_layer_ind: int = 0
@@ -81,6 +83,7 @@ var entity_types = {
 		],
 	
 }
+
 
 const field_def_template = {	
 	"identifier": "Field",
@@ -267,6 +270,11 @@ const entity_inst_template = {
 		]
 }
 
+const messagePack_template = {
+	"name": "0",
+	"messages": [],
+}
+
 const field_inst_template = {
 	"__identifier": "fieldInst",
 	"__value": "fieldVal",
@@ -277,6 +285,31 @@ const field_inst_template = {
 	"__hasStruct": true,
 }
 
+
+func add_messagePack():
+	var data: Dictionary = messagePack_template.duplicate(true)
+	entity_types["defs"]["messagePacks"].append(data)
+	
+func add_message():
+	if cur_messagePack_ind == -1:
+		return
+	var data: String = "test message"
+	entity_types["defs"]["messagePacks"][cur_messagePack_ind]["messages"].append(data)
+
+func delete_cur_messagePack():
+	if cur_messagePack_ind == -1:
+		return
+	entity_types["defs"]["messagePacks"].remove(cur_messagePack_ind)
+	
+func delete_cur_message():
+	
+	entity_types["defs"]["messagePacks"][cur_messagePack_ind]["messages"].remove(cur_message_ind)
+
+func change_messagePack_name(msgPack_name: String):
+	entity_types["defs"]["messagePacks"][cur_messagePack_ind]["name"] = msgPack_name
+
+func change_cur_message(text: String):
+	entity_types["defs"]["messagePacks"][cur_messagePack_ind]["messages"][cur_message_ind] = text
 
 func get_project_folder_path():
 	return cur_project_folder_path
@@ -481,6 +514,10 @@ func change_cur_entityInst(key: String, val):
 func get_amount_of_levels():
 	return len(entity_types["levels"])
 
+func get_messagePack_arr():
+	return entity_types["defs"]["messagePacks"]
+	
+
 func change_entityInstName_by_defId(entity_name: String, defId: int):
 	var amount_of_levels = get_amount_of_levels()
 	for level_ind in range(amount_of_levels):
@@ -646,19 +683,26 @@ func get_level_name(level_num: int):
 func add_level():
 	
 	
-	var level_data = level_template.duplicate()
+	var level_data = level_template.duplicate(true)
 	level_data["identifier"] = "Level_" + str(cur_level_ind)
-	if len(entity_types["levels"]) > 0:
-		var prev_level = entity_types["levels"][cur_level_ind]
-		level_data["pxHei"] = prev_level["pxHei"]
-		level_data["pxWid"] = prev_level["pxWid"]
-		level_data["bgRelPath"] = prev_level["bgRelPath"]
-		level_data["bgRelPath2"] = prev_level["bgRelPath2"]
+	#if len(entity_types["levels"]) > 0:
+	#	var prev_level = entity_types["levels"][cur_level_ind]
+	#	level_data["pxHei"] = prev_level["pxHei"]
+	#	level_data["pxWid"] = prev_level["pxWid"]
+	#	level_data["bgRelPath"] = prev_level["bgRelPath"]
+	#	level_data["bgRelPath2"] = prev_level["bgRelPath2"]
 	
 	entity_types["levels"].append(level_data)
 	
+	var last_level_ind: int = len(entity_types["levels"])-1
+	#Add layers
+	
+	add_level_layer(last_level_ind, "Entity", "Entity")
+	add_level_layer(last_level_ind, "Positions", "Position")
+	add_level_layer(last_level_ind, "Collision", "Collision")
+	
 	#cur_level_ind += 1
-	cur_level += 1
+	#cur_level += 1
 
 func change_cur_field(field_property_name: String, field_property_value: String):
 	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind][field_property_name] = field_property_value
@@ -894,20 +938,19 @@ func add_fieldDef_to_entity(fieldDef: Dictionary):
 	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"].append(fieldDef)
 
 func add_field_to_entity(entity_name: String, field_name:String):
-	var ent_ind = 0
-	var temp_ent_ind = 0
+	var ent_ind:int = -1
+	var temp_ent_ind:int = 0
 	#find entity ind by name
 	for entity in entity_types["defs"]["entities"]:
 		if entity["identifier"] == entity_name:
 			ent_ind = temp_ent_ind
 			break
 		temp_ent_ind += 1
+	if ent_ind == -1:
+		return
 	var field_def_data = field_def_template.duplicate(true)
 	field_def_data["identifier"] = field_name
 	field_def_data["fieldId"] = get_unique_entity_fieldId()
-	print("Debug")
-	print(field_def_data)
-	print(entity_types)
 	entity_types["defs"]["entities"][ent_ind]["fieldDefs"].append(field_def_data)
 
 
@@ -916,6 +959,8 @@ func add_entity_def(entity_name: String):
 	entity_def_data["identifier"] = entity_name
 	entity_def_data["defId"] = get_unique_entity_defId()
 	entity_types["defs"]["entities"].append(entity_def_data)
+	
+	cur_entity_type_ind = -1
 	
 	add_fieldDef_to_entity(field_def_spriteDef)
 	add_fieldDef_to_entity(field_def_triggerRectDef)
@@ -971,6 +1016,34 @@ func delete_fieldDef(field_ind: int):
 func delete_entityDef(entity_name: String):
 	var entity_def = get_entityDef(entity_name)
 	entity_types["defs"]["entities"].remove(entity_def["ind"])
+	
+	delete_entityDef_from_game(entity_def["ind"])
+
+func delete_entityDef_from_game(defId: int):
+	var level_amount = get_level_count()
+	var cur_level: int = 0
+	while cur_level < level_amount:
+		delete_entityDef_from_level(cur_level, defId)
+		cur_level += 1
+		
+	
+
+func delete_entityDef_from_level(levelInd: int, defId: int):
+	var layer_ind: int = -1
+	var temp_layer_ind: int = 0
+	for layer in entity_types["levels"][levelInd]["layerInstances"]:
+		if layer["__type"] == "Entity":
+			layer_ind = temp_layer_ind
+		temp_layer_ind += 1
+	if layer_ind == -1:
+		return
+	
+	var new_entityInst_arr = []
+	for entity_inst in  entity_types["levels"][levelInd]["layerInstances"][layer_ind]["entityInstances"]:
+		if entity_inst["defId"] == defId:
+			continue
+		new_entityInst_arr.append(entity_inst)
+	entity_types["levels"][levelInd]["layerInstances"][layer_ind]["entityInstances"] = new_entityInst_arr
 
 func is_entity_name_exists(entity_name: String):
 	for entity in entity_types["defs"]["entities"]:

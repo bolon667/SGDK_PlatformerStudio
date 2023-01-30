@@ -92,11 +92,11 @@ size_flags_horizontal = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_right = 808.0
-margin_bottom = 84.0
+margin_bottom = 40.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 margin_right = 402.0
-margin_bottom = 84.0
+margin_bottom = 40.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -119,6 +119,7 @@ size_flags_horizontal = 3
 text = "dsfsdfsdf"
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+visible = false
 margin_top = 44.0
 margin_right = 402.0
 margin_bottom = 84.0
@@ -140,19 +141,19 @@ text = "On"
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
 margin_left = 406.0
 margin_right = 808.0
-margin_bottom = 84.0
+margin_bottom = 40.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer"]
-margin_top = 88.0
+margin_top = 44.0
 margin_right = 808.0
 margin_bottom = 546.0
 size_flags_vertical = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
 margin_right = 250.0
-margin_bottom = 458.0
+margin_bottom = 502.0
 
 [node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer"]
 margin_right = 250.0
@@ -171,28 +172,28 @@ margin_bottom = 68.0
 [node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer"]
 margin_top = 72.0
 margin_right = 250.0
-margin_bottom = 458.0
+margin_bottom = 502.0
 rect_min_size = Vector2( 250, 0 )
 size_flags_vertical = 3
 scroll_horizontal_enabled = false
 
 [node name="ContainerChooseField" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/ScrollContainer"]
 margin_right = 250.0
-margin_bottom = 386.0
+margin_bottom = 430.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
 margin_left = 254.0
 margin_right = 808.0
-margin_bottom = 458.0
+margin_bottom = 502.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 scroll_horizontal_enabled = false
 
 [node name="ContainerFieldProperties" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer"]
 margin_right = 554.0
-margin_bottom = 458.0
+margin_bottom = 502.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 

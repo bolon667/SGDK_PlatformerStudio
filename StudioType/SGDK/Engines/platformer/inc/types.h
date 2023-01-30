@@ -46,8 +46,6 @@ typedef struct {
 	s16 triggerHp;
 } Trigger;
 
-
-
 typedef struct {
 	bool alive;
 	Vect2D_s16 posInt;
@@ -62,6 +60,15 @@ typedef struct {
 	SpriteDefinition* sprDef;
 	s16 lifeTime;
 } Bullet;
+
+typedef struct {
+	char* str;
+} Message;
+
+typedef struct {
+	Message* messages;
+	char* name
+} MessagePack;
 
 //$entityMergedStruct$
 
