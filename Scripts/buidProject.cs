@@ -284,6 +284,10 @@ public class buidProject : Node
 		String levelsCode = System.IO.File.ReadAllText(levelsC_path);
 		String levelFullArr_code = genLevelFulArr_Code();
 		levelsCode = levelsCode.Replace("//$levelFullArr$", levelFullArr_code);
+		//loadLevel replace
+		String loadLevelPath = engineRootPath + "/code_template/loadLevel.c";
+		String loadLevelCode = System.IO.File.ReadAllText(loadLevelPath);
+		levelsCode = levelsCode.Replace("//$loadLevel$", loadLevelCode);
 		System.IO.File.WriteAllText(levelsC_path, levelsCode);
 		GD.Print("levels.c code replaced");
 		

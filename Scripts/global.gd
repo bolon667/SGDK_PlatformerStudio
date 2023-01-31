@@ -515,6 +515,8 @@ func get_amount_of_levels():
 	return len(entity_types["levels"])
 
 func get_messagePack_arr():
+	if(!entity_types["defs"].has("messagePacks")):
+		entity_types["defs"]["messagePacks"] = []
 	return entity_types["defs"]["messagePacks"]
 	
 
