@@ -28,6 +28,12 @@ struct pBody {
 	bool climbingStair;
 	bool attack;
 
+	bool damaged;
+
+	s16 animMode;
+	bool animModeChangable;
+
+	s16 hp;
 	
 
 	Vect2D_s16 position;

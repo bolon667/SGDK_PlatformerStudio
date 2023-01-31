@@ -278,7 +278,8 @@ public class buidProject : Node
 	}
 
 	private void levelsC_CodeReplacer()
-	{	
+	{
+		GD.Print("levels.c code replacing...");
 		String levelsC_path = engineRootPath + "/build/src/levels.c";
 		String levelsCode = System.IO.File.ReadAllText(levelsC_path);
 		String levelFullArr_code = genLevelFulArr_Code();
@@ -525,13 +526,17 @@ public class buidProject : Node
 
 		//Opening Trigger_arr block
 		result += "{";
-		
+
 		foreach (Godot.Collections.Dictionary entityInst in entityInstances)
 		{
+			
 			//Getting useful data about entity
 			String entityName = (String)entityInst["__identifier"];
+
+			GD.Print(entityName);
 			
 			int mergedId = (int)mergedIdsDict[entityName];
+
 			
 			Godot.Collections.Array pos = (Godot.Collections.Array)entityInst["px"];
 			
@@ -555,23 +560,24 @@ public class buidProject : Node
 
 			}
 			
-			float triggerValue = 0;
-			float triggerValue2 = 0;
-			float triggerValue3 = 0;
+			int triggerValue = 0;
+			int triggerValue2 = 0;
+			int triggerValue3 = 0;
 			if (entityInst.Contains("triggerValue"))
 			{
-				triggerValue = (float)entityInst["triggerValue"];
+				triggerValue = (int)int.Parse(entityInst["triggerValue"].ToString());
 			}
+		
 			if (entityInst.Contains("triggerValue2"))
 			{
-				triggerValue2 = (float)entityInst["triggerValue2"];
+				triggerValue2 = (int)int.Parse(entityInst["triggerValue2"].ToString());
 			}
-
+		
 			if (entityInst.Contains("triggerValue3"))
 			{
-				triggerValue3 = (float)entityInst["triggerValue3"];
+				triggerValue3 = (int)int.Parse(entityInst["triggerValue3"].ToString());
 			}
-
+			
 			int[] spd = { 0, 0 };
 
 			//Opening Trigger block
@@ -658,15 +664,20 @@ public class buidProject : Node
 		Node singleton = (Node)GetNode("/root/singleton");
 		int amountOfLevel = (int)singleton.Call("get_level_count");
 
-		
+
 		
 		for (int curLevel = 0; curLevel < amountOfLevel; curLevel++)
 		{
 			result += genPositionsCode(curLevel);
+			
 			result += genTriggerCode(curLevel);
+			
 			result += genEntityMergedCode(curLevel);
+			
 			result += genEntityAllCode(curLevel);
+			
 			result += genLvlCode(curLevel);
+			
 		}
 		//return result;
 		result += "const LevelFull const LevelFull_arr[] = {";

@@ -24,8 +24,8 @@ void entityCheckForBullet(EntityMerged* entity){
 			curBullet->posInt.y + curBullet->rect.min.y,
 			curBullet->posInt.y + curBullet->rect.max.y
 		);
-		if((entityTriggerBounds.min.x < bulletBounds.max.x) && (entityTriggerBounds.max.x > bulletBounds.min.x)){
-			if((entityTriggerBounds.min.y < bulletBounds.max.y) && (entityTriggerBounds.max.y > bulletBounds.min.y)){
+		if((bulletBounds.min.x < entityTriggerBounds.max.x) && (bulletBounds.max.x > entityTriggerBounds.min.x)){
+			if((bulletBounds.min.y < entityTriggerBounds.max.y) && (bulletBounds.max.y > entityTriggerBounds.min.y)){
 				entity->hp -= curBullet->damage;
 				break;
 			}
@@ -88,6 +88,7 @@ void checkTriggerForPlayer(Trigger* trigger){
 	if(!trigger->alive){
 		return;
 	}
+	
 	AABB triggerBounds = newAABB(
 		trigger->pos.x + trigger->rect.min.x,
 		trigger->pos.x + trigger->rect.max.x,
@@ -106,6 +107,10 @@ void checkTriggerForPlayer(Trigger* trigger){
 				case 1:
 					trigger->alive = FALSE;
 					break;
+				case 2:
+					//playerBody.damaged = TRUE;
+					playerBody.animMode = 1;
+					break;
 			}
 		}
 	}
@@ -118,6 +123,10 @@ void showEntityMerged(EntityMerged* entity){
 }
 
 void showEntityAll(){
+	if(playerBody.animModeChangable){
+		playerBody.animMode = 0;
+	}
+	
 	for(u16 i=0; i<curEntityAll->Bullet_size; i++){
 		showBullet(&curEntityAll->Bullet_arr[i]);
 	}

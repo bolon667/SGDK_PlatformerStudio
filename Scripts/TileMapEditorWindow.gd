@@ -82,6 +82,8 @@ func move_map_around():
 
 func update_tilemap_cell_size(cell_size: Vector2):
 	tile_map.cell_size = cell_size
+	
+	
 	temp_tile_map.cell_size = cell_size
 
 func load_tileMap():
@@ -186,7 +188,12 @@ func _ready():
 	
 	#Changing tilemap cell size
 	tile_map.cell_size = Vector2(singleton.cell_size, singleton.cell_size)
+	if(singleton.cell_size == 8):
+		tile_map.tile_set = load("res://TileSets/8x8TileSet.tres")
+	if(singleton.cell_size == 16):
+		tile_map.tile_set = load("res://TileSets/16x16TileSet.tres")
 	temp_tile_map.cell_size = tile_map.cell_size
+	temp_tile_map.tile_set = tile_map.tile_set
 	
 	load_level()
 
