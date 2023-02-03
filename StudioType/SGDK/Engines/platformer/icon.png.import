@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/coin.png-cd91f826d913100b1b5c98a8ef3ed08f.stex"
+path="res://.import/icon.png-90f84585dd8c579dd66767e73b4f5e6b.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://StudioType/SGDK/Engines/platformer/res/sprites/coin.png"
-dest_files=[ "res://.import/coin.png-cd91f826d913100b1b5c98a8ef3ed08f.stex" ]
+source_file="res://StudioType/SGDK/Engines/platformer/icon.png"
+dest_files=[ "res://.import/icon.png-90f84585dd8c579dd66767e73b4f5e6b.stex" ]
 
 [params]
 
@@ -20,7 +20,7 @@ compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
 flags/repeat=0
-flags/filter=true
+flags/filter=false
 flags/mipmaps=false
 flags/anisotropic=false
 flags/srgb=2

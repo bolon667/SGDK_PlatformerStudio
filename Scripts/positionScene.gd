@@ -17,7 +17,7 @@ var sprite_size: Vector2 = Vector2(32,32)
 func _ready():
 	pass # Replace with function body.
 	cur_index = get_index()
-	var entityInst_info = singleton.get_entityInst_by_instId(entityInst_id)
+	var entityInst_info = singleton.get_positionInst_by_instId(entityInst_id)
 	fixed_toggle_point = get_viewport().get_mouse_position()
 	updateCurMessage()
 	_draw()

@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/level.png-d03141845713011fb480fc6ee0be3c2b.stex"
+path="res://.import/level.png-9c9c78a490a190c573f460c067b4e831.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://StudioType/SGDK/Engines/platformer/res/images/level.png"
-dest_files=[ "res://.import/level.png-d03141845713011fb480fc6ee0be3c2b.stex" ]
+source_file="res://StudioType/SGDK/Engines/platformer/build/res/images/level.png"
+dest_files=[ "res://.import/level.png-9c9c78a490a190c573f460c067b4e831.stex" ]
 
 [params]
 

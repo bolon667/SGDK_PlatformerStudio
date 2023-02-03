@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/player.png-dd18e5a484a4e30fc084b64cbabb2ce5.stex"
+path="res://.import/defaultBG.png-a34955864e301d6997d6f22b1f3b4164.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://StudioType/SGDK/Engines/platformer/res/images/player.png"
-dest_files=[ "res://.import/player.png-dd18e5a484a4e30fc084b64cbabb2ce5.stex" ]
+source_file="res://InternalData/defaultBG.png"
+dest_files=[ "res://.import/defaultBG.png-a34955864e301d6997d6f22b1f3b4164.stex" ]
 
 [params]
 
@@ -20,7 +20,7 @@ compress/hdr_mode=0
 compress/bptc_ldr=0
 compress/normal_map=0
 flags/repeat=0
-flags/filter=true
+flags/filter=false
 flags/mipmaps=false
 flags/anisotropic=false
 flags/srgb=2

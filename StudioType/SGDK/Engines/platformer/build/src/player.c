@@ -237,7 +237,32 @@ void updatePlayer() {
 	}
 }
 
-//$updateAnimations$
+void updateAnimations() {
+	//Sprite flip depending on the horizontal input
+	if (playerBody.input.x > 0) {
+		SPR_setHFlip(playerBody.sprite, TRUE);
+		playerBody.facingDirection = 1;
+	}else if (playerBody.input.x < 0) {
+		SPR_setHFlip(playerBody.sprite, FALSE);
+		playerBody.facingDirection = -1;
+	}
+
+	//If the player is on ground and not climbing the stair it can be idle or running
+	if (playerBody.velocity.fixY == 0 && !playerBody.climbingStair) {
+		if (playerBody.velocity.x != 0 && runningAnim == FALSE && playerBody.onGround) {
+			SPR_setAnim(playerBody.sprite, 1);
+			runningAnim = TRUE;
+		}else if (playerBody.velocity.x == 0 && playerBody.onGround) {
+			SPR_setAnim(playerBody.sprite, 0);
+			runningAnim = FALSE;
+		}
+	}
+
+	//Climb animation
+	if (playerBody.climbingStair) {
+		SPR_setAnim(playerBody.sprite, 2);
+	}
+}
 
 void checkCollisions() {
 	//As we now have to check for collisions, we will later check if it is true or false, but for now it is false
@@ -293,7 +318,31 @@ void checkCollisions() {
 				levelLimits.max.x = tileBounds.min.x;
 				break;
 			}
-		}else if (rTileValue == LADDER_TILE) {
+		} else if(rTileValue == SLOPE_90_RIGHT){
+			u16 bottomEdgePos = getTileTopEdge(y);
+			u16 rightEdgePos = getTileRightEdge(rx);
+			if (bottomEdgePos < levelLimits.max.y) { // && bottomEdgePos >= playerFeetPos
+				levelLimits.max.y = bottomEdgePos + rightEdgePos-playerBody.globalPosition.x- playerBody.aabb.min.x;
+			}
+			 
+		}
+		else if(rTileValue == SLOPE_45_RIGHT1){
+			
+			u16 bottomEdgePos = getTileTopEdge(y);
+			u16 rightEdgePos = getTileRightEdge(rx);
+			if (bottomEdgePos < levelLimits.max.y) { // && bottomEdgePos >= playerFeetPos
+				levelLimits.max.y = bottomEdgePos + ((rightEdgePos-playerBody.globalPosition.x-playerBody.aabb.min.x)>>1) ;
+			} 
+		}
+		else if(rTileValue == SLOPE_45_RIGHT2){
+			
+			u16 bottomEdgePos = getTileTopEdge(y);
+			u16 rightEdgePos = getTileRightEdge(rx);
+			if (bottomEdgePos < levelLimits.max.y) { // && bottomEdgePos >= playerFeetPos
+				levelLimits.max.y = bottomEdgePos + ((rightEdgePos-playerBody.globalPosition.x-playerBody.aabb.min.x)>>1)-CELL_SIZE_DIV_2;
+			} 
+		}
+		else if (rTileValue == LADDER_TILE) {
 			stairLeftEdge = getTileLeftEdge(rx);
 			collidingAgainstStair = TRUE;
 		}
@@ -309,7 +358,34 @@ void checkCollisions() {
 				levelLimits.min.x = tileBounds.max.x;
 				break;
 			}
-		}else if (lTileValue == LADDER_TILE) {
+		} 
+		else if(lTileValue == SLOPE_90_LEFT){
+			u16 bottomEdgePos = getTileTopEdge(y);
+			u16 leftEdgePos = getTileLeftEdge(lx);
+			if (bottomEdgePos < levelLimits.max.y) { // && bottomEdgePos >= playerFeetPos
+				levelLimits.max.y = bottomEdgePos - (leftEdgePos-playerBody.globalPosition.x-playerBody.aabb.max.x) ;
+			}
+	 
+		}
+		
+		else if(lTileValue == SLOPE_45_LEFT1){
+			
+			u16 bottomEdgePos = getTileTopEdge(y);
+			u16 leftEdgePos = getTileLeftEdge(lx);
+			if (bottomEdgePos < levelLimits.max.y) { // && bottomEdgePos >= playerFeetPos
+				levelLimits.max.y = bottomEdgePos - ((leftEdgePos-playerBody.globalPosition.x-playerBody.aabb.max.x)>>1) ;
+			} 
+		}
+		else if(lTileValue == SLOPE_45_LEFT2){
+			
+			u16 bottomEdgePos = getTileTopEdge(y);
+			u16 leftEdgePos = getTileLeftEdge(lx);
+			if (bottomEdgePos < levelLimits.max.y) { // && bottomEdgePos >= playerFeetPos
+				levelLimits.max.y = bottomEdgePos - ((leftEdgePos-playerBody.globalPosition.x-playerBody.aabb.max.x)>>1)-CELL_SIZE_DIV_2;
+			} 
+		}
+		
+		else if (lTileValue == LADDER_TILE) {
 			stairLeftEdge = getTileLeftEdge(lx);
 			collidingAgainstStair = TRUE;
 		}
@@ -357,7 +433,7 @@ void checkCollisions() {
 
 			//This is the exact same method that we use for horizontal collisions
 			u16 bottomTileValue = getTileValue(x, y);
-			if (bottomTileValue == GROUND_TILE || bottomTileValue == ONE_WAY_PLATFORM_TILE) {
+			if (bottomTileValue == GROUND_TILE || bottomTileValue == ONE_WAY_PLATFORM_UP_TILE) {
 				if (getTileRightEdge(x) == levelLimits.min.x || getTileLeftEdge(x) == levelLimits.max.x)
 					continue;
 
@@ -366,7 +442,48 @@ void checkCollisions() {
 				if (bottomEdgePos < levelLimits.max.y && bottomEdgePos >= (playerFeetPos - oneWayPlatformErrorCorrection)) {
 					levelLimits.max.y = bottomEdgePos;
 				}
-			}else if (bottomTileValue == LADDER_TILE) {
+				playerBody.velocity.fixY = 0;
+			}
+			else if(bottomTileValue == SLOPE_45_RIGHT1){
+				u16 bottomEdgePos = getTileTopEdge(y);
+				u16 rightEdgePos = getTileRightEdge(x);
+				if (bottomEdgePos < levelLimits.max.y) { // && bottomEdgePos >= playerFeetPos
+					s16 downValue = ((rightEdgePos-playerBody.globalPosition.x-playerBody.aabb.min.x)>>1);
+					levelLimits.max.y = bottomEdgePos + downValue;
+				} 
+			}
+			else if(bottomTileValue == SLOPE_45_RIGHT2){
+				u16 bottomEdgePos = getTileTopEdge(y);
+				u16 rightEdgePos = getTileRightEdge(x);
+				if (bottomEdgePos < levelLimits.max.y) { // && bottomEdgePos >= playerFeetPos
+					s16 downValue = ((rightEdgePos-playerBody.globalPosition.x-playerBody.aabb.min.x)>>1)-CELL_SIZE_DIV_2;
+					if(downValue < 0){
+						downValue = 0;
+					}
+					levelLimits.max.y = bottomEdgePos + downValue;// CELL_SIZE
+				} 
+			}
+			else if(bottomTileValue == SLOPE_45_LEFT1){
+				u16 bottomEdgePos = getTileTopEdge(y);
+				u16 leftEdgePos = getTileLeftEdge(x);
+				if (bottomEdgePos < levelLimits.max.y) { // && bottomEdgePos >= playerFeetPos
+					s16 downValue = ((leftEdgePos-playerBody.globalPosition.x-playerBody.aabb.max.x)>>1);
+					levelLimits.max.y = bottomEdgePos - downValue;
+				} 
+			}
+			else if(bottomTileValue == SLOPE_45_LEFT2){
+				
+				u16 bottomEdgePos = getTileTopEdge(y);
+				u16 leftEdgePos = getTileLeftEdge(x);
+				if (bottomEdgePos < levelLimits.max.y) { // && bottomEdgePos >= playerFeetPos
+					s16 downValue = ((leftEdgePos-playerBody.globalPosition.x-playerBody.aabb.max.x)>>1)-CELL_SIZE_DIV_2;
+					if(downValue > 0){
+						downValue = 0;
+					}
+					levelLimits.max.y = bottomEdgePos - downValue;
+				} 
+			}
+			else if (bottomTileValue == LADDER_TILE) {
 				stairLeftEdge = getTileLeftEdge(x);
 
 				u16 bottomEdgePos = getTileTopEdge(y);
@@ -379,14 +496,14 @@ void checkCollisions() {
 				}
 			}
 		}
-	}else {
+	} else {
 		for (u16 i = 0; i <= tileBoundDifference.x; i++) {
 			s16 x = minTilePos.x + i;
 			u16 y = minTilePos.y;
 
 			//And the same once again
 			u16 topTileValue = getTileValue(x, y);
-			if (topTileValue == GROUND_TILE) {
+			if (topTileValue == GROUND_TILE || topTileValue == ONE_WAY_PLATFORM_DOWN_TILE) {
 				if (getTileRightEdge(x) == levelLimits.min.x || getTileLeftEdge(x) == levelLimits.max.x)
 					continue;
 
@@ -395,7 +512,17 @@ void checkCollisions() {
 					levelLimits.min.y = upperEdgePos;
 					break;
 				}
-			}else if (topTileValue == LADDER_TILE) {
+				playerBody.velocity.fixY = 0;
+			}
+			else if(topTileValue == SLOPE_90_LEFT_UP){
+				u16 upperEdgePos = getTileBottomEdge(y);
+				u16 leftEdgePos = getTileLeftEdge(x);
+				if (upperEdgePos < levelLimits.max.y) {
+					levelLimits.min.y = upperEdgePos-(leftEdgePos-playerBody.globalPosition.x);
+				}
+				playerBody.velocity.fixY = 0;
+			}
+			else if (topTileValue == LADDER_TILE) {
 				stairLeftEdge = getTileLeftEdge(x);
 				collidingAgainstStair = TRUE;
 			}
@@ -405,7 +532,7 @@ void checkCollisions() {
 	//Now we modify the player position and some properties if necessary
 	if (levelLimits.min.y > playerBounds.min.y) {
 		playerBody.globalPosition.y = levelLimits.min.y - playerBody.aabb.min.y;
-		playerBody.velocity.fixY = 0;
+		//playerBody.velocity.fixY = 0;
 	}
 	if (levelLimits.max.y <= playerBounds.max.y) {
 		if (levelLimits.max.y == 768) {
@@ -417,7 +544,7 @@ void checkCollisions() {
 			currentCoyoteTime = coyoteTime;
 			playerBody.jumping = FALSE;
 			playerBody.globalPosition.y = levelLimits.max.y - playerBody.aabb.max.y;
-			playerBody.velocity.fixY = 0;
+			//playerBody.velocity.fixY = 0;
 		}
 	}else {
 		playerBody.onStair = playerBody.onGround = FALSE;

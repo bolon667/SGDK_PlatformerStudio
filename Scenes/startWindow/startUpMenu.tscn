@@ -31,14 +31,14 @@ margin_right = 984.0
 margin_bottom = 266.0
 
 [node name="NewProjBtn" type="Button" parent="VBoxContainer/ContainerButtons"]
-margin_right = 132.0
+margin_right = 89.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 0, 50 )
-text = "New project TODO"
+text = "New project"
 
 [node name="LoadProjBtn" type="Button" parent="VBoxContainer/ContainerButtons"]
-margin_left = 136.0
-margin_right = 227.0
+margin_left = 93.0
+margin_right = 184.0
 margin_bottom = 50.0
 rect_min_size = Vector2( 0, 50 )
 text = "Load project"

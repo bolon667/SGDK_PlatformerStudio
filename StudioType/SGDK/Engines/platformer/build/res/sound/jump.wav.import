@@ -2,12 +2,12 @@
 
 importer="wav"
 type="AudioStreamSample"
-path="res://.import/jump.wav-05dadc7bcf345477e1c8fcfce9f46186.sample"
+path="res://.import/jump.wav-e622d8e252a722e57845d1ed30e3e07a.sample"
 
 [deps]
 
-source_file="res://StudioType/SGDK/Engines/platformer/res/sound/jump.wav"
-dest_files=[ "res://.import/jump.wav-05dadc7bcf345477e1c8fcfce9f46186.sample" ]
+source_file="res://StudioType/SGDK/Engines/platformer/build/res/sound/jump.wav"
+dest_files=[ "res://.import/jump.wav-e622d8e252a722e57845d1ed30e3e07a.sample" ]
 
 [params]
 

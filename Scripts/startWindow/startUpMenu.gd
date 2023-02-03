@@ -5,6 +5,7 @@ extends Control
 # var a = 2
 # var b = "text"
 
+onready var newProjectDialog_t = preload("res://Scenes/InputDialog.tscn")
 onready var prevProjectBtn_t = preload("res://Scenes/startWindow/prevProjectButton.tscn")
 
 onready var prevProjectsContainer = $"VBoxContainer/HBoxContainer/Control/ListContainer/HBoxContainer/ScrollContainer/prevProjectsContainer"
@@ -14,7 +15,7 @@ var cur_path:String = ProjectSettings.globalize_path("res://") + "StudioType/SGD
 func _ready():
 	pass # Replace with function body.
 	$loadProjectDialog.current_path = cur_path
-	load_project_last_paths(singleton.load_project_last_paths())
+	load_project_last_paths(singleton.load_project_last_paths(cur_path))
 
 func load_prev_project(project_name: String):
 	singleton.cur_project_folder_path = cur_path + project_name 
@@ -30,7 +31,9 @@ func load_project_last_paths(dict):
 	
 
 func _on_NewProjBtn_button_down():
-	$createProjectDialog.popup_centered()
+	var node_inst = newProjectDialog_t.instance()
+	add_child(node_inst)
+	#$createProjectDialog.popup_centered()
 
 
 func _on_createProjectDialog_file_selected(path):

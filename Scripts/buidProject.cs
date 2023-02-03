@@ -40,7 +40,7 @@ public class buidProject : Node
 		fullEngineResPath = fullEngineRootPath + "/build/res";
 		fullEmulatorPath = workingDir + "/Emulators/BlastEm/blastem.exe";
 
-		fullTemplatePath = workingDir + "/StudioType/SGDK/Engines/platformer";
+		fullTemplatePath = workingDir + "/StudioType/SGDK/Engines/platformer/build";
 	}
 
 	private static void CopyFilesRecursively(string sourcePath, string targetPath)
@@ -77,6 +77,7 @@ public class buidProject : Node
 		String definesCode = "";
 		definesCode += "#define TILE_SHIFT_LEFT_VALUE " + shiftVal.ToString() + "\n";
 		definesCode += "#define CELL_SIZE " + cellSize.ToString() + "\n";
+		definesCode += "#define CELL_SIZE_DIV_2 " + (cellSize/2).ToString() + "\n";
 
 		typesCode = typesCode.Replace("//$definesCode$", definesCode);
 
@@ -219,7 +220,8 @@ public class buidProject : Node
 		GD.Print("Running project");
 		Process iStartProcess = new Process();
 		iStartProcess.StartInfo.FileName = fullEmulatorPath;
-		iStartProcess.StartInfo.Arguments = fullEngineRootPath + "/build/out/rom.bin";
+		GD.Print(fullEngineRootPath + "/build/out/rom.bin");
+		iStartProcess.StartInfo.Arguments = '"' + fullEngineRootPath + "/build/out/rom.bin\"";
 		//iStartProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
 		iStartProcess.Start();
 		
@@ -379,6 +381,7 @@ public class buidProject : Node
 
 	private String genPositionsCode(int curLevel)
 	{
+		GD.Print($"Gen Position code for level {curLevel}");
 		Node singleton = (Node)GetNode("/root/singleton");
 		String result = ""; ;
 		Godot.Collections.Array positionInstances = (Godot.Collections.Array)singleton.Call("get_positionInstances_by_levelNum", curLevel);
@@ -518,10 +521,12 @@ public class buidProject : Node
 		GD.Print("curLevel: ", curLevel);
 		
 		Node singleton = (Node)GetNode("/root/singleton");
-
+		GD.Print(0);
 		String result = ""; ;
 		//Getting "entity_name: mergedId" pairs
 		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict");
+
+		GD.Print(1);
 		
 		//Getting entityInstances in curLevel
 		Godot.Collections.Array entityInstances = (Godot.Collections.Array)singleton.Call("get_entityInstances_by_levelNum", curLevel);
@@ -533,15 +538,17 @@ public class buidProject : Node
 
 		foreach (Godot.Collections.Dictionary entityInst in entityInstances)
 		{
-			
+			GD.Print(2);
 			//Getting useful data about entity
+			if (!entityInst.Contains("__identifier"))
+			{
+				continue;
+			}
 			String entityName = (String)entityInst["__identifier"];
 
 			GD.Print(entityName);
-			
-			int mergedId = (int)mergedIdsDict[entityName];
+			GD.Print(3);
 
-			
 			Godot.Collections.Array pos = (Godot.Collections.Array)entityInst["px"];
 			
 			Godot.Collections.Array triggerAABB = new Godot.Collections.Array();
@@ -664,6 +671,7 @@ public class buidProject : Node
 
 	private String genLevelFulArr_Code()
 	{
+		GD.Print("Gen LevelFullArr_code");
 		String result = "";
 		Node singleton = (Node)GetNode("/root/singleton");
 		int amountOfLevel = (int)singleton.Call("get_level_count");
@@ -698,6 +706,7 @@ public class buidProject : Node
 	//System.IO.File.WriteAllText(path, code);
 	private void mapsC_CodeReplacer()
 	{
+		GD.Print("maps.c code replacing...");
 		Node singleton = (Node)GetNode("/root/singleton");
 		int amountOfLevel = (int)singleton.Call("get_level_count");
 		String mapsC_path = engineRootPath + "/build/src/maps.c";
@@ -737,16 +746,21 @@ public class buidProject : Node
 
 	private void playerC_CodeReplacer()
 	{
-		String playerCReplace_path = engineRootPath + "/code_template/player/player.c";
-		String playerCode_path = engineRootPath + "/build/src/player.c";
+		String playerCReplace_path = engineRootPath + "/code_template/src/player.c";
+		if (System.IO.File.Exists(playerCReplace_path))
+		{
+			String playerCode_path = engineRootPath + "/build/src/player.c";
+			String playerCReplaceCode = System.IO.File.ReadAllText(playerCReplace_path);
+			System.IO.File.WriteAllText(playerCode_path, playerCReplaceCode);
+		}
+
 		//String playerCode = System.IO.File.ReadAllText(playerCode_path);
-		String playerCReplaceCode = System.IO.File.ReadAllText(playerCReplace_path);
 		//playerCode = playerCode.Replace(@"//$updateAnimations$", updateAnimationsCode);
 
 
 
 
-		System.IO.File.WriteAllText(playerCode_path, playerCReplaceCode);
+		
 		GD.Print("player.c code replaced");
 	}
 
@@ -776,9 +790,11 @@ public class buidProject : Node
 
 	private String genCollisionArrayCode(int levelNum)
 	{
+		GD.Print($"Collision code replacing for level {levelNum}");
 		Node singleton = (Node)GetNode("/root/singleton");
 		Godot.Collections.Array collisionMap = (Godot.Collections.Array)singleton.Call("get_collisionMapForLevel", levelNum);
 
+		
 		int cellSize = (int)singleton.Call("get_cell_size");
 
 		
@@ -795,7 +811,20 @@ public class buidProject : Node
 
 		}
 
+		
 		String resultCode = "const u8 const collisionMap" + levelNumText + "[" + bgSpriteSizeInCells.y + "][" + bgSpriteSizeInCells.x + "] = {\n";
+
+		if(collisionMap.Count == 0)
+		{
+			GD.Print("Collision map is null, making empty collision map");
+			collisionMap = new Godot.Collections.Array();
+			//If you have no collision map, then, make empty collision map
+			float size = bgSpriteSizeInCells.x * bgSpriteSizeInCells.y;
+			for (int i=0; i< size; i++)
+			{
+				collisionMap.Add(0);
+			}
+		}
 
 		int curX = 0;
 		int curY = 0;
@@ -804,10 +833,10 @@ public class buidProject : Node
 			resultCode += "{";
 			while (curX < (int)bgSpriteSizeInCells.x)
 			{
-
 				resultCode += (collisionMap[curX+(curY* (int)bgSpriteSizeInCells.x)]).ToString() + ", ";
 				curX++;
 			}
+			
 			curX = 0;
 			curY++;
 			resultCode += "}, \n";

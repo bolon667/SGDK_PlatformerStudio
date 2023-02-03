@@ -18,6 +18,9 @@ void entityCheckForBullet(EntityMerged* entity){
 	);
 	for(u16 i = 0; i < curEntityAll->Bullet_size; i++){
 		Bullet* curBullet = &curEntityAll->Bullet_arr[i];
+		if(!curBullet->alive){
+			continue;
+		}
 		AABB bulletBounds = newAABB(
 			curBullet->posInt.x + curBullet->rect.min.x,
 			curBullet->posInt.x + curBullet->rect.max.x,

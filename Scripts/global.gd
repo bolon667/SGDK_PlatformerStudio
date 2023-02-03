@@ -217,8 +217,8 @@ const level_template = {
 	"identifier": "Level1",
 	"worldX": 0,
 	"worldY": 0,
-	"pxWid": 500,
-	"pxHei": 500,
+	"pxWid": 320,
+	"pxHei": 224,
 	"bgRelPath": "",
 	"bgRelPath2": "",
 	"startPos": [0,0],
@@ -380,7 +380,7 @@ func get_sprite_size_from_path(path:String):
 		result = Vector2(t_width*8, t_height*8)
 	return result
 
-func load_project_last_paths():
+func load_project_last_paths(projects_path: String):
 	var paths = {
 		"last_project_paths": [],
 	}
@@ -395,7 +395,13 @@ func load_project_last_paths():
 		if data_parse.error != OK:
 			return paths
 		
-		return data_parse.result
+		#Checking if folders exists
+		var directory = Directory.new();
+		for project_name in data_parse.result["last_project_paths"]:
+			if(directory.dir_exists(projects_path + project_name)):
+				paths["last_project_paths"].append(project_name)
+		save_project_last_paths_fast(paths)
+		return paths
 	else:
 		var dir = Directory.new()
 		dir.open("./")
@@ -405,7 +411,14 @@ func load_project_last_paths():
 		file.store_string(to_json(paths))
 		file.close()
 		return paths
-		
+
+func save_project_last_paths_fast(paths_dict: Dictionary):
+	var file_path: String = "./InternalData/lastPath_arr.json"
+	var file = File.new()
+	file.open(file_path, file.WRITE)
+	file.store_string(to_json(paths_dict))
+	file.close()
+
 func save_project_last_paths():
 	var paths = {}
 	var file = File.new()
@@ -429,6 +442,12 @@ func save_project_last_paths():
 	file2.open(file_path, file2.WRITE)
 	file2.store_string(to_json(paths_dict))
 	file2.close()
+
+func update_cur_project_folder_path(path: String):
+	cur_project_folder_path = path
+
+func update_cur_project_path(path: String):
+	cur_project_path = path
 
 func save_project():
 	entity_types["defaultGridSize"] = cell_size
@@ -625,6 +644,16 @@ func change_entityInst_by_instId(instId: int, key:String, val):
 			break
 		cur_InstInd+=1
 
+func get_positionInst_by_instId(instId: int):
+	#Getting entity layer
+	var cur_ind: int = 0
+	for layer in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if layer["__type"] == "Position":
+			break
+		cur_ind += 1
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_ind]["entityInstances"]:
+		if entity_inst["instId"] == instId:
+			return entity_inst
 
 func get_entityInst_by_instId(instId: int):
 	#Getting entity layer
@@ -687,6 +716,7 @@ func add_level():
 	
 	var level_data = level_template.duplicate(true)
 	level_data["identifier"] = "Level_" + str(cur_level_ind)
+	level_data["bgRelPath"] = ProjectSettings.globalize_path("res://") + "InternalData/defaultBG.png"
 	#if len(entity_types["levels"]) > 0:
 	#	var prev_level = entity_types["levels"][cur_level_ind]
 	#	level_data["pxHei"] = prev_level["pxHei"]

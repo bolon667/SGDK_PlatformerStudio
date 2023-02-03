@@ -118,11 +118,13 @@ func load_positions_on_scene():
 		entity_node.position = Vector2(entity_pos[0], entity_pos[1])
 		entity_node.entityInst_id = entity_inst["instId"]
 		
+		
 		entity_node.get_node("CollisionShape2D").shape = RectangleShape2D.new()
 		var draggableShape: Vector2 = Vector2(16,16)
 
 		entity_node.get_node("CollisionShape2D").shape.extents = draggableShape
 		position_obj_list.add_child(entity_node)
+		
 
 func clear_entities_on_scene():
 	var children = entity_obj_list.get_children()
@@ -198,7 +200,7 @@ func _ready():
 	load_level()
 
 func load_level():
-	
+	remove_fields_of_entity()
 	
 	
 	#get image of level background
@@ -306,7 +308,31 @@ func make_line_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int, tile_map):
 			return
 		if(pos1.x >= map_size_tiles.x or pos1.y >= map_size_tiles.y):
 			return
-		tile_map.set_cell(pos1.x, pos1.y, tile_ind);
+		if(tile_ind == 8):
+			tile_map.set_cell(pos1.x, pos1.y, 8)
+			tile_map.set_cell(pos1.x+1, pos1.y, 9)
+		elif(tile_ind == 9):
+			tile_map.set_cell(pos1.x, pos1.y, 9)
+			tile_map.set_cell(pos1.x-1, pos1.y, 8)
+		elif(tile_ind == 10):
+			tile_map.set_cell(pos1.x, pos1.y, 10)
+			tile_map.set_cell(pos1.x+1, pos1.y, 11)
+		elif(tile_ind == 11):
+			tile_map.set_cell(pos1.x, pos1.y, 11)
+			tile_map.set_cell(pos1.x-1, pos1.y, 10)
+		elif(tile_ind == 12):
+			tile_map.set_cell(pos1.x, pos1.y, 12)
+			tile_map.set_cell(pos1.x+1, pos1.y, 13)
+		elif(tile_ind == 13):
+			tile_map.set_cell(pos1.x, pos1.y, 13)
+			tile_map.set_cell(pos1.x-1, pos1.y, 12)
+		elif(tile_ind == 14):
+			tile_map.set_cell(pos1.x, pos1.y, 14)
+			tile_map.set_cell(pos1.x+1, pos1.y, 15)
+		elif(tile_ind == 15):
+			tile_map.set_cell(pos1.x, pos1.y, 15)
+			tile_map.set_cell(pos1.x-1, pos1.y, 14)
+		tile_map.set_cell(pos1.x, pos1.y, tile_ind)
 		return
 	var x_increment = dx / steps;
 	var y_increment = dy / steps;
