@@ -18,8 +18,11 @@ func _ready():
 	load_project_last_paths(singleton.load_project_last_paths(cur_path))
 
 func load_prev_project(project_name: String):
-	singleton.cur_project_folder_path = cur_path + project_name 
-	singleton.cur_project_path =  cur_path + project_name + "/data.json"
+	singleton.cur_project_folder_path = cur_path + project_name
+	singleton.cur_project_path = singleton.cur_project_folder_path + "/data.json"
+	var file = File.new()
+	if !file.file_exists(singleton.cur_project_path):
+		return
 	singleton.load_project(singleton.cur_project_path)
 	get_tree().change_scene("res://Scenes/mapEditorScene.tscn")
 

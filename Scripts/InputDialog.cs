@@ -44,19 +44,27 @@ public class InputDialog : Control
 
 	public void makeNewProject()
 	{
-		String toPath = workingDir + "/StudioType/SGDK/Projects/" + textEdit.Text;
-		if (System.IO.Directory.Exists(toPath))
+		String ditrectoryPath = workingDir + "/StudioType/SGDK/Projects/" + textEdit.Text;
+		String toPathBuild = workingDir + "/StudioType/SGDK/Projects/" + textEdit.Text + "/build";
+		String toPathCodeTemplate = workingDir + "/StudioType/SGDK/Projects/" + textEdit.Text + "/code_template";
+		String toPathIcon = workingDir + "/StudioType/SGDK/Projects/" + textEdit.Text + "/icon.png";
+
+		if (System.IO.Directory.Exists(ditrectoryPath))
 		{
 			infoLabel.Text = $"Project '{textEdit.Text}' already exists!";
 			return;
 		}
-		String fromPath = workingDir + "/StudioType/SGDK/Engines/platformer";
-		
+		String fromPathCodeTemplate = workingDir + "/StudioType/SGDK/Engines/platformer/code_template";
+		String fromPathNewProject = workingDir + "/StudioType/SGDK/Engines/platformer/new_project";
+		String fromPathIcon = workingDir + "/StudioType/SGDK/Engines/platformer/icon.png";
+
+		CopyFilesRecursively(fromPathNewProject, toPathBuild);
+		CopyFilesRecursively(fromPathCodeTemplate, toPathCodeTemplate);
+		System.IO.File.Copy(fromPathIcon, toPathIcon, true);
 		String dataJsonPath = workingDir + "/StudioType/SGDK/Projects/" + textEdit.Text + "/data.json";
-		CopyFilesRecursively(fromPath, toPath);
 		singleton.Call("update_cur_project_path", dataJsonPath);
-		singleton.Call("update_cur_project_folder_path", toPath);
-		singleton.Call("save_project");
+		singleton.Call("update_cur_project_folder_path", ditrectoryPath);
+		singleton.Call("create_new_project");
 		singleton.Call("save_project_last_paths");
 		GetTree().ChangeScene("res://Scenes/mapEditorScene.tscn");
 	}

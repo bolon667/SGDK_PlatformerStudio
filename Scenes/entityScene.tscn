@@ -35,6 +35,8 @@ func _ready():
 	pass # Replace with function body.
 	var entityInst_info = singleton.get_entityInst_by_instId(entityInst_id)
 	triggerAABB = entityInst_info[\"triggerAABB\"]
+	if(entityInst_info.has(\"addTrigger\")):
+		$ColorRect.visible = entityInst_info[\"addTrigger\"]
 	print(\"chheck \",$CollisionShape2D.shape.extents)
 	print($Sprite.texture.get_size()/2)
 	#$Sprite.region_rect = Rect2(0, 0, 10,10)
@@ -67,7 +69,7 @@ func change_sprite_rect(rect: Rect2):
 func _draw():
 	update()
 	if(highlight):
-		var color = Color(0.5,0.5,0)
+		var color: Color = Color( 1, 0.84, 0, 1 )
 		var line_thickness = 3
 		var col_rect_pos: Vector2 = $CollisionShape2D.position
 		#line_thickness = stepify(line_thickness*camera2D.zoom,0)
@@ -138,12 +140,21 @@ func move_entity():
 		show_fields_of_entity()
 		is_moving = true
 		singleton.cur_entity_inst_ind = entityInst_id
-		print(\"cur entity inst id: \", singleton.cur_entity_inst_ind)
+		var entityInst_info = singleton.get_entityInst_by_instId(entityInst_id)
+		
+		if !entityInst_info.has(\"addTrigger\"):
+			var entityDef = singleton.get_entityDef_by_defId(entityInst_info[\"defId\"])
+			entityInst_info[\"addTrigger\"] = entityDef[\"addTrigger\"]
+			pass
 	if(is_moving):
 		global_position.x += (ref.x - fixed_toggle_point.x)*camera2D.zoom.x
 		global_position.y += (ref.y - fixed_toggle_point.y)*camera2D.zoom.y
+		
 	if(Input.is_action_just_released(\"mouse1\")):
 		is_moving = false
+		if(singleton.entity_snap_to_grid):
+			global_position.x = (round(global_position.x/8))*8
+			global_position.y = (round(global_position.y/8))*8
 	if(Input.is_action_pressed(\"mouse2\") and highlight):
 		remove_fields_of_entity()
 		singleton.delete_entityInstance(entityInst_id)

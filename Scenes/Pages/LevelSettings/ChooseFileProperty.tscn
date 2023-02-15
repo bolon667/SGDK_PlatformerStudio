@@ -1,0 +1,58 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/Pages/LevelSettings/ChooseFileProperty.cs" type="Script" id=1]
+
+[node name="HBoxContainer" type="HBoxContainer"]
+margin_right = 1024.0
+margin_bottom = 58.0
+script = ExtResource( 1 )
+
+[node name="Label" type="Label" parent="."]
+margin_top = 22.0
+margin_right = 125.0
+margin_bottom = 36.0
+text = "Before level script: "
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = 129.0
+margin_right = 1024.0
+margin_bottom = 58.0
+size_flags_horizontal = 3
+
+[node name="infoLabel" type="Label" parent="VBoxContainer"]
+margin_right = 895.0
+margin_bottom = 14.0
+text = "NULL"
+align = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 18.0
+margin_right = 895.0
+margin_bottom = 58.0
+
+[node name="Button" type="Button" parent="VBoxContainer/HBoxContainer"]
+margin_right = 851.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 0, 40 )
+size_flags_horizontal = 3
+text = "Choose script"
+
+[node name="removeBtn" type="Button" parent="VBoxContainer/HBoxContainer"]
+margin_left = 855.0
+margin_right = 895.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 40, 40 )
+text = " X "
+
+[node name="FileDialog" type="FileDialog" parent="."]
+margin_left = 624.0
+margin_right = 1024.0
+margin_bottom = 300.0
+rect_min_size = Vector2( 400, 300 )
+window_title = "Открыть файл"
+mode = 0
+access = 2
+
+[connection signal="button_down" from="VBoxContainer/HBoxContainer/Button" to="." method="_on_Button_button_down"]
+[connection signal="button_down" from="VBoxContainer/HBoxContainer/removeBtn" to="." method="_on_removeBtn_button_down"]
+[connection signal="file_selected" from="FileDialog" to="." method="_on_FileDialog_file_selected"]

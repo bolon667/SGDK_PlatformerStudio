@@ -1,0 +1,9 @@
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\bin\ExportRelease\GodotTileMapEditor.dll
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\bin\ExportRelease\GodotTileMapEditor.pdb
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\obj\ExportRelease\GodotTileMapEditor.csproj.AssemblyReference.cache
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\obj\ExportRelease\GodotTileMapEditor.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\obj\ExportRelease\GodotTileMapEditor.AssemblyInfoInputs.cache
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\obj\ExportRelease\GodotTileMapEditor.AssemblyInfo.cs
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\obj\ExportRelease\GodotTileMapEditor.csproj.CoreCompileInputs.cache
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\obj\ExportRelease\GodotTileMapEditor.dll
+C:\Users\bolon667\Documents\GitHub\SGDK_OneScreenPlatformerStudio\.mono\temp\obj\ExportRelease\GodotTileMapEditor.pdb

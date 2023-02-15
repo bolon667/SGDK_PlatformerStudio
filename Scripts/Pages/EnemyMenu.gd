@@ -12,8 +12,9 @@ onready var entity_list_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBo
 onready var entity_name_edit = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3/EntityNameEdit
 onready var add_new_field_btn = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/AddNewEntityField
 onready var field_properties_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/ContainerFieldProperties
+onready var add_trigger_btn = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer5/addTriggerActivate
 
-
+var add_trigger_activated: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -22,6 +23,18 @@ func _ready():
 	load_list_of_entity()
 
 
+func load_entity_has_trigger():
+	add_trigger_btn.disabled = false
+	if(singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind].has("addTrigger")):
+		add_trigger_activated = singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["addTrigger"]
+	else:
+		singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["addTrigger"] = false
+		add_trigger_activated = singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["addTrigger"]
+	if add_trigger_activated:
+		add_trigger_btn.text = "On"
+	else:
+		add_trigger_btn.text = "Off"
+		
 func clear_list_of_entity():
 	var entity_list_container_children = entity_list_container.get_children()
 	for child in entity_list_container_children:
@@ -68,6 +81,7 @@ func load_list_of_entity():
 	singleton.entity_names_len = entity_names_len
 	print("entity_names_len: ", entity_names_len)
 	print(singleton.cur_entity_type_ind)
+	
 	
 	if(entity_names_len == 0):
 		entity_name_edit.readonly = true
@@ -132,7 +146,7 @@ func _on_AddNewEntityBtn_button_down():
 	var final_entity_name = entity_name
 
 	if(singleton.is_entity_name_exists(entity_name)):
-		var i=2;
+		var i:int = 2;
 		while(i<100):
 			final_entity_name = entity_name + str(i)
 			if(!singleton.is_entity_name_exists(final_entity_name)):
@@ -199,3 +213,12 @@ func _on_ExitBtn_button_down():
 
 func _on_entityMergedActive_toggled(button_pressed):
 	pass # Replace with function body.
+
+
+func _on_addTriggerActivate_button_down():
+	add_trigger_activated = !add_trigger_activated
+	singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["addTrigger"] = add_trigger_activated
+	if add_trigger_activated:
+		add_trigger_btn.text = "On"
+	else:
+		add_trigger_btn.text = "Off"

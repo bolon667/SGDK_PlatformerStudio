@@ -6,6 +6,7 @@ onready var layer_value_list = $VBoxContainer/LayerValuesList/LayerValuesContain
 
 onready var entity_menu_t = preload("res://Scenes/Pages/EntityMenu.tscn")
 onready var msg_packs_menu_t = preload("res://Scenes/Pages/MessagePack/MessagePacksMenu.tscn")
+onready var level_settings_menu_t = preload("res://Scenes/Pages/LevelSettings/LevelSettingsMenu.tscn")
 onready var layer_button_t = preload("res://Scenes/LayerButton.tscn")
 
 onready var change_start_pos_t = preload("res://Scenes/Pages/changeStartPos.tscn")
@@ -42,10 +43,12 @@ func load_layer_values(btn: Button):
 				entity_layer_value_btn_node.text = entity_name
 				layer_value_list.add_child(entity_layer_value_btn_node)
 		"Position": #Same as Entity but not so heavy, because, it stores only x,y, coords
+			get_tree().call_group("tilemapEditorWindow", "remove_fields_of_entity")
 			singleton.cur_editor_mode = singleton.EditorMode.POSITION
 			print("Position mode")
 			singleton.cur_entity_type_ind = -1 #Can't create entity
 		"Collision":
+			get_tree().call_group("tilemapEditorWindow", "remove_fields_of_entity")
 			singleton.cur_editor_mode = singleton.EditorMode.COLLISION
 			print("Collision mode")
 			singleton.cur_entity_type_ind = -1 #Can't create entity
@@ -68,3 +71,8 @@ func _on_changeStartPosBtn_button_down():
 func _on_msgPacksBtn_button_down():
 	var msg_packs_node = msg_packs_menu_t.instance()
 	add_child(msg_packs_node)
+
+
+func _on_lvlSettingsBtn_button_down():
+	var node = level_settings_menu_t.instance()
+	add_child(node)

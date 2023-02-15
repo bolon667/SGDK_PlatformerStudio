@@ -18,6 +18,11 @@ config/icon="res://icon.png"
 
 singleton="*res://Scripts/global.gd"
 
+[debug]
+
+settings/gdscript/max_call_stack=5000
+settings/visual_script/max_call_stack=5000
+
 [gui]
 
 common/drop_mouse_on_gui_input_disabled=true
@@ -102,6 +107,10 @@ history_forward={
 [mono]
 
 project/assembly_name="GodotTileMapEditor"
+
+[network]
+
+limits/debugger_stdout/max_chars_per_second=30000
 
 [physics]
 

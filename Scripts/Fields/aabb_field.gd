@@ -11,6 +11,15 @@ var cur_aabb:Array =  [0,0,0,0]
 func _ready():
 	pass # Replace with function body.
 	load_aabb()
+	print("help me")
+	print("cur_inst_id: ", singleton.cur_entity_inst_ind)
+	print("inst_len: ", len(singleton.entity_types["levels"][singleton.cur_level_ind]["layerInstances"][0]["entityInstances"]))
+	#Found a weird bug, idk how to reproduce it, but, i know, that if i check this,
+	print("identifier: ",singleton.entity_types["levels"][singleton.cur_level_ind]["layerInstances"][0]["entityInstances"][singleton.cur_entity_inst_ind]["__identifier"])
+	
+	#And crush happens, this bug is appeared
+	#Something with new on/off add trigger, crap..
+	
 	#update_trigger_rect()
 	
 
@@ -32,7 +41,9 @@ func update_trigger_rect():
 	get_tree().call_group("tilemapEditorWindow", "change_entity_trigger_rect_by_instId", singleton.cur_entity_inst_ind, Rect2(cur_aabb[0], cur_aabb[1], cur_aabb[2], cur_aabb[3]))
 	var new_val:String = "{" + str(cur_aabb[0]) + "," + str(cur_aabb[1]) + "," + str(cur_aabb[2]) + "," + str(cur_aabb[3]) + "}"
 	singleton.change_fiendInst_by_instId("Trigger rect", new_val)
-	singleton.change_cur_entityInst("triggerAABB", cur_aabb)
+	singleton.change_cur_entityInstTriggerAABB(cur_aabb)
+	print("cur_aabb")
+	print(cur_aabb)
 	$HBoxContainer/VBoxContainer/realVal.text = new_val
 	pass
 

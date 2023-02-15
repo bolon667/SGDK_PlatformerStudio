@@ -23,6 +23,8 @@ var map_size_px:Vector2
 var map_size_tiles:Vector2
 
 
+
+
 onready var temp_tile_map = $roomSize/tempTileMap
 #onready var temp_tile_map = $tempTileMap
 
@@ -81,10 +83,14 @@ func move_map_around():
 	fixed_toggle_point = ref
 
 func update_tilemap_cell_size(cell_size: Vector2):
-	tile_map.cell_size = cell_size
-	
-	
-	temp_tile_map.cell_size = cell_size
+	#Changing tilemap cell size
+	tile_map.cell_size = Vector2(singleton.cell_size, singleton.cell_size)
+	if(singleton.cell_size == 8):
+		tile_map.tile_set = load("res://TileSets/8x8TileSet.tres")
+	if(singleton.cell_size == 16):
+		tile_map.tile_set = load("res://TileSets/16x16TileSet.tres")
+	temp_tile_map.cell_size = tile_map.cell_size
+	temp_tile_map.tile_set = tile_map.tile_set
 
 func load_tileMap():
 	#clear all from scene
@@ -143,7 +149,7 @@ func load_entities_on_scene():
 		
 		if(!entity_inst.has("triggerAABB")):
 			continue
-		entity_node.triggerAABB = entity_inst["triggerAABB"]
+		entity_node.triggerAABB = entity_inst["triggerAABB"].duplicate(true)
 		
 		if len(entity_inst["__spritePath"]) > 0:
 			var img1 = Image.new()
@@ -189,13 +195,7 @@ func _ready():
 	$Area2D/CollisionShape2D.shape.extents = window_size
 	
 	#Changing tilemap cell size
-	tile_map.cell_size = Vector2(singleton.cell_size, singleton.cell_size)
-	if(singleton.cell_size == 8):
-		tile_map.tile_set = load("res://TileSets/8x8TileSet.tres")
-	if(singleton.cell_size == 16):
-		tile_map.tile_set = load("res://TileSets/16x16TileSet.tres")
-	temp_tile_map.cell_size = tile_map.cell_size
-	temp_tile_map.tile_set = tile_map.tile_set
+	update_tilemap_cell_size(Vector2(singleton.cell_size, singleton.cell_size))
 	
 	load_level()
 
@@ -220,6 +220,7 @@ func load_level():
 	load_entities_on_scene()
 	#Fill tilemap with data from json (singleton.entity_types)
 	load_tileMap()
+
 
 func area2d_follow_camera():
 	$Area2D.global_position = camera.global_position
@@ -308,7 +309,13 @@ func make_line_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int, tile_map):
 			return
 		if(pos1.x >= map_size_tiles.x or pos1.y >= map_size_tiles.y):
 			return
-		if(tile_ind == 8):
+		if(tile_ind == 4):
+			tile_map.set_cell(pos1.x, pos1.y, 4)
+			tile_map.set_cell(pos1.x, pos1.y+1, 0)
+		elif(tile_ind == 5):
+			tile_map.set_cell(pos1.x, pos1.y, 5)
+			tile_map.set_cell(pos1.x, pos1.y+1, 0)
+		elif(tile_ind == 8):
 			tile_map.set_cell(pos1.x, pos1.y, 8)
 			tile_map.set_cell(pos1.x+1, pos1.y, 9)
 		elif(tile_ind == 9):
@@ -501,7 +508,12 @@ func entity_list_handler():
 	
 	if(Input.is_action_just_pressed("mouse1") and singleton.can_create_entity_obj and singleton.cur_entity_type_ind != -1):
 		var mouse_pos = get_global_mouse_position()
-		entity_obj_node.position = Vector2(mouse_pos.x - $roomSize.rect_position.x, mouse_pos.y - $roomSize.rect_position.y)
+		if singleton.entity_snap_to_grid:
+			var x_pos = (round((mouse_pos.x - $roomSize.rect_position.x)/8)) * 8
+			var y_pos = (round((mouse_pos.y - $roomSize.rect_position.y)/8)) * 8
+			entity_obj_node.position = Vector2(x_pos, y_pos)
+		else:
+			entity_obj_node.position = Vector2(mouse_pos.x - $roomSize.rect_position.x, mouse_pos.y - $roomSize.rect_position.y)
 		#Got uid for entityInst
 		var entity_inst = singleton.add_cur_entityInstance()
 		#Put entityInst in database

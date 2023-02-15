@@ -32,6 +32,8 @@ var entity_names_len: int = 0
 
 var cur_level: int = 1
 
+var entity_snap_to_grid: bool = false
+
 var mergedFieldArr: Array
 
 var can_create_entity_obj: bool = true
@@ -84,6 +86,17 @@ var entity_types = {
 	
 }
 
+const enum_template = {
+	"identifier": "",
+	"uid": -1,
+	"values": [],
+	"tags": [],
+}
+
+const enum_val_template = {
+	"name": "test",
+	"color": 0, 
+}
 
 const field_def_template = {	
 	"identifier": "Field",
@@ -182,6 +195,7 @@ const entity_def_template = {
 	"show": true,
 	"isMerged": true,
 	"spritePath": "",
+	"addTrigger": false,
 	"triggerAABB": [0,0,8,8],
 	"triggerType": 1,
 	"triggerValue": 1,
@@ -204,6 +218,7 @@ const startPos_def_template = {
 	"height": 16,
 	"show": true,
 	"spritePath": "",
+	"addTrigger": false,
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
 	#entity name or field name in entity menu.
 	"color": "#0048FF",
@@ -221,6 +236,12 @@ const level_template = {
 	"pxHei": 224,
 	"bgRelPath": "",
 	"bgRelPath2": "",
+	"bgaMode": 0,
+	"bgbMode": 0,
+	"musicName": "",
+	"beforeLevelScript": "",
+	"everyFrameScript": "",
+	"afterLevelScript": "",
 	"startPos": [0,0],
 	"fieldInstances":
 		[
@@ -230,14 +251,17 @@ const level_template = {
 		[
 			
 		],
-	
+	"messagePacks":
+		[
+			
+		],
 }
 
 const level_layer_template = {
 	"__identifier": "tLayer",
 	"__type": "Collision",
-	"__cWid": 500,
-	"__cHei": 500,
+	"__cWid": 320,
+	"__cHei": 224,
 	"__gridSize": 8,
 	"__tilesetRelPath": "",
 	"visible": true,
@@ -256,6 +280,7 @@ const entity_inst_template = {
 	"height": 32,
 	"isMerged": true,
 	"px": [0,0],
+	"addTrigger": false,
 	"triggerType": 1,
 	"triggerValue": 1,
 	"triggerValue2": 1,
@@ -285,33 +310,58 @@ const field_inst_template = {
 	"__hasStruct": true,
 }
 
+func change_load_image_mode_bga(mode: int):
+	entity_types["levels"][cur_level_ind]["bgaMode"] = mode
+func change_load_image_mode_bgb(mode: int):
+	entity_types["levels"][cur_level_ind]["bgbMode"] = mode
+
+func get_level_attr(attr: String):
+	if(!entity_types["levels"][cur_level_ind].has(attr)):
+		entity_types["levels"][cur_level_ind][attr] = ""
+	return entity_types["levels"][cur_level_ind][attr]
+		
+func get_load_modes():
+	if(!entity_types["levels"][cur_level_ind].has("bgaMode")):
+		entity_types["levels"][cur_level_ind]["bgaMode"] = 0
+	if(!entity_types["levels"][cur_level_ind].has("bgbMode")):
+		entity_types["levels"][cur_level_ind]["bgbMode"] = 0
+	return[entity_types["levels"][cur_level_ind]["bgaMode"], entity_types["levels"][cur_level_ind]["bgbMode"]];
+
+func change_level_attr(attr: String, val):
+	entity_types["levels"][cur_level_ind][attr] = val
+
+func add_trigger_enum():
+	entity_types[""]
+	enum_template
+	pass
 
 func add_messagePack():
 	var data: Dictionary = messagePack_template.duplicate(true)
-	entity_types["defs"]["messagePacks"].append(data)
+	entity_types["levels"][cur_level_ind]["messagePacks"].append(data)
 	
 func add_message():
 	if cur_messagePack_ind == -1:
 		return
 	var data: String = "test message"
-	entity_types["defs"]["messagePacks"][cur_messagePack_ind]["messages"].append(data)
+	entity_types["levels"][cur_level_ind]["messagePacks"][cur_messagePack_ind]["messages"].append(data)
 
 func delete_cur_messagePack():
 	if cur_messagePack_ind == -1:
 		return
-	entity_types["defs"]["messagePacks"].remove(cur_messagePack_ind)
+	entity_types["levels"][cur_level_ind]["messagePacks"].remove(cur_messagePack_ind)
 	
 func delete_cur_message():
 	
-	entity_types["defs"]["messagePacks"][cur_messagePack_ind]["messages"].remove(cur_message_ind)
+	entity_types["levels"][cur_level_ind]["messagePacks"][cur_messagePack_ind]["messages"].remove(cur_message_ind)
 
 func change_messagePack_name(msgPack_name: String):
-	entity_types["defs"]["messagePacks"][cur_messagePack_ind]["name"] = msgPack_name
+	entity_types["levels"][cur_level_ind]["messagePacks"][cur_messagePack_ind]["name"] = msgPack_name
 
 func change_cur_message(text: String):
-	entity_types["defs"]["messagePacks"][cur_messagePack_ind]["messages"][cur_message_ind] = text
+	entity_types["levels"][cur_level_ind]["messagePacks"][cur_messagePack_ind]["messages"][cur_message_ind] = text
 
 func get_project_folder_path():
+	print("cur project folder path: ", cur_project_folder_path)
 	return cur_project_folder_path
 
 func get_engine_root_path():
@@ -319,12 +369,13 @@ func get_engine_root_path():
 
 func get_cell_size():
 	return cell_size
+	
+func change_cell_size(new_size: int):
+	cell_size = new_size
+	entity_types["defaultGridSize"] = cell_size
 
 func _ready():
 	add_level()
-	add_level_layer(cur_level_ind, "Entity", "Entity")
-	add_level_layer(cur_level_ind, "Positions", "Position")
-	add_level_layer(cur_level_ind, "Collision", "Collision")
 
 func is_level_layer_exists(level_num: int, layer_type):
 	for layer in entity_types["levels"][level_num]["layerInstances"]:
@@ -333,22 +384,7 @@ func is_level_layer_exists(level_num: int, layer_type):
 	
 	return false
 
-func project_update():
-	var layer_name_arr = [
-		{"name": "Entity", "type": "Entity"},
-		{"name": "Positions", "type": "Position"},
-		{"name": "Collision", "type": "Collision"},
-		]
-	var amount_of_levels = get_amount_of_levels()
-	for level_ind in range(amount_of_levels):
-		for layer_info in layer_name_arr:
-			if(!is_level_layer_exists(level_ind, layer_info["type"])):
-				add_level_layer(level_ind, layer_info["name"], layer_info["type"])
-	
-	pass
-	#Do checks to update json structure if nessesary
-	
-	#if entity_types[""]
+
 
 func load_project(projectPath: String):
 	var dict = {}
@@ -362,7 +398,6 @@ func load_project(projectPath: String):
 		return
 	
 	entity_types = data_parse.result
-	project_update()
 	cell_size = entity_types["defaultGridSize"]
 	
 
@@ -449,8 +484,13 @@ func update_cur_project_folder_path(path: String):
 func update_cur_project_path(path: String):
 	cur_project_path = path
 
-func save_project():
+func create_new_project():
 	entity_types["defaultGridSize"] = cell_size
+	add_entity_def("EntitySimple")
+	add_positionInstance()
+	save_project()
+
+func save_project():
 	print("saving project")
 	print("cur_path ", cur_project_path)
 	var file = File.new()
@@ -522,6 +562,18 @@ func get_collisionMapForLevel(levelNum:int):
 	return entity_types["levels"][levelNum]["layerInstances"][collision_layer_ind]["intGridCsv"]
 
 
+func change_cur_entityInstTriggerAABB(aabb: Array):
+	var entity_layer_ind: int = -1
+	var temp_entity_layer_ind: int = 0
+	for layer_inst in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if(layer_inst["__type"] == "Entity"):
+			entity_layer_ind = temp_entity_layer_ind
+			break
+		temp_entity_layer_ind += 1
+	if entity_layer_ind == -1:
+		return
+	entity_types["levels"][cur_level_ind]["layerInstances"][entity_layer_ind]["entityInstances"][cur_entity_inst_ind]["triggerAABB"] = aabb
+
 func change_cur_entityInst(key: String, val):
 	var entity_layer_ind: int = 0
 	for layer_inst in entity_types["levels"][cur_level_ind]["layerInstances"]:
@@ -534,9 +586,9 @@ func get_amount_of_levels():
 	return len(entity_types["levels"])
 
 func get_messagePack_arr():
-	if(!entity_types["defs"].has("messagePacks")):
-		entity_types["defs"]["messagePacks"] = []
-	return entity_types["defs"]["messagePacks"]
+	if(!entity_types["levels"][cur_level_ind].has("messagePacks")):
+		entity_types["levels"][cur_level_ind]["messagePacks"] = []
+	return entity_types["levels"][cur_level_ind]["messagePacks"]
 	
 
 func change_entityInstName_by_defId(entity_name: String, defId: int):
@@ -598,9 +650,13 @@ func delete_entityInstance(instId: int):
 		posInArray += 1
 
 func save_entityInst_pos(instId: int, posPx: Array):
+	var posInArray: int = 0
 	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
 		if entity_inst["instId"] == instId:
 			entity_inst["px"] = [int(posPx[0]), int(posPx[1])]
+			entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][posInArray]["px"] = [int(posPx[0]), int(posPx[1])]
+			break
+		posInArray += 1
 
 func get_level_count():
 	var level_count: int = 0
@@ -640,7 +696,6 @@ func change_entityInst_by_instId(instId: int, key:String, val):
 			print(val)
 			print(key)
 			entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_InstInd][key] = val
-			print(entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_InstInd])
 			break
 		cur_InstInd+=1
 
@@ -691,10 +746,36 @@ func change_sprite_by_instId(spritePath: String):
 			break
 		cur_inst_ind += 1
 
+func add_positionInstance_to_level(levelInd: int):
+	var entity_instance = {"px": [0,0], "instId": -1}
+	entity_instance["instId"] = get_unique_entity_instId()
+	var temp_layer_id:int = 0
+	var layer_id:int = -1
+	for layer in entity_types["levels"][levelInd]["layerInstances"]:
+		if layer["__type"] == "Position":
+			layer_id = temp_layer_id
+			break
+		temp_layer_id += 1
+	
+	if(layer_id == -1):
+		return
+	entity_types["levels"][levelInd]["layerInstances"][layer_id]["entityInstances"].append(entity_instance)
+	return entity_instance
+
 func add_positionInstance():
 	var entity_instance = {"px": [0,0], "instId": -1}
 	entity_instance["instId"] = get_unique_entity_instId()
-	entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"].append(entity_instance)
+	var temp_layer_id:int = 0
+	var layer_id:int = -1
+	for layer in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if layer["__type"] == "Position":
+			layer_id = temp_layer_id
+			break
+		temp_layer_id += 1
+	
+	if(layer_id == -1):
+		return
+	entity_types["levels"][cur_level_ind]["layerInstances"][layer_id]["entityInstances"].append(entity_instance)
 	return entity_instance
 
 func add_cur_entityInstance():
@@ -703,7 +784,7 @@ func add_cur_entityInstance():
 	return entity_instance
 
 func add_level_layer(level_num: int, layer_name: String, layer_type: String):
-	var level_layer_data = level_layer_template.duplicate()
+	var level_layer_data = level_layer_template.duplicate(true)
 	level_layer_data["__identifier"] = layer_name
 	level_layer_data["__type"] = layer_type
 	entity_types["levels"][level_num]["layerInstances"].append(level_layer_data)
@@ -712,8 +793,6 @@ func get_level_name(level_num: int):
 	return entity_types["levels"][level_num]["identifier"]
 
 func add_level():
-	
-	
 	var level_data = level_template.duplicate(true)
 	level_data["identifier"] = "Level_" + str(cur_level_ind)
 	level_data["bgRelPath"] = ProjectSettings.globalize_path("res://") + "InternalData/defaultBG.png"
@@ -733,8 +812,22 @@ func add_level():
 	add_level_layer(last_level_ind, "Positions", "Position")
 	add_level_layer(last_level_ind, "Collision", "Collision")
 	
+	#Add position instance
+	add_positionInstance_to_level(last_level_ind)
+	
 	#cur_level_ind += 1
 	#cur_level += 1
+
+func delete_cur_level():
+	var level_count: int = get_level_count()
+	if(level_count < 2):
+		#You must have at least one level
+		return
+	entity_types["levels"].remove(cur_level_ind)
+	level_count = get_level_count()
+	if(cur_level_ind > level_count-1):
+		cur_level_ind = level_count-1
+	
 
 func change_cur_field(field_property_name: String, field_property_value: String):
 	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind][field_property_name] = field_property_value
@@ -793,6 +886,10 @@ func get_entityInstanAmount_by_levelNum(level_num: int):
 	if entity_layer_ind < 0:
 		return
 	return len(entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["entityInstances"])
+
+func get_messagePacks_by_levelNum(level_num: int):
+	if(entity_types["levels"][level_num].has("messagePacks")):
+		return entity_types["levels"][level_num]["messagePacks"]
 
 func get_positionInstances_by_levelNum(level_num: int):
 	var temp_entity_layer_ind: int = 0
@@ -918,8 +1015,8 @@ func get_def_entity_names():
 
 
 func get_cur_entityInstance_t():
-	var def = entity_types["defs"]["entities"][cur_entity_type_ind]
-	var entity_inst = entity_inst_template.duplicate()
+	var def = entity_types["defs"]["entities"][cur_entity_type_ind].duplicate(true)
+	var entity_inst = entity_inst_template.duplicate(true)
 	entity_inst["__identifier"] = def["identifier"]
 	entity_inst["triggerAABB"] = def["triggerAABB"]
 	entity_inst["triggerType"] = def["triggerType"]
@@ -930,6 +1027,7 @@ func get_cur_entityInstance_t():
 	if(!def.has("triggerValue3")):
 		def["triggerValue3"] = 0
 	entity_inst["triggerValue3"] = def["triggerValue3"]
+	entity_inst["addTrigger"] = def["addTrigger"]
 	
 	#Loading sprite path
 	entity_inst["__spritePath"] = def["spritePath"]
@@ -941,16 +1039,30 @@ func get_cur_entityInstance_t():
 	#Entity definition - template for entity
 	#Entity instance - actual entity
 	for field in def["fieldDefs"]:	
-		var field_inst = field_inst_template.duplicate()
+		var field_inst = field_inst_template.duplicate(true)
 		field_inst["__identifier"] = field["identifier"]
 		field_inst["__value"] = field["defaultValue"]
 		field_inst["__type"] = field["__type"]
 		field_inst["fieldId"] = field["fieldId"]
 		field_inst["__hasStruct"] = field["hasStruct"]
 		filed_inst_arr.append(field_inst)
+		if(field["identifier"] == "Trigger type"):
+			entity_inst["triggerType"] = int(field["defaultValue"])
+		elif(field["identifier"] == "Trigger value"):
+			entity_inst["triggerValue"] = int(field["defaultValue"])
+		elif(field["identifier"] == "Trigger value2"):
+			entity_inst["triggerValue2"] = int(field["defaultValue"])
+		elif(field["identifier"] == "Trigger value3"):
+			entity_inst["triggerValue3"] = int(field["defaultValue"])
+			
 	entity_inst["fieldInstances"] = filed_inst_arr
 	return entity_inst
 	
+
+func get_entityDef_by_defId(defId: int):
+	for entityDef in entity_types["defs"]["entities"]:
+		if entityDef["defId"] == defId:
+			return entityDef
 
 func get_entityDef_by_ind(entity_ind: int):
 	return entity_types["defs"]["entities"][entity_ind]
@@ -967,7 +1079,7 @@ func get_entityDef(entity_name: String):
 	return {"ind": 0,"val": []}
 
 func add_fieldDef_to_entity(fieldDef: Dictionary):
-	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"].append(fieldDef)
+	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"].append(fieldDef.duplicate(true))
 
 func add_field_to_entity(entity_name: String, field_name:String):
 	var ent_ind:int = -1

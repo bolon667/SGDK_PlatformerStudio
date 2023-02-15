@@ -1,11 +1,13 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Scripts/LayerButton.gd" type="Script" id=1]
+[ext_resource path="res://Styles/style1.tres" type="Theme" id=2]
 
 [node name="LayerButton" type="Button"]
 margin_right = 200.0
 margin_bottom = 20.0
 rect_min_size = Vector2( 0, 30 )
+theme = ExtResource( 2 )
 text = "dasdasdsa"
 script = ExtResource( 1 )
 

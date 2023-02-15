@@ -1,12 +1,14 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Scripts/Pages/entityFieldItemSprite.gd" type="Script" id=1]
+[ext_resource path="res://Styles/style1.tres" type="Theme" id=2]
 
 [node name="entityFieldItemSprite" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 size_flags_horizontal = 3
 size_flags_vertical = 0
+theme = ExtResource( 2 )
 script = ExtResource( 1 )
 
 [node name="FileDialog" type="FileDialog" parent="."]
@@ -24,20 +26,20 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="Label" type="Label" parent="HBoxContainer"]
-margin_right = 64.0
-margin_bottom = 14.0
+margin_right = 86.0
+margin_bottom = 20.0
 size_flags_vertical = 0
 text = "Test text: "
 
 [node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
-margin_left = 68.0
+margin_left = 90.0
 margin_right = 1024.0
 margin_bottom = 600.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="TextEdit" type="TextEdit" parent="HBoxContainer/VBoxContainer"]
-margin_right = 956.0
+margin_right = 934.0
 margin_bottom = 30.0
 rect_min_size = Vector2( 0, 30 )
 size_flags_horizontal = 3
@@ -45,7 +47,7 @@ text = "dasdasdasd"
 
 [node name="changeSpriteBtn" type="Button" parent="HBoxContainer/VBoxContainer"]
 margin_top = 34.0
-margin_right = 956.0
+margin_right = 934.0
 margin_bottom = 64.0
 rect_min_size = Vector2( 0, 30 )
 size_flags_horizontal = 3
@@ -53,7 +55,7 @@ text = "Change Sprite"
 
 [node name="Control" type="Control" parent="HBoxContainer/VBoxContainer"]
 margin_top = 68.0
-margin_right = 956.0
+margin_right = 934.0
 margin_bottom = 68.0
 
 [node name="Sprite" type="Sprite" parent="HBoxContainer/VBoxContainer/Control"]

@@ -20,6 +20,8 @@ public class buidProject : Node
 
 	private String fullEmulatorPath = "";
 
+	private String workingDir;
+
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -31,7 +33,7 @@ public class buidProject : Node
 	{
 		Node singleton = (Node)GetNode("/root/singleton");
 		engineRootPath = (String)singleton.Call("get_project_folder_path");
-		String workingDir = System.IO.Directory.GetCurrentDirectory();
+		workingDir = System.IO.Directory.GetCurrentDirectory();
 		//fullEngineRootPath = workingDir + engineRootPath.Substring(1);
 		fullEngineRootPath = engineRootPath;
 
@@ -69,6 +71,7 @@ public class buidProject : Node
 		typesCode = typesCode.Replace("//$entityMergedStruct$", mergedStructCode);
 
 		int cellSize = (int)singleton.Call("get_cell_size");
+		GD.Print($"Got cell_size {cellSize}");
 		int shiftVal = 3;
 		if (cellSize == 16)
 		{
@@ -125,6 +128,9 @@ public class buidProject : Node
 		String fromFolder = fullTemplatePath;
 		
 		String toFolder = engineRootPath + "/build";
+		String outFolder = toFolder + "/out";
+		//Delete out folder
+		//System.IO.Directory.Delete(outFolder, true);
 
 		CopyFilesRecursively(fromFolder, toFolder);
 		GD.Print("New SGDK project created");
@@ -140,6 +146,7 @@ public class buidProject : Node
 
 
 			codeReplacer();
+			applyMods();
 			//return;
 			//System.Threading.Thread.Sleep(3000);
 			compileProject();
@@ -149,6 +156,24 @@ public class buidProject : Node
 			GD.Print(ex);
 		}
 		
+	}
+
+	private void applyMods()
+	{
+		fileReplceMod();
+
+	}
+
+	private void fileReplceMod()
+	{
+		String fromPath;
+		String toPath;
+		fromPath = engineRootPath + "/code_template/src/";
+		toPath  = engineRootPath + "/build/src/";
+		CopyFilesRecursively(fromPath, toPath);
+		fromPath = engineRootPath + "/code_template/inc/";
+		toPath = engineRootPath + "/build/inc/";
+		CopyFilesRecursively(fromPath, toPath);
 	}
 
 	private void genResCode()
@@ -172,22 +197,55 @@ public class buidProject : Node
 		{
 			Dictionary levelDict = (Dictionary)singleton.Call("get_level", curLevel);
 			String bgaPath = (String)levelDict["bgRelPath"];
+			int bgaMode = 0;
+			if (levelDict.Contains("bgaMode"))
+			{
+				bgaMode = (int)int.Parse(levelDict["bgaMode"].ToString());
+			}
 			String bgbPath = (String)levelDict["bgRelPath2"];
+			int bgbMode = 0;
+			if (levelDict.Contains("bgbMode"))
+			{
+				bgbMode = (int)int.Parse(levelDict["bgbMode"].ToString());
+			}
 			String levelName = (String)levelDict["identifier"];
 			if (bgaPath.Length > 0)
 			{
+				String fileName = bgaPath.Substring(bgaPath.FindLast("/"));
 				String fileExtension = bgaPath.Substring(bgaPath.FindLast("."));
-
-				String toPath = fullEngineResPath + $"/gfx/Level_{curLevel.ToString()}_bga" + fileExtension;
-				//GD.Print(toPath);
-				System.IO.File.Copy(bgaPath, toPath, true);
+				String toPath;
+				switch (bgaMode)
+				{
+					case 0: //map mode
+						toPath = fullEngineResPath + $"/gfx/{fileName}";
+						//GD.Print(toPath);
+						System.IO.File.Copy(bgaPath, toPath, true);
+						break;
+					case 1: //image mode
+						toPath = fullEngineResPath + $"/images/{fileName}";
+						//GD.Print(toPath);
+						System.IO.File.Copy(bgaPath, toPath, true);
+						break;
+				}
 			}
 			if (bgbPath.Length > 0)
 			{
+				String fileName = bgbPath.Substring(bgbPath.FindLast("/"));
 				String fileExtension = bgbPath.Substring(bgbPath.FindLast("."));
-
-				String toPath = fullEngineResPath + $"/gfx/Level_{curLevel.ToString()}_bgb" + fileExtension;
-				System.IO.File.Copy(bgbPath, toPath, true);
+				String toPath;
+				switch (bgbMode)
+				{
+					case 0: //map mode
+						toPath = fullEngineResPath + $"/gfx/{fileName}";
+						//GD.Print(toPath);
+						System.IO.File.Copy(bgbPath, toPath, true);
+						break;
+					case 1: //image mode
+						toPath = fullEngineResPath + $"/images/{fileName}";
+						//GD.Print(toPath);
+						System.IO.File.Copy(bgbPath, toPath, true);
+						break;
+				}
 			}
 			curLevel++;
 		}
@@ -240,6 +298,75 @@ public class buidProject : Node
 
 		entityHandlerC_CodeReplacer();
 
+		customScriptsC_CodeReplacer();
+		customScriptsH_CodeReplacer();
+	}
+
+	private void customScriptsC_CodeReplacer()
+	{
+		String customScriptsC_path = engineRootPath + "/build/src/customScripts.c";
+		String customScriptsCode = System.IO.File.ReadAllText(customScriptsC_path);
+		String finalCode = customScriptsCode.Replace("//$customScripts$", genCustomScriptsCodeC());
+		System.IO.File.WriteAllText(customScriptsC_path, finalCode);
+		GD.Print("customScripts.c code replaced");
+	}
+
+	private void customScriptsH_CodeReplacer()
+	{
+		String customScriptsH_path = engineRootPath + "/build/inc/customScripts.h";
+		String customScriptsCode = System.IO.File.ReadAllText(customScriptsH_path);
+		String finalCode = customScriptsCode.Replace("//$customScripts$", genCustomScriptsCodeH());
+		System.IO.File.WriteAllText(customScriptsH_path, finalCode);
+		GD.Print("customScripts.h code replaced");
+	}
+
+	private String genCustomScriptsCodeC()
+	{
+		String result = "";
+		Node singleton = (Node)GetNode("/root/singleton");
+		//find scripts in use.
+		string scriptsFolderPath = engineRootPath + "/code_template/customScripts";
+		String[] paths = System.IO.Directory.GetFiles(scriptsFolderPath);
+		Array<String> fileNames = new Array<String>();
+		//Adding scripts code
+		foreach (String path in paths)
+		{
+			String curScriptText = System.IO.File.ReadAllText(path);
+			result += curScriptText + "\n";
+			String fileNameNoExt = System.IO.Path.GetFileName(path);
+			fileNameNoExt = fileNameNoExt.Substring(0, fileNameNoExt.Find("."));
+			fileNames.Add(fileNameNoExt);
+		}
+		//Add default empty func
+		result += "void emptyScript(){};\n";
+		//Creating arr of funcs, to be able to use them, when collision with trigger occurs
+		result += "void (* customScriptArr[])(void) = {";
+		foreach (String funcName in fileNames)
+		{
+			result += funcName + ", ";
+		}
+		result += "};\n";
+		return result;
+	}
+
+	private String genCustomScriptsCodeH()
+	{
+		String result = "";
+		Node singleton = (Node)GetNode("/root/singleton");
+		//find scripts in use.
+		string scriptsFolderPath = engineRootPath + "/code_template/customScripts";
+		String[] paths = System.IO.Directory.GetFiles(scriptsFolderPath);
+		//Creating externs for funcs (scripts)
+		foreach (String path in paths)
+		{
+			String fileNameNoExt = System.IO.Path.GetFileName(path);
+			fileNameNoExt = fileNameNoExt.Substring(0, fileNameNoExt.Find("."));
+			result += $"extern void {fileNameNoExt}();\n";
+		}
+		result += "extern void emptyScript();\n";
+		//Creating arr of funcs, to be able to use them, when collision with trigger occurs
+		result += "extern void (* customScriptArr[])(void);\n";
+		return result;
 	}
 
 	private void entityHandlerC_CodeReplacer()
@@ -259,12 +386,20 @@ public class buidProject : Node
 		//Generating funcs
 		foreach(String entityName in entityNames)
 		{
+			String defaultEntityCodePath = engineRootPath + "/code_template/showEntity/showDefault.c";
 			String checkPath = engineRootPath + "/code_template/showEntity/show" + entityName + ".c";
 			if (System.IO.File.Exists(checkPath))
 			{
 				String insertData = System.IO.File.ReadAllText(checkPath);
 				insertData = insertData.Replace("$entityName$", entityName);
 				insertData = insertData.Replace("$entityType$", "EntityMerged");
+				result += insertData + "\n";
+			} else
+			{
+				String insertData = System.IO.File.ReadAllText(defaultEntityCodePath);
+				insertData = insertData.Replace("$entityName$", entityName);
+				insertData = insertData.Replace("$entityType$", "EntityMerged");
+				System.IO.File.WriteAllText(checkPath, insertData);
 				result += insertData + "\n";
 			}
 		}
@@ -286,10 +421,6 @@ public class buidProject : Node
 		String levelsCode = System.IO.File.ReadAllText(levelsC_path);
 		String levelFullArr_code = genLevelFulArr_Code();
 		levelsCode = levelsCode.Replace("//$levelFullArr$", levelFullArr_code);
-		//loadLevel replace
-		String loadLevelPath = engineRootPath + "/code_template/loadLevel.c";
-		String loadLevelCode = System.IO.File.ReadAllText(loadLevelPath);
-		levelsCode = levelsCode.Replace("//$loadLevel$", loadLevelCode);
 		System.IO.File.WriteAllText(levelsC_path, levelsCode);
 		GD.Print("levels.c code replaced");
 		
@@ -312,6 +443,7 @@ public class buidProject : Node
 
 	private String genLvlCode(int curLevel)
 	{
+		GD.Print($"Gen lvl code for level {curLevel}");
 		Node singleton = (Node)GetNode("/root/singleton");
 		Dictionary levelDict = (Dictionary)singleton.Call("get_level", curLevel);
 		int cellSize = (int)singleton.Call("get_cell_size");
@@ -324,49 +456,113 @@ public class buidProject : Node
 		String bgaPath = (String)levelDict["bgRelPath"];
 		String bgbPath = (String)levelDict["bgRelPath2"];
 
+		
+
+
+		int bgaMode = 0;
+		int bgbMode = 0;
+		if (levelDict.Contains("bgaMode"))
+		{
+			bgaMode = (int)int.Parse(levelDict["bgaMode"].ToString());
+		}
+		if (levelDict.Contains("bgbMode"))
+		{
+			bgbMode = (int)int.Parse(levelDict["bgbMode"].ToString());
+		}
+
 		String levelName = (String)levelDict["identifier"];
 
-		GD.Print(9);
+		//GD.Print(9);
 		String posArrText = $"&Position_arr_Level_{curLevel.ToString()}";
-		GD.Print(9.5);
+		//GD.Print(9.5);
 		//(int)int.Parse(entityInst["width"].ToString());
 
 		String posAmountText = singleton.Call("get_positionInstancesAmount_by_levelNum", curLevel).ToString();
-		GD.Print(10);
-		
-		String bgaResName = $"Level_{curLevel.ToString()}_bga";
-		String bgbResName = $"Level_{curLevel.ToString()}_bgb";
-		String bgaMapResName;
-		String bgaTilesetResName;
-		String bgaPalResName;
-		String bgbMapResName;
-		String bgbTilesetResName;
-		String bgbPalResName;
+		//GD.Print(10);
+
+		String bgaMapResName = "NULL";
+		String bgaTilesetResName = "NULL";
+		String bgaPalResName = "NULL";
+		String bgaImageName = "NULL";
+		String bgbMapResName = "NULL";
+		String bgbTilesetResName = "NULL";
+		String bgbPalResName = "NULL";
+		String bgbImageName = "NULL";
+		String musicName = "NULL";
+		String beforeLevelScriptName = "NULL";
+		String everyFrameScriptName = "emptyScript";
+		String afterLevelScriptName = "NULL";
+
+		if (levelDict.Contains("beforeLevelScript"))
+		{
+			String temp = (String)levelDict["beforeLevelScript"];
+			if (temp.Length > 0)
+			{
+				beforeLevelScriptName = temp;
+			}
+		}
+
+		if (levelDict.Contains("everyFrameScript"))
+		{
+			String temp = (String)levelDict["everyFrameScript"];
+			if (temp.Length > 0)
+			{
+				everyFrameScriptName = temp;
+			}
+		}
+
+		if (levelDict.Contains("afterLevelScript"))
+		{
+			String temp = (String)levelDict["afterLevelScript"];
+			if (temp.Length > 0)
+			{
+				afterLevelScriptName = temp;
+			}
+		}
+
+		if (levelDict.Contains("musicName"))
+		{
+			String temp = (String)levelDict["musicName"];
+			if (temp.Length > 0)
+			{
+				musicName = "&mus_" + temp;
+			}
+		}
+
 		if (bgaPath.Length > 0)
 		{
-			bgaMapResName = "&" + bgaResName + "_map";
-			bgaTilesetResName = "&" + bgaResName + "_tileset";
-			bgaPalResName = "&" + bgaResName + "_pal";
-		}
-		else
-		{
-			bgaMapResName = "NULL";
-			bgaTilesetResName = "NULL";
-			bgaPalResName = "NULL";
+			String fileName = bgaPath.Substring(bgaPath.FindLast("/")+1);
+			fileName = fileName.Substring(0, fileName.LastIndexOf("."));
+			switch (bgaMode)
+			{
+				case 0: //map mode
+					bgaMapResName = "&" + fileName + "_map";
+					bgaTilesetResName = "&" + fileName + "_tileset";
+					bgaPalResName = "&" + fileName + "_pal";
+					break;
+				case 1: //image mode
+					bgaImageName = "&img_" + fileName;
+					break;
+			}		
 		}
 
 		if (bgbPath.Length > 0)
 		{
-			bgbMapResName = "&" + bgbResName + "_map";
-			bgbTilesetResName = "&" + bgbResName + "_tileset";
-			bgbPalResName = "&" + bgbResName + "_pal";
+			String fileName = bgbPath.Substring(bgbPath.FindLast("/")+1);
+			fileName = fileName.Substring(0, fileName.LastIndexOf("."));
+			switch (bgbMode)
+			{
+				case 0: //map mode
+					bgbMapResName = "&" + fileName + "_map";
+					bgbTilesetResName = "&" + fileName + "_tileset";
+					bgbPalResName = "&" + fileName + "_pal";
+					break;
+				case 1: //image mode
+					bgbImageName = "&img_" + fileName;
+					break;
+			}
 		}
-		else
-		{
-			bgbMapResName = "NULL";
-			bgbTilesetResName = "NULL";
-			bgbPalResName = "NULL";
-		}
+
 
 		String collMapName = "collisionMap";
 		if (curLevel > 0)
@@ -375,15 +571,54 @@ public class buidProject : Node
 
 		}
 
-		String levelCode = $"const Level const lvl_Level_{curLevel.ToString()} = {{{bgaMapResName}, {bgbMapResName}, {bgaTilesetResName}, {bgbTilesetResName}, {bgaPalResName}, {bgbPalResName}, {posArrText}, {posAmountText}, {collMapName}, {levelSizePxText}, {levelSizeTilesText}}};\n";
+
+
+		String levelCode = $"const Level const lvl_Level_{curLevel.ToString()} = {{{bgaMapResName}, {bgbMapResName}, {bgaTilesetResName}, {bgbTilesetResName}, {bgaPalResName}, {bgbPalResName}," +
+			$" {bgaImageName}, {bgbImageName}, {posArrText}, {posAmountText}, {collMapName}, {levelSizePxText}, {levelSizeTilesText}, {musicName}, {beforeLevelScriptName}, {everyFrameScriptName}," +
+			$" {afterLevelScriptName}}};\n";
 		return levelCode;
+	}
+
+	private String genMessagePacksCode(int curLevel)
+	{
+		String result = "";
+		GD.Print($"Gen MessagePacks code for level {curLevel}");
+		Node singleton = (Node)GetNode("/root/singleton");
+		Godot.Collections.Array messagePacks = (Godot.Collections.Array)singleton.Call("get_messagePacks_by_levelNum", curLevel);
+		int amountOfMessages = 0;
+		int curMsgPack = 0;
+		if (messagePacks == null)
+		{
+			result += $"const Message const msgArr_Level_{curLevel}_msgPack_{curMsgPack}[] = {{}};\n";
+			result += $"const MessagePack const MessagePack_Level_{curLevel}[] = {{}};\n";
+			return result;
+		}
+		
+		String messagePackCode = $"const MessagePack const MessagePack_Level_{curLevel}[] = {{";
+		foreach (Godot.Collections.Dictionary messagePack in messagePacks)
+		{
+			result += $"const Message const msgArr_Level_{curLevel}_msgPack_{curMsgPack}[] = {{";
+			amountOfMessages = 0;
+			foreach (String message in (Godot.Collections.Array)messagePack["messages"])
+			{
+				result += $"{{\"{message}\", {message.Length}}}, ";
+				amountOfMessages++;
+			}
+			result += "};\n";
+			String messagePackName = (String)messagePack["name"];
+			messagePackCode += $"{{msgArr_Level_{curLevel}_msgPack_{curMsgPack}, {amountOfMessages}, \"{messagePackName}\"}}, ";
+			curMsgPack++;
+		}
+		messagePackCode += "};\n";
+		result += messagePackCode;
+		return result;
 	}
 
 	private String genPositionsCode(int curLevel)
 	{
 		GD.Print($"Gen Position code for level {curLevel}");
 		Node singleton = (Node)GetNode("/root/singleton");
-		String result = ""; ;
+		String result = "";
 		Godot.Collections.Array positionInstances = (Godot.Collections.Array)singleton.Call("get_positionInstances_by_levelNum", curLevel);
 		result += $"const Vect2D_s16 const Position_arr_Level_{curLevel.ToString()}[] = ";
 
@@ -402,36 +637,43 @@ public class buidProject : Node
 		}
 		//Closing Position_arr block
 		result += "};\n";
+		GD.Print($"Created Position code for level {curLevel}");
 		return result;
 	}
 
 	private String genEntityMergedCode(int curLevel)
 	{
+		GD.Print("Gen EntityMerged Code...");
 		Node singleton = (Node)GetNode("/root/singleton");
 		Godot.Collections.Array mergedFieldDef_arr = (Godot.Collections.Array)singleton.Call("get_merged_fieldDef");
-		GD.Print(1);
+		//GD.Print(1);
 		String result = "";;
 		//Getting "entity_name: mergedId" pairs
 		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict");
 		//Getting entityInstances in curLevel
 		Godot.Collections.Array entityInstances = (Godot.Collections.Array)singleton.Call("get_entityInstances_by_levelNum", curLevel);
-		GD.Print(2);
+		//GD.Print(2);
 		result += $"const EntityMerged const EntityMerged_arr_Level_{curLevel.ToString()}[] = ";
 
 		//Opening EntityMerged_arr block
 		result += "{";
-		int curEntityInd = 0;
+		int curTriggerInd = 0;
 		foreach (Godot.Collections.Dictionary entityInst in entityInstances)
 		{
 			//Getting useful data about entity
+			if (!entityInst.Contains("__identifier"))
+			{
+				continue;
+			}
+			bool addTrigger = false;
 			String entityName = (String)entityInst["__identifier"];
 			int mergedId = (int)mergedIdsDict[entityName];
 			Godot.Collections.Array pos = (Godot.Collections.Array)entityInst["px"];
 			int width = 0;
 			int height = 0;
-			GD.Print(0.4);
+		//	GD.Print(0.4);
 			width = (int)int.Parse(entityInst["width"].ToString());
-			GD.Print(0.5);
+		//	GD.Print(0.5);
 			//Studio crashes if you don't do proper conversion.
 			height = (int)int.Parse(entityInst["height"].ToString());
 
@@ -466,8 +708,17 @@ public class buidProject : Node
 			result += "{" + spd[0].ToString() + ", " + spd[1].ToString() + "}, "; //spd
 			result += "{" + width.ToString() + ", " + height.ToString() + "}, "; //size
 			result += "FALSE, "; //onScreen
-			result += $"&Trigger_arr_Level_{curLevel}[{curEntityInd}],"; //trigger
-			result += $"{curEntityInd},"; //triggerInd = curEntityInd, since all entity have trigger, which is not good for preformance reasons
+
+
+			if (!entityInst.Contains("addTrigger") || (bool)entityInst["addTrigger"] == false)
+			{
+				result += $"NULL,"; //trigger = NULL
+			} else
+			{
+				addTrigger = true;
+				result += $"&Trigger_arr_Level_{curLevel}[{curTriggerInd}],"; //trigger
+			}
+			result += $"{curTriggerInd},"; //triggerInd = curEntityInd, since all entity have trigger, which is not good for preformance reasons
 			result += "NULL,"; //spr
 
 			//Checking every field
@@ -489,7 +740,7 @@ public class buidProject : Node
 					//if names of fieldDef and fieldInstance are equal
 					if((String)fieldInst["__identifier"] == (String)fieldDef["identifier"])
 					{
-						GD.Print(fieldInst["__identifier"]);
+						//GD.Print(fieldInst["__identifier"]);
 						//Then value is found
 						value = fieldInst["__value"].ToString();
 						break;
@@ -506,8 +757,11 @@ public class buidProject : Node
 				
 				
 			}
-
-			curEntityInd++;
+			if (addTrigger)
+			{
+				curTriggerInd++;
+			}
+			
 			//Closing entityMerged block
 			result += "}, ";
 		}
@@ -518,15 +772,15 @@ public class buidProject : Node
 
 	private String genTriggerCode(int curLevel)
 	{
-		GD.Print("curLevel: ", curLevel);
+		GD.Print("Gen TriggerCode for level ", curLevel);
 		
 		Node singleton = (Node)GetNode("/root/singleton");
-		GD.Print(0);
+		//GD.Print(0);
 		String result = ""; ;
 		//Getting "entity_name: mergedId" pairs
 		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict");
 
-		GD.Print(1);
+		//GD.Print(1);
 		
 		//Getting entityInstances in curLevel
 		Godot.Collections.Array entityInstances = (Godot.Collections.Array)singleton.Call("get_entityInstances_by_levelNum", curLevel);
@@ -538,16 +792,20 @@ public class buidProject : Node
 
 		foreach (Godot.Collections.Dictionary entityInst in entityInstances)
 		{
-			GD.Print(2);
+			//GD.Print(2);
 			//Getting useful data about entity
 			if (!entityInst.Contains("__identifier"))
 			{
 				continue;
 			}
+			if(!entityInst.Contains("addTrigger") || (bool)entityInst["addTrigger"] == false)
+			{
+				continue;
+			}
 			String entityName = (String)entityInst["__identifier"];
 
-			GD.Print(entityName);
-			GD.Print(3);
+			//GD.Print(entityName);
+			//GD.Print(3);
 
 			Godot.Collections.Array pos = (Godot.Collections.Array)entityInst["px"];
 			
@@ -564,13 +822,14 @@ public class buidProject : Node
 				triggerAABB.Add(0);
 
 			}
-			
-			float triggerType = 0;
+			//GD.Print(4);
+			int triggerType = 0;
 			if (entityInst.Contains("triggerType")) {
-				triggerType = (float)entityInst["triggerType"];
+				
+				triggerType = (int)int.Parse(entityInst["triggerType"].ToString());
 
 			}
-			
+			//GD.Print(4.5);
 			int triggerValue = 0;
 			int triggerValue2 = 0;
 			int triggerValue3 = 0;
@@ -588,7 +847,8 @@ public class buidProject : Node
 			{
 				triggerValue3 = (int)int.Parse(entityInst["triggerValue3"].ToString());
 			}
-			
+			//GD.Print(5);
+
 			int[] spd = { 0, 0 };
 
 			//Opening Trigger block
@@ -688,14 +948,16 @@ public class buidProject : Node
 			
 			result += genEntityAllCode(curLevel);
 			
+			result += genMessagePacksCode(curLevel);
+
 			result += genLvlCode(curLevel);
-			
+
 		}
 		//return result;
 		result += "const LevelFull const LevelFull_arr[] = {";
 		for (int curLevel = 0; curLevel < amountOfLevel; curLevel++)
 		{
-			result += "{" + $"&lvl_Level_{curLevel.ToString()}, &EntityAll_arr_Level_{curLevel.ToString()}" + "}, ";
+			result += "{" + $"&lvl_Level_{curLevel.ToString()}, &EntityAll_arr_Level_{curLevel.ToString()}, &MessagePack_Level_{curLevel.ToString()}" + "}, ";
 		}
 		result += "};\n";
 
@@ -790,7 +1052,7 @@ public class buidProject : Node
 
 	private String genCollisionArrayCode(int levelNum)
 	{
-		GD.Print($"Collision code replacing for level {levelNum}");
+		//GD.Print($"Collision code replacing for level {levelNum}");
 		Node singleton = (Node)GetNode("/root/singleton");
 		Godot.Collections.Array collisionMap = (Godot.Collections.Array)singleton.Call("get_collisionMapForLevel", levelNum);
 

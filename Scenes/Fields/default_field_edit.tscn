@@ -1,5 +1,6 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
+[ext_resource path="res://Styles/style1.tres" type="Theme" id=1]
 [ext_resource path="res://Scripts/default_field_edit.gd" type="Script" id=2]
 
 [node name="Control" type="VBoxContainer"]
@@ -9,9 +10,11 @@ script = ExtResource( 2 )
 
 [node name="fieldName" type="LineEdit" parent="."]
 margin_right = 1024.0
-margin_bottom = 24.0
+margin_bottom = 26.0
+theme = ExtResource( 1 )
 
 [node name="fieldValue" type="LineEdit" parent="."]
-margin_top = 28.0
+margin_top = 30.0
 margin_right = 1024.0
-margin_bottom = 52.0
+margin_bottom = 56.0
+theme = ExtResource( 1 )

@@ -11,9 +11,11 @@ extern u16 levelNum;
 
 extern Level* curLvlData;
 extern EntityAll* curEntityAll;
+extern MessagePack* curMessagePacks;
+
+extern u16 palette_full[];
 
 void updateRoomSize(Level* lvl);
-void loadLevel(u16 levelNum, u16 positionNum);
 
 u16 getTileValue(s16 x, s16 y);
 

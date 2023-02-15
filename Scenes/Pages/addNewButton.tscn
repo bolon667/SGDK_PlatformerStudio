@@ -1,4 +1,6 @@
-[gd_scene format=2]
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Styles/style1.tres" type="Theme" id=1]
 
 [node name="addNewBtn" type="Button"]
 anchor_right = 1.0
@@ -8,4 +10,5 @@ margin_top = 5.0
 margin_right = -5.0
 margin_bottom = -5.0
 rect_min_size = Vector2( 80, 50 )
+theme = ExtResource( 1 )
 text = "+"

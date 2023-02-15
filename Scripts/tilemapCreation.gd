@@ -11,7 +11,7 @@ onready var TileMapEditorWindow_bgA = $TileMapEditorWindow/roomSize/bgA
 onready var TileMapEditorWindow_bgB = $TileMapEditorWindow/roomSize/bgB
 
 
-var load_mode: int = 0
+var layer_id: int = 0
 
 
 var level_count: int = 0
@@ -27,6 +27,16 @@ func _ready():
 	if(singleton.cell_size == 16):
 		cell_ind = 1
 	$CanvasLayer/VBoxContainer/ChangeCellSize.select(cell_ind)
+	update_load_image_modes()
+	update_change_level_list()
+
+func update_load_image_modes():
+	var load_modes: Array = singleton.get_load_modes()
+	$CanvasLayer/VBoxContainer/HBoxContainer/loadImageOption1.select(load_modes[0])
+	$CanvasLayer/VBoxContainer/HBoxContainer2/loadImageOption2.select(load_modes[1])
+
+func update_change_level_list():
+	$CanvasLayer/VBoxContainer/ChangeCurLevel.clear()
 	level_count = singleton.get_level_count()
 	for cur_level_ind in range(level_count):
 		$CanvasLayer/VBoxContainer/ChangeCurLevel.add_item("Level_"+str(cur_level_ind), cur_level_ind)
@@ -41,14 +51,14 @@ func _process(delta):
 		
 
 func _on_LoadBackgroundBtn_button_down():
-	load_mode = 0
+	layer_id = 0
 	$CanvasLayer/LoadBGFile.popup_centered()
 
 
 func _on_LoadBGFile_file_selected(path):
 	
 	var ext = path.get_extension();
-	if(!(ext in ['png', 'jpg', 'bmp'])):
+	if(!(ext in ['png', 'bmp'])):
 		return
 	print(ext)
 	print(path)
@@ -57,17 +67,18 @@ func _on_LoadBGFile_file_selected(path):
 	var imgTex = ImageTexture.new()
 	imgTex.create_from_image(bgImage, 1)
 	var level_size
-	match load_mode:
-		0:
+	var load_modes: Array = singleton.get_load_modes()
+	match layer_id:
+		0: #bga
 			singleton.change_bgRelPath(path)
 			TileMapEditorWindow_bgA.texture = imgTex;
 			level_size = TileMapEditorWindow_bgA.texture.get_size()
-		1:
+		1: #bgb
 			singleton.change_bgRelPath2(path)
 			TileMapEditorWindow_bgB.texture = imgTex;
 			level_size = TileMapEditorWindow_bgB.texture.get_size()
-	
-	singleton.change_level_size(level_size);
+	if load_modes[layer_id] == 0:
+		singleton.change_level_size(level_size);
 	
 	
 
@@ -117,29 +128,33 @@ func _on_addNewLevelBtn_button_down():
 
 
 func _on_deleteCurLevelBtn_button_down():
-	pass # Replace with function body.
+	singleton.delete_cur_level()
+	update_change_level_list()
+	get_tree().call_group("tilemapEditorWindow", "load_level")
+	update_load_image_modes()
 
 
 func _on_ChangeCurLevel_item_selected(index):
 	pass # Replace with function body.
 	singleton.cur_level_ind = index
 	get_tree().call_group("tilemapEditorWindow", "load_level")
+	update_load_image_modes()
 
 
 func _on_ChangeCellSize_item_selected(index):
 	match index:
 		0:
 			print("changed to 8x8 cell size")
-			singleton.cell_size = 8
+			singleton.change_cell_size(8)
 			get_tree().call_group("tilemapEditorWindow", "update_tilemap_cell_size", Vector2(singleton.cell_size, singleton.cell_size))
 		1:
 			print("changed to 16x16 cell size")
-			singleton.cell_size = 16
+			singleton.change_cell_size(16)
 			get_tree().call_group("tilemapEditorWindow", "update_tilemap_cell_size", Vector2(singleton.cell_size, singleton.cell_size))
 
 
 func _on_LoadBackgroundBtn2_button_down():
-	load_mode = 1
+	layer_id = 1
 	$CanvasLayer/LoadBGFile.popup_centered()
 
 
@@ -152,3 +167,16 @@ func _on_DeleteBgABtn_button_down():
 func _on_DeleteBgBBtn_button_down():
 	TileMapEditorWindow_bgB.texture = null;
 	singleton.change_bgRelPath2("");
+
+
+func _on_snapToGridBtn_toggled(button_pressed):
+	singleton.entity_snap_to_grid = button_pressed
+
+
+
+func _on_loadImageOption1_item_selected(index):
+	singleton.change_load_image_mode_bga(index)
+
+
+func _on_loadImageOption2_item_selected(index):
+	singleton.change_load_image_mode_bgb(index)

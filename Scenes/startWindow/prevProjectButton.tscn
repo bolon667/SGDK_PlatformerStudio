@@ -1,11 +1,13 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Scenes/startWindow/prevProjectButton.gd" type="Script" id=1]
+[ext_resource path="res://Styles/style1.tres" type="Theme" id=2]
 
 [node name="prevProjectButton" type="Button"]
 margin_right = 968.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 0, 40 )
+theme = ExtResource( 2 )
 text = "C:/Users/bolon667/Documents/GitHub/SGDK_OneScreenPlatformerStudio/test.json"
 script = ExtResource( 1 )
 

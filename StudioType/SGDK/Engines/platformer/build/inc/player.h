@@ -50,7 +50,24 @@ struct pBody {
 };
 
 extern struct pBody playerBody;
+extern bool runningAnim;
 
-void playerInputChanged();
-void playerInit(u16 positionNum);
-void updatePlayer();
+extern const s16 coyoteTime;
+extern s16 currentCoyoteTime;
+extern const s16 jumpBufferTime;
+extern s16 currentJumpBufferTime;
+
+extern bool collidingAgainstStair;
+extern bool runningAnim;
+
+extern u16 dyingSteps;
+extern const u16 dieDelay;
+
+extern const u16 oneWayPlatformErrorCorrection;
+
+extern u16 curPlayerAnim;
+
+extern s16 stairLeftEdge;
+extern const u16 stairPositionOffset;
+
+extern bool facingRight;

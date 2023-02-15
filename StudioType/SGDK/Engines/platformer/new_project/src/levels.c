@@ -1,0 +1,37 @@
+#include "../inc/levels.h"
+
+#include "../inc/maps.h"
+#include "../inc/global.h"
+#include "../inc/player.h"
+
+#include "../res/resources.h"
+#include "../res/gfx.h"
+#include "../res/sprites.h"
+
+
+u16 levelNum = 0;
+Level* curLvlData;
+EntityAll* curEntityAll;
+
+u16 palette_full[64];
+
+//$levelFullArr$
+
+Vect2D_s16 getLevelPos(u16 posNum) {
+	return curLvlData->posArr[posNum];
+}
+
+void updateRoomSize(Level* lvl){
+	roomSize = newAABB(0, lvl->sizeinPx.x, 0, lvl->sizeinPx.y);
+}
+
+//$loadLevel$
+
+u16 getTileValue(s16 x, s16 y) {
+	if (x >= curLvlData->sizeinTiles.x || x < 0 || y < 0 || y >= curLvlData->sizeinTiles.y)
+		return 0;
+
+	//If the position is inside the collision map return the value of the tile from it
+	return curLvlData->collArr[x+(y*curLvlData->sizeinTiles.x)];
+}
+
