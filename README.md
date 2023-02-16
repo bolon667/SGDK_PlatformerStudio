@@ -1,6 +1,7 @@
 # SGDK Platformer Studio
 
 ![SGDK Studio Logo](https://github.com/bolon667/SGDK_OneScreenPlatformerStudio/blob/main/readMe/sgdk_studio_github_pic2.png)
+![SGDK Studio Screenshot](https://github.com/bolon667/SGDK_PlatformerStudio/blob/main/Images/sgdkStudioScreen.jpg)
 
 # About project
 
