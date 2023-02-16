@@ -31,11 +31,18 @@ margin_right = 895.0
 margin_bottom = 58.0
 
 [node name="Button" type="Button" parent="VBoxContainer/HBoxContainer"]
-margin_right = 851.0
+margin_right = 713.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 0, 40 )
 size_flags_horizontal = 3
 text = "Choose script"
+
+[node name="applyAllLevelsBtn" type="Button" parent="VBoxContainer/HBoxContainer"]
+margin_left = 717.0
+margin_right = 851.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 0, 40 )
+text = "Apply to ALL levels"
 
 [node name="removeBtn" type="Button" parent="VBoxContainer/HBoxContainer"]
 margin_left = 855.0
@@ -45,14 +52,29 @@ rect_min_size = Vector2( 40, 40 )
 text = " X "
 
 [node name="FileDialog" type="FileDialog" parent="."]
-margin_left = 624.0
-margin_right = 1024.0
+margin_left = 420.0
+margin_right = 820.0
 margin_bottom = 300.0
 rect_min_size = Vector2( 400, 300 )
 window_title = "Открыть файл"
 mode = 0
 access = 2
 
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+margin_left = 758.0
+margin_right = 1024.0
+margin_bottom = 70.0
+window_title = "Подтверждение..."
+dialog_text = "Do you want to delete from ALL levels?"
+
+[node name="ConfirmationDialog2" type="ConfirmationDialog" parent="."]
+margin_left = 758.0
+margin_right = 1024.0
+margin_bottom = 70.0
+window_title = "Подтверждение..."
+dialog_text = "Do you want to choose this for ALL levels?"
+
 [connection signal="button_down" from="VBoxContainer/HBoxContainer/Button" to="." method="_on_Button_button_down"]
+[connection signal="button_down" from="VBoxContainer/HBoxContainer/applyAllLevelsBtn" to="." method="_on_applyAllLevelsBtn_button_down"]
 [connection signal="button_down" from="VBoxContainer/HBoxContainer/removeBtn" to="." method="_on_removeBtn_button_down"]
 [connection signal="file_selected" from="FileDialog" to="." method="_on_FileDialog_file_selected"]

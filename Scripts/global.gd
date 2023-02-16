@@ -310,6 +310,13 @@ const field_inst_template = {
 	"__hasStruct": true,
 }
 
+func change_load_image_mode_bga_all_levels():
+	for level_ind in range(len(entity_types["levels"])):
+		entity_types["levels"][level_ind]["bgaMode"] = entity_types["levels"][cur_level_ind]["bgaMode"]
+func change_load_image_mode_bgb_all_levels():
+	for level_ind in range(len(entity_types["levels"])):
+		entity_types["levels"][level_ind]["bgbMode"] = entity_types["levels"][cur_level_ind]["bgbMode"]
+
 func change_load_image_mode_bga(mode: int):
 	entity_types["levels"][cur_level_ind]["bgaMode"] = mode
 func change_load_image_mode_bgb(mode: int):
@@ -327,13 +334,32 @@ func get_load_modes():
 		entity_types["levels"][cur_level_ind]["bgbMode"] = 0
 	return[entity_types["levels"][cur_level_ind]["bgaMode"], entity_types["levels"][cur_level_ind]["bgbMode"]];
 
+func change_all_level_attr(attr: String, val):
+	for level_ind in range(len(entity_types["levels"])):
+		entity_types["levels"][level_ind][attr] = val
+
 func change_level_attr(attr: String, val):
 	entity_types["levels"][cur_level_ind][attr] = val
 
+func get_trigger_enum():
+	for cur_enum in entity_types["defs"]["enums"]:
+		if cur_enum["identifier"] == "trigger":
+			return cur_enum
+
 func add_trigger_enum():
-	entity_types[""]
-	enum_template
-	pass
+	if not entity_types["defs"].has("enums"):
+		entity_types["defs"]["enums"] = []
+	for cur_enum in entity_types["defs"]["enums"]:
+		if cur_enum["identifier"] == "trigger":
+			return
+	var new_enum = enum_template.duplicate(true)
+	new_enum["identifier"] = "trigger"
+	var enum_default_val_names: Array = ["change_level", "got_something", "got_damage", "show_message", "execute_custom_script"]
+	for enum_val_name in enum_default_val_names:
+		var temp_enum_val = enum_val_template.duplicate(true)
+		temp_enum_val["name"] = enum_val_name
+		new_enum["values"].append(temp_enum_val)
+	entity_types["defs"]["enums"].append(new_enum)
 
 func add_messagePack():
 	var data: Dictionary = messagePack_template.duplicate(true)
@@ -399,6 +425,9 @@ func load_project(projectPath: String):
 	
 	entity_types = data_parse.result
 	cell_size = entity_types["defaultGridSize"]
+	#autoupdate crunch, should be deleted
+	#TODO
+	add_trigger_enum()
 	
 
 func get_sprite_size_from_path(path:String):
@@ -488,6 +517,7 @@ func create_new_project():
 	entity_types["defaultGridSize"] = cell_size
 	add_entity_def("EntitySimple")
 	add_positionInstance()
+	add_trigger_enum()
 	save_project()
 
 func save_project():
@@ -528,6 +558,14 @@ func change_level_size(size: Vector2):
 	
 func get_level_size(levelNum):
 	return Vector2(entity_types["levels"][levelNum]["pxWid"], entity_types["levels"][levelNum]["pxHei"]);
+
+func change_bgRelPath_all_levels():
+	for level_ind in range(len(entity_types["levels"])):
+		entity_types["levels"][level_ind]["bgRelPath"] = entity_types["levels"][cur_level_ind]["bgRelPath"]
+	
+func change_bgRelPath2_all_levels():
+	for level_ind in range(len(entity_types["levels"])):
+		entity_types["levels"][level_ind]["bgRelPath2"] = entity_types["levels"][cur_level_ind]["bgRelPath2"]
 
 func change_bgRelPath(new_bg_path: String):
 	entity_types["levels"][cur_level_ind]["bgRelPath"] = new_bg_path
@@ -724,6 +762,7 @@ func get_entityInst_by_instId(instId: int):
 
 
 func change_fiendInst_by_instId(fieldName: String, fieldValue):
+	print("changed ", fieldName, "value to ", fieldValue)
 	var instId = cur_entity_inst_ind
 	var cur_inst_ind: int = 0
 	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:

@@ -201,7 +201,7 @@ func _ready():
 
 func load_level():
 	remove_fields_of_entity()
-	
+	singleton.cur_entity_inst_ind = 0
 	
 	#get image of level background
 	var bgRelPath: String = singleton.get_bgRelPath()

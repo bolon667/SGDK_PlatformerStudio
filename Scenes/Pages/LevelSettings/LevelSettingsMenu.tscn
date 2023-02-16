@@ -92,9 +92,13 @@ margin_right = 850.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 632.0
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 636.0
 margin_right = 806.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="1"]
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="2"]
 margin_left = 810.0
 margin_right = 850.0
 
@@ -125,9 +129,13 @@ margin_right = 852.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 634.0
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 638.0
 margin_right = 808.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="1"]
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="2"]
 margin_left = 812.0
 margin_right = 852.0
 
@@ -160,9 +168,13 @@ margin_right = 863.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 645.0
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 649.0
 margin_right = 819.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="1"]
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="2"]
 margin_left = 823.0
 margin_right = 863.0
 
@@ -196,9 +208,14 @@ margin_right = 893.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 675.0
+text = "Choose vgm"
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 679.0
 margin_right = 849.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="1"]
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="2"]
 margin_left = 853.0
 margin_right = 893.0
 

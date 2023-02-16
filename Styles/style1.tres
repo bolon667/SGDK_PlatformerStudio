@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=13 format=2]
+[gd_resource type="Theme" load_steps=18 format=2]
 
 [ext_resource path="res://Fonts/Hardpixel.OTF" type="DynamicFontData" id=1]
 
@@ -15,29 +15,29 @@ border_width_right = 3
 border_width_bottom = 3
 border_color = Color( 0.298039, 0.298039, 0.298039, 1 )
 
-[sub_resource type="StyleBoxFlat" id=4]
-bg_color = Color( 0.0156863, 0.184314, 0.47451, 1 )
+[sub_resource type="StyleBoxFlat" id=18]
+bg_color = Color( 0.372549, 0.141176, 0.745098, 1 )
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color( 0.305882, 0.192157, 0, 1 )
+border_color = Color( 0.109804, 0.6, 0.74902, 1 )
 
 [sub_resource type="StyleBoxFlat" id=5]
-bg_color = Color( 0.0470588, 0.121569, 0.313726, 1 )
+bg_color = Color( 0.0509804, 0.12549, 0.32549, 1 )
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color( 0.207843, 0.129412, 0, 1 )
+border_color = Color( 0.109804, 0.6, 0.74902, 1 )
 
 [sub_resource type="StyleBoxFlat" id=6]
-bg_color = Color( 0.168627, 0.12549, 0.109804, 1 )
+bg_color = Color( 0.352941, 0, 0.454902, 1 )
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color( 0.305882, 0.192157, 0, 1 )
+border_color = Color( 0.133333, 0, 0.12549, 1 )
 
 [sub_resource type="StyleBoxFlat" id=7]
 bg_color = Color( 0.156863, 0.156863, 0.156863, 1 )
@@ -79,8 +79,44 @@ border_width_right = 3
 border_width_bottom = 3
 border_color = Color( 0, 0, 0, 1 )
 
+[sub_resource type="StyleBoxFlat" id=19]
+bg_color = Color( 0.164706, 0.164706, 0.164706, 1 )
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color( 0, 0, 0, 1 )
+
 [sub_resource type="StyleBoxFlat" id=9]
 bg_color = Color( 0.352941, 0.356863, 0.317647, 1 )
+
+[sub_resource type="StyleBoxFlat" id=14]
+bg_color = Color( 0, 0.54902, 0.760784, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0.0431373, 0.227451, 0.427451, 1 )
+
+[sub_resource type="StyleBoxFlat" id=15]
+bg_color = Color( 0.0588235, 0.666667, 0.898039, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0.113725, 0.372549, 0.647059, 1 )
+
+[sub_resource type="StyleBoxFlat" id=16]
+bg_color = Color( 0.0588235, 0.309804, 0.898039, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0.298039, 0.47451, 1, 1 )
+
+[sub_resource type="StyleBoxFlat" id=17]
+border_width_left = 10
+border_color = Color( 0.172549, 0, 0.4, 1 )
 
 [resource]
 default_font = SubResource( 1 )
@@ -92,12 +128,20 @@ Button/colors/font_color_pressed = Color( 1, 1, 1, 1 )
 Button/constants/hseparation = 2
 Button/fonts/font = SubResource( 1 )
 Button/styles/disabled = SubResource( 2 )
-Button/styles/hover = SubResource( 4 )
+Button/styles/hover = SubResource( 18 )
 Button/styles/normal = SubResource( 5 )
 Button/styles/pressed = SubResource( 6 )
+FileDialog/colors/file_icon_modulate = Color( 1, 1, 1, 1 )
+FileDialog/colors/files_disabled = Color( 1, 1, 1, 0.25098 )
+FileDialog/colors/folder_icon_modulate = Color( 1, 1, 1, 1 )
 LineEdit/styles/normal = SubResource( 7 )
 LineEdit/styles/read_only = SubResource( 8 )
 PopupMenu/styles/hover = SubResource( 11 )
 PopupMenu/styles/panel = SubResource( 12 )
 TextEdit/styles/normal = SubResource( 10 )
+TextEdit/styles/read_only = SubResource( 19 )
 Tree/styles/bg = SubResource( 9 )
+VScrollBar/styles/grabber = SubResource( 14 )
+VScrollBar/styles/grabber_highlight = SubResource( 15 )
+VScrollBar/styles/grabber_pressed = SubResource( 16 )
+VScrollBar/styles/scroll = SubResource( 17 )

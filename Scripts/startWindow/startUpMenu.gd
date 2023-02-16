@@ -61,3 +61,17 @@ func _on_loadProjectDialog_dir_selected(dir):
 	singleton.save_project_last_paths()
 	
 	get_tree().change_scene("res://Scenes/mapEditorScene.tscn")
+
+
+
+
+func _on_supportBtn_button_down():
+	OS.shell_open("https://boosty.to/bolon667")
+
+
+func _on_discordBtn_button_down():
+	OS.shell_open("https://discord.gg/E9Q2hSMNtV")
+
+
+func _on_githubBtn_button_down():
+	pass # Replace with function body.

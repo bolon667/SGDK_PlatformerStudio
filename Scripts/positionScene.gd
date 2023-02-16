@@ -28,7 +28,7 @@ func updateCurMessage():
 func _draw():
 	update()
 	if(highlight):
-		var color = Color(0.5,0.5,0)
+		var color: Color = Color( 1, 0.84, 0, 1 )
 		var line_thickness = 3
 		var col_rect_pos: Vector2 = $CollisionShape2D.position
 		#line_thickness = stepify(line_thickness*camera2D.zoom,0)

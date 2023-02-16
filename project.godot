@@ -10,9 +10,10 @@ config_version=4
 
 [application]
 
-config/name="SGDKOneScreenPlatformerEngine"
+config/name="Platformer Studio For SGDK"
 run/main_scene="res://Scenes/startWindow/startUpMenu.tscn"
 config/icon="res://icon.png"
+config/windows_native_icon="res://icon.ico"
 
 [autoload]
 

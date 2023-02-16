@@ -13,6 +13,7 @@ onready var mainController = $\"../../../../\"
 onready var settings_field_t = preload(\"res://Scenes/Fields/string_field.tscn\")
 onready var settings_field_sprite_t = preload(\"res://Scenes/Fields/sprite_field.tscn\")
 onready var settings_field_aabb_t = preload(\"res://Scenes/Fields/aabb_field.tscn\")
+onready var settings_field_trigger_type_t = preload(\"res://Scenes/Fields/trigger_type_field.tscn\")
 onready var settings_head_t = preload(\"res://Scenes/Fields/settings_head.tscn\")
 onready var camera2D = $\"../../../../Camera2D\"
 
@@ -96,7 +97,11 @@ func show_fields_of_entity():
 	VBoxContainerRight.add_child(settings_head_node)
 	for field_inst in entity_definition[\"fieldInstances\"]:
 		var settings_field_node
-		if field_inst[\"__type\"] == \"Sprite\":
+		if field_inst[\"__identifier\"] == \"Trigger type\":
+			settings_field_node = settings_field_trigger_type_t.instance()
+			settings_field_node.get_node(\"Label\").text = field_inst[\"__identifier\"]
+			settings_field_node.get_node(\"VBoxContainer/LineEdit\").text = field_inst[\"__value\"]
+		elif field_inst[\"__type\"] == \"Sprite\":
 			settings_field_node = settings_field_sprite_t.instance()
 			settings_field_node.get_node(\"FileDialog\").current_path = singleton.cur_project_folder_path + \"/build/res/sprites/\"
 			

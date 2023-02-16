@@ -60,21 +60,21 @@ func _on_LoadBGFile_file_selected(path):
 	var ext = path.get_extension();
 	if(!(ext in ['png', 'bmp'])):
 		return
-	print(ext)
-	print(path)
+	var localPath = path.replace(ProjectSettings.globalize_path("res://"), "./")
+	print(localPath)
 	var bgImage = Image.new()
-	bgImage.load(path)
+	bgImage.load(localPath)
 	var imgTex = ImageTexture.new()
 	imgTex.create_from_image(bgImage, 1)
 	var level_size
 	var load_modes: Array = singleton.get_load_modes()
 	match layer_id:
 		0: #bga
-			singleton.change_bgRelPath(path)
+			singleton.change_bgRelPath(localPath)
 			TileMapEditorWindow_bgA.texture = imgTex;
 			level_size = TileMapEditorWindow_bgA.texture.get_size()
 		1: #bgb
-			singleton.change_bgRelPath2(path)
+			singleton.change_bgRelPath2(localPath)
 			TileMapEditorWindow_bgB.texture = imgTex;
 			level_size = TileMapEditorWindow_bgB.texture.get_size()
 	if load_modes[layer_id] == 0:
@@ -180,3 +180,21 @@ func _on_loadImageOption1_item_selected(index):
 
 func _on_loadImageOption2_item_selected(index):
 	singleton.change_load_image_mode_bgb(index)
+
+
+func _on_changebgA4AllLevels_confirmed():
+	singleton.change_load_image_mode_bga_all_levels()
+	singleton.change_bgRelPath_all_levels()
+
+
+func _on_changebgB4AllLevels_confirmed():
+	singleton.change_load_image_mode_bgb_all_levels()
+	singleton.change_bgRelPath2_all_levels()
+
+
+func _on_changeBGA4AllLevels_button_down():
+	$changebgA4AllLevels.popup_centered()
+
+
+func _on_changeBGB4AllLevels_button_down():
+	$changebgB4AllLevels.popup_centered()

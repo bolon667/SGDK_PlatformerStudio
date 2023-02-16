@@ -45,8 +45,15 @@ public class ChooseFileProperty : HBoxContainer
 		singleton.Call("change_level_attr", levelAttrName, "");
 		infoLabel.Text = "NULL";
 	}
-
+	
+	private void _on_applyAllLevelsBtn_button_down()
+	{
+		singleton.Call("change_all_level_attr", levelAttrName, infoLabel.Text);
+	}
 }
+
+
+
 
 
 

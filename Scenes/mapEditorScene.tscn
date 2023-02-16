@@ -34,8 +34,8 @@ process_priority = 10075
 layer = -128
 
 [node name="TextureRect" type="TextureRect" parent="TileMapEditorWindow/CanvasLayer2"]
-anchor_right = 1.0
-anchor_bottom = 1.0
+margin_right = 1024.0
+margin_bottom = 600.0
 mouse_filter = 2
 texture = SubResource( 3 )
 stretch_mode = 1
@@ -101,10 +101,17 @@ margin_bottom = 26.0
 theme = ExtResource( 6 )
 text = " X "
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
+[node name="changeBGA4AllLevels" type="Button" parent="CanvasLayer/VBoxContainer"]
 margin_top = 30.0
 margin_right = 300.0
 margin_bottom = 56.0
+theme = ExtResource( 6 )
+text = "Change bgA for ALL levels"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
+margin_top = 60.0
+margin_right = 300.0
+margin_bottom = 86.0
 
 [node name="loadImageOption2" type="OptionButton" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
 margin_right = 105.0
@@ -129,55 +136,62 @@ margin_bottom = 26.0
 theme = ExtResource( 6 )
 text = " X "
 
+[node name="changeBGB4AllLevels" type="Button" parent="CanvasLayer/VBoxContainer"]
+margin_top = 90.0
+margin_right = 300.0
+margin_bottom = 116.0
+theme = ExtResource( 6 )
+text = "Change bgB for ALL levels"
+
 [node name="GenCodeBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
 visible = false
-margin_top = 24.0
-margin_right = 250.0
-margin_bottom = 44.0
+margin_top = 60.0
+margin_right = 300.0
+margin_bottom = 80.0
 text = "Gen Collision Code"
 script = ExtResource( 3 )
 
 [node name="buildProjectBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
-margin_top = 60.0
+margin_top = 120.0
 margin_right = 300.0
-margin_bottom = 86.0
+margin_bottom = 146.0
 theme = ExtResource( 6 )
 text = "Build project"
 script = ExtResource( 5 )
 
 [node name="addNewLevelBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
-margin_top = 90.0
+margin_top = 150.0
 margin_right = 300.0
-margin_bottom = 116.0
+margin_bottom = 176.0
 theme = ExtResource( 6 )
 text = "Add New Level"
 
 [node name="deleteCurLevelBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
-margin_top = 120.0
+margin_top = 180.0
 margin_right = 300.0
-margin_bottom = 146.0
+margin_bottom = 206.0
 theme = ExtResource( 6 )
 text = "Delete Current Level"
 
 [node name="snapToGridBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
-margin_top = 150.0
+margin_top = 210.0
 margin_right = 300.0
-margin_bottom = 176.0
+margin_bottom = 236.0
 theme = ExtResource( 6 )
 toggle_mode = true
 text = "Snap entity to 8x8 grid"
 
 [node name="ChangeCurLevel" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
-margin_top = 180.0
+margin_top = 240.0
 margin_right = 300.0
-margin_bottom = 206.0
+margin_bottom = 266.0
 theme = ExtResource( 6 )
 text = "Change Current Level"
 
 [node name="ChangeCellSize" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
-margin_top = 210.0
+margin_top = 270.0
 margin_right = 300.0
-margin_bottom = 236.0
+margin_bottom = 296.0
 theme = ExtResource( 6 )
 group = SubResource( 1 )
 text = "8x8 px size"
@@ -192,9 +206,9 @@ margin_bottom = 212.0
 text = "Test Button"
 
 [node name="ChangeTileMode" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
-margin_top = 240.0
+margin_top = 300.0
 margin_right = 300.0
-margin_bottom = 266.0
+margin_bottom = 326.0
 theme = ExtResource( 6 )
 group = SubResource( 1 )
 text = "Cur tile"
@@ -203,6 +217,7 @@ text = "Cur tile"
 mouse_filter = 0
 
 [node name="ContainerRight" type="Control" parent="CanvasLayer"]
+visible = false
 light_mask = 0
 anchor_left = 1.0
 anchor_right = 1.0
@@ -229,14 +244,30 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 alignment = 1
 
+[node name="changebgA4AllLevels" type="ConfirmationDialog" parent="."]
+margin_right = 285.0
+margin_bottom = 70.0
+theme = ExtResource( 6 )
+window_title = ""
+dialog_text = "Do you want to change bgA for ALL levels?"
+
+[node name="changebgB4AllLevels" type="ConfirmationDialog" parent="."]
+margin_right = 285.0
+margin_bottom = 70.0
+theme = ExtResource( 6 )
+window_title = ""
+dialog_text = "Do you want to change bgB for ALL levels?"
+
 [connection signal="file_selected" from="CanvasLayer/SaveFile" to="." method="_on_LoadBGFile_file_selected"]
 [connection signal="file_selected" from="CanvasLayer/LoadBGFile" to="." method="_on_LoadBGFile_file_selected"]
 [connection signal="item_selected" from="CanvasLayer/VBoxContainer/HBoxContainer/loadImageOption1" to="." method="_on_loadImageOption1_item_selected"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer/LoadBackgroundBtn" to="." method="_on_LoadBackgroundBtn_button_down"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer/DeleteBgABtn" to="." method="_on_DeleteBgABtn_button_down"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/changeBGA4AllLevels" to="." method="_on_changeBGA4AllLevels_button_down"]
 [connection signal="item_selected" from="CanvasLayer/VBoxContainer/HBoxContainer2/loadImageOption2" to="." method="_on_loadImageOption2_item_selected"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer2/LoadBackgroundBtn2" to="." method="_on_LoadBackgroundBtn2_button_down"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer2/DeleteBgBBtn" to="." method="_on_DeleteBgBBtn_button_down"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/changeBGB4AllLevels" to="." method="_on_changeBGB4AllLevels_button_down"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/GenCodeBtn" to="." method="_on_GenCodeBtn_button_down"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/buildProjectBtn" to="." method="_on_buildProjectBtn_pressed"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/addNewLevelBtn" to="." method="_on_addNewLevelBtn_button_down"]
@@ -246,3 +277,5 @@ alignment = 1
 [connection signal="item_selected" from="CanvasLayer/VBoxContainer/ChangeCellSize" to="." method="_on_ChangeCellSize_item_selected"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/Button" to="." method="_on_Button_pressed"]
 [connection signal="item_selected" from="CanvasLayer/VBoxContainer/ChangeTileMode" to="." method="_on_ChangeTileMode_item_selected"]
+[connection signal="confirmed" from="changebgA4AllLevels" to="." method="_on_changebgA4AllLevels_confirmed"]
+[connection signal="confirmed" from="changebgB4AllLevels" to="." method="_on_changebgB4AllLevels_confirmed"]
