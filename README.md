@@ -15,3 +15,6 @@ Studio wihich allows you easily create platformers for **Sega Genesis**, heavily
 
 # Warning
 It's a first release, if you will get bugs, tell me about them in **Issues** tab
+
+# LICENCE
+MIT
