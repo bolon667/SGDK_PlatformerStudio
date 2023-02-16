@@ -4,7 +4,7 @@
 
 # About project
 
-TODO
+Studio for SGDK platformer development, heavily inspired by **[LDTK](https://ldtk.io/)** simple interface.
 
 # What done:
 
