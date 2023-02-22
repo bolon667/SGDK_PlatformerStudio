@@ -15,6 +15,7 @@ func _ready():
 	print("cur_inst_id: ", singleton.cur_entity_inst_ind)
 	print("inst_len: ", len(singleton.entity_types["levels"][singleton.cur_level_ind]["layerInstances"][0]["entityInstances"]))
 	#Found a weird bug, idk how to reproduce it, but, i know, that if i check this,
+	
 	print("identifier: ",singleton.entity_types["levels"][singleton.cur_level_ind]["layerInstances"][0]["entityInstances"][singleton.cur_entity_inst_ind]["__identifier"])
 	
 	#And crush happens, this bug is appeared

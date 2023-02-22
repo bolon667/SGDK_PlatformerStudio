@@ -51,27 +51,36 @@ size_flags_horizontal = 3
 theme = ExtResource( 4 )
 text = "Level Settings"
 
-[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
-modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
+[node name="projectSettingsBtn" type="Button" parent="VBoxContainer"]
 margin_top = 132.0
 margin_right = 200.0
-margin_bottom = 136.0
+margin_bottom = 172.0
+rect_min_size = Vector2( 0, 40 )
+size_flags_horizontal = 3
+theme = ExtResource( 4 )
+text = "Project Settings"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
+margin_top = 176.0
+margin_right = 200.0
+margin_bottom = 180.0
 
 [node name="LayerList" type="VBoxContainer" parent="VBoxContainer"]
-margin_top = 140.0
+margin_top = 184.0
 margin_right = 200.0
-margin_bottom = 140.0
+margin_bottom = 184.0
 size_flags_horizontal = 3
 theme = ExtResource( 3 )
 
 [node name="HSeparator4" type="HSeparator" parent="VBoxContainer"]
 modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
-margin_top = 144.0
+margin_top = 188.0
 margin_right = 200.0
-margin_bottom = 148.0
+margin_bottom = 192.0
 
 [node name="LayerValuesList" type="ScrollContainer" parent="VBoxContainer"]
-margin_top = 152.0
+margin_top = 196.0
 margin_right = 200.0
 margin_bottom = 588.0
 size_flags_horizontal = 3
@@ -97,3 +106,4 @@ margin_bottom = 600.0
 [connection signal="button_down" from="VBoxContainer/addNewEntityTypeBtn" to="." method="_on_addNewEntityTypeBtn_button_down"]
 [connection signal="button_down" from="VBoxContainer/msgPacksBtn" to="." method="_on_msgPacksBtn_button_down"]
 [connection signal="button_down" from="VBoxContainer/lvlSettingsBtn" to="." method="_on_lvlSettingsBtn_button_down"]
+[connection signal="button_down" from="VBoxContainer/projectSettingsBtn" to="." method="_on_projectSettingsBtn_button_down"]

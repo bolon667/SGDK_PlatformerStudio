@@ -12,14 +12,16 @@ void updatePlayer() {
 	}
 
 	//Check if player wants to jump by looking the coyote time and jump buffer
-	if (currentCoyoteTime > 0 && currentJumpBufferTime > 0) {
-		playerBody.jumping = TRUE;
-		//Play the SFX with the index 64 (jump sfx) with the highest priority
-		XGM_startPlayPCM(64, 15, SOUND_PCM_CH1);
-		playerBody.velocity.fixY = FIX16(-playerBody.jumpSpeed);
-
+	if(playerBody.curAmountOfJumps > 0){
+		if(currentJumpBufferTime > 0){
 		currentCoyoteTime = 0;
 		currentJumpBufferTime = 0;
+		playerBody.curAmountOfJumps--;
+		playerBody.jumping = TRUE;
+			//Play the SFX with the index 64 (jump sfx) with the highest priority
+		XGM_startPlayPCM(64, 15, SOUND_PCM_CH1);
+		playerBody.velocity.fixY = FIX16(-playerBody.jumpSpeed);
+		}
 	}
 	//The ground hasn't been checked yet so we only decrease the jump buffer time for now
 	currentJumpBufferTime = clamp((currentJumpBufferTime - 1), 0, jumpBufferTime); //Clamp to avoid underflowing, it is unlikely to happen but can happen

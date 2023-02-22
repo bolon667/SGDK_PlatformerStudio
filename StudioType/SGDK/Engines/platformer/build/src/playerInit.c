@@ -37,6 +37,10 @@ void playerInit(u16 positionNum) {
 	playerBody.acceleration = FIX16(.25);
 	playerBody.deceleration = FIX16(.2);
 
+	playerBody.maxAmountOfJumps = 2;
+	playerBody.curAmountOfJumps = playerBody.maxAmountOfJumps;
+	
+
 	playerBounds = newAABB(
 			playerBody.globalPosition.x + playerBody.aabb.min.x,
 			playerBody.globalPosition.x + playerBody.aabb.max.x,

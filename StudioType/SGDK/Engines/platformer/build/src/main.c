@@ -19,7 +19,7 @@ int main(bool resetType) {
 	VDP_setHilightShadow(1);
 
 	//Setup the basic things we need for this demo
-	loadLevel(levelNum, 0);
+	loadLevel($curLevel$, 0);
 	//playerInit();
 	setupCamera(newVector2D_u16(160, 112), 20, 20); //We have to setup always after the player, it directly depends on player's data
 

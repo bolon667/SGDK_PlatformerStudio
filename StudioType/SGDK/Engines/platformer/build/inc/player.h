@@ -23,6 +23,7 @@ struct pBody {
 
 	bool onGround;
 	bool onStair;
+	bool onSemiSolid;
 	bool jumping;
 	bool falling;
 	bool climbingStair;
@@ -35,7 +36,6 @@ struct pBody {
 
 	s16 hp;
 	
-
 	Vect2D_s16 position;
 	Vect2D_s16 globalPosition;
 	Vect2D_u16 centerOffset;
@@ -45,6 +45,11 @@ struct pBody {
 		s16 x;
 		fix16 fixY;
 	}velocity;
+
+	
+
+	s16 curAmountOfJumps;
+	s16 maxAmountOfJumps;
 
 	Vect2D_s16 input;
 };

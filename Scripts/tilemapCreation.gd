@@ -22,11 +22,7 @@ func _ready():
 	for tile_id in tile_ids:
 		var texture = TileMapEditorWindow_tileMap.tile_set.tile_get_texture(tile_id)
 		$CanvasLayer/VBoxContainer/ChangeTileMode.add_icon_item(texture, str(tile_id), tile_id)
-	
-	var cell_ind: int = 0
-	if(singleton.cell_size == 16):
-		cell_ind = 1
-	$CanvasLayer/VBoxContainer/ChangeCellSize.select(cell_ind)
+		
 	update_load_image_modes()
 	update_change_level_list()
 
@@ -139,18 +135,6 @@ func _on_ChangeCurLevel_item_selected(index):
 	singleton.cur_level_ind = index
 	get_tree().call_group("tilemapEditorWindow", "load_level")
 	update_load_image_modes()
-
-
-func _on_ChangeCellSize_item_selected(index):
-	match index:
-		0:
-			print("changed to 8x8 cell size")
-			singleton.change_cell_size(8)
-			get_tree().call_group("tilemapEditorWindow", "update_tilemap_cell_size", Vector2(singleton.cell_size, singleton.cell_size))
-		1:
-			print("changed to 16x16 cell size")
-			singleton.change_cell_size(16)
-			get_tree().call_group("tilemapEditorWindow", "update_tilemap_cell_size", Vector2(singleton.cell_size, singleton.cell_size))
 
 
 func _on_LoadBackgroundBtn2_button_down():

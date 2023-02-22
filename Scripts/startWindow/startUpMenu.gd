@@ -74,4 +74,4 @@ func _on_discordBtn_button_down():
 
 
 func _on_githubBtn_button_down():
-	pass # Replace with function body.
+	OS.shell_open("https://github.com/bolon667/SGDK_PlatformerStudio")

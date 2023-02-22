@@ -165,6 +165,7 @@ void checkCollisions() {
 	tileBoundDifference = newVector2D_u16(maxTilePos.x - minTilePos.x, maxTilePos.y - minTilePos.y);
 	
 	bool onStair = FALSE;
+	playerBody.onSemiSolid = FALSE;
 
 	//To avoid having troubles with player snapping to ground ignoring the upward velocity, we separate top and bottom collisions depending on the velocity
 	if (yIntVelocity >= 0) {
@@ -178,12 +179,22 @@ void checkCollisions() {
 				if (getTileRightEdge(x) == levelLimits.min.x || getTileLeftEdge(x) == levelLimits.max.x)
 					continue;
 
-				u16 bottomEdgePos = getTileTopEdge(y);
+				u16 bottomEdgePos;
+				if(bottomTileValue == ONE_WAY_PLATFORM_UP_TILE && playerBody.input.y == 1){
+					// playerBody.onSemiSolid = TRUE;
+					// bottomEdgePos = levelLimits.max.y-1;
+					bottomEdgePos = getTileTopEdge(y)+17;
+				} else {
+					bottomEdgePos = getTileTopEdge(y);
+					playerBody.velocity.fixY = 0;
+				}
+				
 				//The error correction is used to add some extra width pixels in case the player isn't high enough by just some of them
 				if (bottomEdgePos < levelLimits.max.y) { // && bottomEdgePos >= (playerFeetPos - oneWayPlatformErrorCorrection)
 					levelLimits.max.y = bottomEdgePos;
 				}
-				playerBody.velocity.fixY = 0;
+				playerBody.curAmountOfJumps = playerBody.maxAmountOfJumps;
+				
 			}
 			else if(bottomTileValue == SLOPE_90_RIGHT){
 				u16 bottomEdgePos = getTileTopEdge(y);
@@ -256,16 +267,21 @@ void checkCollisions() {
 
 			//And the same once again
 			u16 topTileValue = getTileValue(x, y);
+			
 			if (topTileValue == GROUND_TILE || topTileValue == ONE_WAY_PLATFORM_DOWN_TILE) {
 				if (getTileRightEdge(x) == levelLimits.min.x || getTileLeftEdge(x) == levelLimits.max.x)
 					continue;
 
-				u16 upperEdgePos = getTileBottomEdge(y);
+				u16 upperEdgePos;
+				
+				upperEdgePos = getTileBottomEdge(y);
+				
 				if (upperEdgePos < levelLimits.max.y) {
-					levelLimits.min.y = upperEdgePos;
+					levelLimits.min.y = upperEdgePos+2;
 					break;
 				}
 				playerBody.velocity.fixY = 0;
+				
 			}
 			else if(topTileValue == SLOPE_90_LEFT_UP){
 				u16 upperEdgePos = getTileBottomEdge(y);

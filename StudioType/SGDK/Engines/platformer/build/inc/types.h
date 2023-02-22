@@ -20,7 +20,6 @@ typedef struct {
 	Vect2D_s16 max;
 }AABB;
 
-
 typedef struct {
 	MapDefinition* foregroundMap;
 	MapDefinition* backgroundMap;

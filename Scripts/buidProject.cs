@@ -66,6 +66,7 @@ public class buidProject : Node
 		Godot.Collections.Array mergedFieldDef_arr = (Godot.Collections.Array)singleton.Call("get_merged_fieldDef");
 
 		String typesH_path = engineRootPath + "/build/inc/types.h";
+		GD.Print("TEST: ", typesH_path);
 		String typesCode = System.IO.File.ReadAllText(typesH_path);
 		String mergedStructCode = genMergedStructCode(mergedFieldDef_arr);
 		typesCode = typesCode.Replace("//$entityMergedStruct$", mergedStructCode);
@@ -300,6 +301,20 @@ public class buidProject : Node
 
 		customScriptsC_CodeReplacer();
 		customScriptsH_CodeReplacer();
+
+		mainC_CodeReplacer();
+	}
+
+	private void mainC_CodeReplacer()
+	{
+		int curLevel;
+		Node singleton = (Node)GetNode("/root/singleton");
+		curLevel = (int)singleton.Call("get_run_level_ind");
+		String mainC_path = engineRootPath + "/build/src/main.c";
+		String mainCode = System.IO.File.ReadAllText(mainC_path);
+		String finalCode = mainCode.Replace("$curLevel$", curLevel.ToString());
+		System.IO.File.WriteAllText(mainC_path, finalCode);
+		GD.Print("main.c code replaced");
 	}
 
 	private void customScriptsC_CodeReplacer()

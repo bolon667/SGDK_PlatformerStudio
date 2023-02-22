@@ -45,12 +45,13 @@ var entity_types = {
 		"app": "SGDK Studio",
 		"doc": "???",
 		"appAuthor": "bolon667",
-		"appVersion": "1.0.0 alpha",
-		"url": "https://github.com/bolon667/SGDK_OneScreenPlatformerStudio",
+		"appVersion": "1.0 alpha",
+		"url": "https://github.com/bolon667/SGDK_PlatformerStudio",
 	},
 	"jsonVersion": "1.0.0",
 	"engineRootPath": "./StudioType/SGDK/Engines/platformer",
 	"isOneScreen": false, #mb, i will delete that
+	"runFromCurrentLevel": false,
 	"defaultGridSize": 16,
 	"defs": 
 	{
@@ -519,6 +520,13 @@ func create_new_project():
 	add_positionInstance()
 	add_trigger_enum()
 	save_project()
+
+func get_run_level_ind():
+	var lvl_ind: int = 0
+	if entity_types.has("runFromCurrentLevel"):
+		if entity_types["runFromCurrentLevel"]:
+			lvl_ind = cur_level_ind
+	return lvl_ind
 
 func save_project():
 	print("saving project")

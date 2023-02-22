@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Styles/style1.tres" type="Theme" id=1]
+[ext_resource path="res://Scripts/Pages/ProjectSettings/ChangeCellSize.gd" type="Script" id=2]
+
+[sub_resource type="ButtonGroup" id=1]
+
+[node name="ChangeCellSize" type="OptionButton"]
+margin_top = 270.0
+margin_right = 300.0
+margin_bottom = 296.0
+size_flags_horizontal = 3
+theme = ExtResource( 1 )
+group = SubResource( 1 )
+text = "8x8 px size"
+items = [ "8x8 px size", null, false, 0, null, "16x16 px size", null, false, 1, null ]
+selected = 0
+script = ExtResource( 2 )
+
+[connection signal="item_selected" from="." to="." method="_on_ChangeCellSize_item_selected"]
