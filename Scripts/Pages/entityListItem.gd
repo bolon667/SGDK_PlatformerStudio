@@ -42,6 +42,7 @@ func _on_TextBtn_button_down():
 	get_tree().call_group("entityMenu", "load_entity_pic")
 	get_tree().call_group("entityMenu", "enitity_name_edit_readonly", false)
 	get_tree().call_group("entityMenu", "load_entity_has_trigger")
+	get_tree().call_group("entityMenu", "load_add_new_entity")
 	
 	
 	

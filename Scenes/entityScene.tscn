@@ -34,7 +34,8 @@ var sprite_size: Vector2
 
 func _ready():
 	pass # Replace with function body.
-	var entityInst_info = singleton.get_entityInst_by_instId(entityInst_id)
+	singleton.cur_entity_inst_ind = singleton.get_entityInst_ind_by_id(entityInst_id)
+	var entityInst_info = singleton.get_cur_entityInst()
 	triggerAABB = entityInst_info[\"triggerAABB\"]
 	if(entityInst_info.has(\"addTrigger\")):
 		$ColorRect.visible = entityInst_info[\"addTrigger\"]
@@ -89,7 +90,7 @@ func _process(delta):
 func show_fields_of_entity():
 	ContainerRight.visible = true
 	var settings_head_node = settings_head_t.instance()
-	var entity_definition = singleton.get_entityInst_by_instId(entityInst_id)
+	var entity_definition = singleton.get_cur_entityInst()
 	if(!entity_definition):
 		return
 	settings_head_node.get_node(\"Label\").text = entity_definition[\"__identifier\"]
@@ -141,11 +142,14 @@ func move_entity():
 	
 	var ref = get_viewport().get_mouse_position()
 	if(Input.is_action_just_pressed(\"mouse1\")):
+		singleton.cur_entity_instId = entityInst_id
+		singleton.cur_entity_inst_ind = singleton.get_entityInst_ind_by_id(entityInst_id)
 		remove_fields_of_entity()
 		show_fields_of_entity()
 		is_moving = true
-		singleton.cur_entity_inst_ind = entityInst_id
-		var entityInst_info = singleton.get_entityInst_by_instId(entityInst_id)
+		
+		print(\"Found entity instInd: \", singleton.cur_entity_inst_ind)
+		var entityInst_info = singleton.get_cur_entityInst()
 		
 		if !entityInst_info.has(\"addTrigger\"):
 			var entityDef = singleton.get_entityDef_by_defId(entityInst_info[\"defId\"])

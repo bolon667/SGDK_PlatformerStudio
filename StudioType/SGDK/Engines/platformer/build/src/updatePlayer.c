@@ -49,7 +49,7 @@ void updatePlayer() {
 	}
 
 	//Apply gravity with a terminal velocity
-	if (!playerBody.onGround && !playerBody.climbingStair) {
+	if (!playerBody.onGround && !playerBody.climbingStair) { // && !playerBody.onPlatform
 		if (fix16ToInt(playerBody.velocity.fixY) <= playerBody.maxFallSpeed) {
 			playerBody.velocity.fixY = fix16Add(playerBody.velocity.fixY, gravityScale);
 		}else {
@@ -75,8 +75,6 @@ void updatePlayer() {
 	playerBody.position.y = playerBody.globalPosition.y - cameraPosition.y;
 	SPR_setPosition(playerBody.sprite, playerBody.position.x, playerBody.position.y);
 	
-	//Update the player animations
-	updateAnimations();
 
 	//Reset when falling off the screen
 	if (playerBody.falling) {

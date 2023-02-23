@@ -55,6 +55,7 @@ typedef struct {
 
 typedef struct {
 	bool alive;
+	bool preDeath;
 	Vect2D_s16 posInt;
 	Vect2D_f16 pos;
 	Vect2D_f16 spd;
@@ -66,6 +67,8 @@ typedef struct {
 	Sprite* spr;
 	SpriteDefinition* sprDef;
 	s16 lifeTime;
+	Sprite* spr2;
+	Sprite* spr3;
 } Bullet;
 
 typedef struct {

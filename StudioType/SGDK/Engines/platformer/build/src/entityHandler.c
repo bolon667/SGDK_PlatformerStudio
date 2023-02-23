@@ -12,7 +12,12 @@
 #include "../inc/customScripts.h"
 
 
+//$entityDefaultConsts$
+
+//$addNewEntityFuncs$
+
 void entityCheckForBullet(EntityMerged* entity){
+	entity->damaged = FALSE;
 	AABB entityTriggerBounds = newAABB(
 		entity->trigger->pos.x + entity->trigger->rect.min.x,
 		entity->trigger->pos.x + entity->trigger->rect.max.x,
@@ -33,7 +38,9 @@ void entityCheckForBullet(EntityMerged* entity){
 		if((bulletBounds.min.x < entityTriggerBounds.max.x) && (bulletBounds.max.x > entityTriggerBounds.min.x)){
 			if((bulletBounds.min.y < entityTriggerBounds.max.y) && (bulletBounds.max.y > entityTriggerBounds.min.y)){
 				entity->hp -= curBullet->damage;
-				break;
+				entity->damaged = TRUE;
+				curBullet->preDeath = TRUE;
+				return;
 			}
 		}
 	}
@@ -52,6 +59,13 @@ void showBullet(Bullet* entity){
     if(!entity->alive){
 		return;
 	}
+	if(entity->preDeath){
+		if(entity->spr)	SPR_releaseSprite(entity->spr);
+		if(entity->spr2) SPR_releaseSprite(entity->spr2);
+		if(entity->spr3) SPR_releaseSprite(entity->spr3);
+		entity->alive = FALSE;
+		return;
+	}
 
     s16 posX_OnCam = entity->posInt.x-cameraPosition.x;
 	s16 posY_OnCam = entity->posInt.y-cameraPosition.y;
@@ -59,8 +73,7 @@ void showBullet(Bullet* entity){
 	//$updatePosition_Entity_always$
 	if ((posX_OnCam < -entity->size.x) || (posX_OnCam > 320) || (posY_OnCam < -entity->size.y) || (posY_OnCam > 224)) {
 		if(entity->onScreen) {
-			if(entity->spr) SPR_releaseSprite(entity->spr);
-			entity->alive = FALSE;
+			entity->preDeath = TRUE;
 			return;
 		}
 		entity->onScreen = FALSE;
@@ -69,10 +82,18 @@ void showBullet(Bullet* entity){
     else
     {
 		if(!entity->onScreen) {
-			if(entity->sprDef) entity->spr = SPR_addSprite(entity->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(ENEMY_PALETTE, 0, FALSE, FALSE));
+			if(entity->sprDef) {
+				entity->spr = SPR_addSprite(entity->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(ENEMY_PALETTE, 15, FALSE, FALSE));
+				
+			}
+			entity->spr2 = SPR_addSprite(&spr_debugLeftTopCorner, posX_OnCam, posY_OnCam, TILE_ATTR(PAL3, 11, FALSE, FALSE));
+			entity->spr3 = SPR_addSprite(&spr_debugRightBottom, posX_OnCam, posY_OnCam, TILE_ATTR(PAL3, 11, FALSE, FALSE));
+			
 		}
-        if(entity->spr){
+        if(entity->sprDef){
 			SPR_setPosition(entity->spr, posX_OnCam, posY_OnCam);
+			
+			
 			//Update position
 			entity->pos.x += entity->spd.x;
 			entity->pos.y += entity->spd.y;
@@ -80,14 +101,44 @@ void showBullet(Bullet* entity){
 			entity->posInt.y = fix16ToInt(entity->pos.y);
 
 		}
+		SPR_setPosition(entity->spr2, posX_OnCam, posY_OnCam);
+		SPR_setPosition(entity->spr3, posX_OnCam+entity->size.x-8, posY_OnCam+entity->size.y-8);
 		entity->lifeTime--;
 		if(entity->lifeTime < 0){
-			if(entity->spr) SPR_releaseSprite(entity->spr);
-			entity->alive = FALSE;
+			entity->preDeath = TRUE;
 			return;
 		}
+		
 		entity->onScreen = TRUE;
     }
+}
+
+void forcePlayerUp(Trigger* trigger){
+	if((playerBody.globalPosition.y+playerBody.aabb.max.y) > (trigger->pos.y+trigger->rect.min.y)) {
+		playerBody.globalPosition.y = trigger->pos.y-playerBody.aabb.max.y+1;
+		playerBody.curAmountOfJumps = playerBody.maxAmountOfJumps;
+		playerBody.velocity.fixY = 0;
+		playerBody.onGround = TRUE;
+	}
+}
+
+void forcePlayerDown(Trigger* trigger){
+	if((playerBody.globalPosition.y+playerBody.aabb.min.y) < (trigger->pos.y+trigger->rect.max.y)) {
+		playerBody.globalPosition.y = trigger->pos.y+trigger->rect.max.y-playerBody.aabb.min.y+1;
+		playerBody.velocity.fixY = 0;
+	}
+}
+
+void forcePlayerLeft(Trigger* trigger){
+	if((playerBody.globalPosition.x+playerBody.aabb.max.x) > (trigger->pos.x+trigger->rect.min.x)) {
+		playerBody.globalPosition.x = trigger->pos.x+trigger->rect.min.x-playerBody.aabb.max.x-1;
+	}
+}
+
+void forcePlayerRight(Trigger* trigger){
+	if((playerBody.globalPosition.x+playerBody.aabb.min.x) < (trigger->pos.x+trigger->rect.max.x)) {
+		playerBody.globalPosition.x = trigger->pos.x+trigger->rect.max.x-playerBody.aabb.min.x;
+	}
 }
 
 void checkTriggerForPlayer(Trigger* trigger){
@@ -127,7 +178,18 @@ void checkTriggerForPlayer(Trigger* trigger){
 					break;
 				case 4: //execute custom script
 					customScriptArr[trigger->val1]();
-					
+					break;
+				case 5: //semi-solid Up
+					forcePlayerUp(trigger);
+					break;
+				case 6: //semi-solid Down
+					forcePlayerDown(trigger);
+					break;
+				case 7: //semi-solid Left
+					forcePlayerLeft(trigger);
+					break;
+				case 8: //semi-solid Right
+					forcePlayerRight(trigger);
 					break;
 			}
 		}

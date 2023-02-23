@@ -35,5 +35,5 @@ func _on_LineEdit_text_changed(new_text):
 		singleton.change_entityInst_by_instId(singleton.cur_entity_inst_ind, "triggerValue3", int(new_text))
 		pass
 		#trigger_type
-	singleton.change_fiendInst_by_instId($Label.text, new_text)
+	singleton.change_fiendInst_value($Label.text, new_text)
 	pass # Replace with function body.

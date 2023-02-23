@@ -40,7 +40,7 @@ func _on_LineEdit_text_changed(new_text):
 		select_ind = enum_amount
 	
 	
-	singleton.change_fiendInst_by_instId("Trigger type", str(select_ind))
+	singleton.change_fiendInst_value("Trigger type", str(select_ind))
 	
 	$VBoxContainer/OptionButton.select(select_ind)
 	pass # Replace with function body.

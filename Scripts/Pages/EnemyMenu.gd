@@ -13,6 +13,9 @@ onready var entity_name_edit = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxCont
 onready var add_new_field_btn = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/AddNewEntityField
 onready var field_properties_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/ScrollContainer/ContainerFieldProperties
 onready var add_trigger_btn = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer5/addTriggerActivate
+onready var can_add_new_entity = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer6/canAddNewEntityBtn
+onready var change_amount_of_entity = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer6/changeAmountOfEntity
+
 
 var add_trigger_activated: bool = false
 
@@ -23,6 +26,23 @@ func _ready():
 	load_list_of_entity()
 
 
+func load_add_new_entity():
+	can_add_new_entity.disabled = false
+	change_amount_of_entity.readonly = false
+	if(singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind].has("canAddNewEntity")):
+		var val = singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["canAddNewEntity"]
+		can_add_new_entity.pressed = val
+		if(val):
+			can_add_new_entity.text = "On"
+			if singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind].has("amountOfEntity"):
+				var val2 = singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["amountOfEntity"]
+				change_amount_of_entity.text = str(val2)
+		else:
+			can_add_new_entity.text = "Off"
+	else:
+		can_add_new_entity.pressed = false
+		can_add_new_entity.text = "Off"
+		change_amount_of_entity.text = ""
 func load_entity_has_trigger():
 	add_trigger_btn.disabled = false
 	if(singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind].has("addTrigger")):
@@ -222,3 +242,21 @@ func _on_addTriggerActivate_button_down():
 		add_trigger_btn.text = "On"
 	else:
 		add_trigger_btn.text = "Off"
+
+
+func _on_canAddNewEntityBtn_toggled(button_pressed):
+	#can_add_new_entity change_amount_of_entity
+	can_add_new_entity.pressed =  button_pressed
+	if(button_pressed):
+		can_add_new_entity.text = "On"
+	else:
+		can_add_new_entity.text = "Off"
+		
+	singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["canAddNewEntity"] = button_pressed
+	pass # Replace with function body.
+
+
+func _on_changeAmountOfEntity_text_changed():
+	var val: int = int(change_amount_of_entity.text)
+	singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["amountOfEntity"] = val
+	pass # Replace with function body.

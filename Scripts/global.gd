@@ -22,6 +22,7 @@ var cur_entity_type_ind: int = -1
 var cur_entity_field_ind: int
 var cur_entity_field_def_ind: int
 var cur_entity_inst_ind: int
+var cur_entity_instId: int
 var cur_messagePack_ind: int = -1
 var cur_message_ind: int = -1
 
@@ -347,15 +348,24 @@ func get_trigger_enum():
 		if cur_enum["identifier"] == "trigger":
 			return cur_enum
 
+func get_show_trigger_rects():
+	if !entity_types.has("debugSettings"):
+		return false
+	if !entity_types["debugSettings"].has("showTriggerRects"):
+		return false
+	return entity_types["debugSettings"]["showTriggerRects"]
+
 func add_trigger_enum():
 	if not entity_types["defs"].has("enums"):
 		entity_types["defs"]["enums"] = []
 	for cur_enum in entity_types["defs"]["enums"]:
 		if cur_enum["identifier"] == "trigger":
-			return
+			entity_types["defs"]["enums"] = []
+			break
+	#DEBUG stuff to autoupdate all projects to new enum trigger
 	var new_enum = enum_template.duplicate(true)
 	new_enum["identifier"] = "trigger"
-	var enum_default_val_names: Array = ["change_level", "got_something", "got_damage", "show_message", "execute_custom_script"]
+	var enum_default_val_names: Array = ["change_level", "got_something", "got_damage", "show_message", "execute_custom_script", "force_player_up", "force_player_down", "force_player_left", "force_player_right"]
 	for enum_val_name in enum_default_val_names:
 		var temp_enum_val = enum_val_template.duplicate(true)
 		temp_enum_val["name"] = enum_val_name
@@ -430,6 +440,7 @@ func load_project(projectPath: String):
 	#TODO
 	add_trigger_enum()
 	
+
 
 func get_sprite_size_from_path(path:String):
 	var result
@@ -608,6 +619,21 @@ func get_collisionMapForLevel(levelNum:int):
 	return entity_types["levels"][levelNum]["layerInstances"][collision_layer_ind]["intGridCsv"]
 
 
+func fix_cur_level_inst_ids():
+	var entity_layer_ind: int = -1
+	var temp_entity_layer_ind: int = 0
+	for layer_inst in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if(layer_inst["__type"] == "Entity"):
+			entity_layer_ind = temp_entity_layer_ind
+			break
+		temp_entity_layer_ind += 1
+	var entityInst_amount:int = len(entity_types["levels"][cur_level_ind]["layerInstances"][entity_layer_ind]["entityInstances"])
+	var cur_ind: int = 0
+	while cur_ind < entityInst_amount:
+		entity_types["levels"][cur_level_ind]["layerInstances"][entity_layer_ind]["entityInstances"][cur_ind]["instId"] = cur_ind
+		cur_ind += 1
+	print("InstIds are fixed on level ", cur_level_ind)
+
 func change_cur_entityInstTriggerAABB(aabb: Array):
 	var entity_layer_ind: int = -1
 	var temp_entity_layer_ind: int = 0
@@ -756,33 +782,35 @@ func get_positionInst_by_instId(instId: int):
 		if entity_inst["instId"] == instId:
 			return entity_inst
 
-func get_entityInst_by_instId(instId: int):
+func get_entityInst_ind_by_id(entityInst_id: int):
+	var result_ind: int = 0
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+		if entity_inst["instId"] == entityInst_id:
+			return result_ind
+		result_ind += 1
+
+func get_cur_entityInst():
 	#Getting entity layer
-	var cur_ind: int = 0
+	var temp_cur_ind: int = 0
+	var cur_ind: int = -1
 	for layer in entity_types["levels"][cur_level_ind]["layerInstances"]:
 		if layer["__type"] == "Entity":
+			cur_ind = temp_cur_ind
 			break
-		cur_ind += 1
-	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_ind]["entityInstances"]:
-		if entity_inst["instId"] == instId:
-			return entity_inst
+		temp_cur_ind += 1
+	return entity_types["levels"][cur_level_ind]["layerInstances"][cur_ind]["entityInstances"][cur_entity_inst_ind]
+
+	
 
 
-
-func change_fiendInst_by_instId(fieldName: String, fieldValue):
+func change_fiendInst_value(fieldName: String, fieldValue):
 	print("changed ", fieldName, "value to ", fieldValue)
-	var instId = cur_entity_inst_ind
-	var cur_inst_ind: int = 0
-	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
-		if entity_inst["instId"] == instId:
-			break
-		cur_inst_ind += 1
 	var cur_fieldInst_ind: int = 0
-	for fieldInst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_inst_ind]["fieldInstances"]:
+	for fieldInst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_entity_inst_ind]["fieldInstances"]:
 		if fieldInst["__identifier"] == fieldName:
 			break
 		cur_fieldInst_ind += 1
-	entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_inst_ind]["fieldInstances"][cur_fieldInst_ind]["__value"] = fieldValue
+	entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_entity_inst_ind]["fieldInstances"][cur_fieldInst_ind]["__value"] = fieldValue
 	
 func change_sprite_by_instId(spritePath: String):
 	var instId = cur_entity_inst_ind
@@ -1199,6 +1227,29 @@ func get_merged_fieldDef():
 	mergedFieldArr = mergedFieldDef_arr
 	return mergedFieldDef_arr
 
+
+func get_merged_fieldDefs_v2():
+	var result: Dictionary = {}
+	
+	var mergedFields_arr = get_merged_fieldDef()
+	
+	#for ALL entity types
+	for entityDef in entity_types["defs"]["entities"]:
+		var temp_mergedFieldDef_arr = []
+		for mergedField in mergedFields_arr: 
+			#var replace_field_val: bool = false
+			var applyFieldVal = mergedField
+			for entityField in entityDef["fieldDefs"]:	
+				#check if cur entity contains mergedField
+				if mergedField["identifier"] == entityField["identifier"]:
+					#if so, then replacing default merged value with new one
+					
+					#replace_field_val = true
+					applyFieldVal = entityField
+					break
+			temp_mergedFieldDef_arr.append(applyFieldVal)
+		result[entityDef["identifier"]] = temp_mergedFieldDef_arr.duplicate(true)
+	return result
 
 func delete_fieldDef(field_ind: int):
 	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"].remove(field_ind)

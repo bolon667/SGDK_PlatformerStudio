@@ -41,7 +41,7 @@ func update_trigger_rect():
 	#singleton.get_cur_entityInstance_t()
 	get_tree().call_group("tilemapEditorWindow", "change_entity_trigger_rect_by_instId", singleton.cur_entity_inst_ind, Rect2(cur_aabb[0], cur_aabb[1], cur_aabb[2], cur_aabb[3]))
 	var new_val:String = "{" + str(cur_aabb[0]) + "," + str(cur_aabb[1]) + "," + str(cur_aabb[2]) + "," + str(cur_aabb[3]) + "}"
-	singleton.change_fiendInst_by_instId("Trigger rect", new_val)
+	singleton.change_fiendInst_value("Trigger rect", new_val)
 	singleton.change_cur_entityInstTriggerAABB(cur_aabb)
 	print("cur_aabb")
 	print(cur_aabb)

@@ -9,6 +9,7 @@ void show$entityName$($entityType$* entity){
 	if ((posX_OnCam < -entity->size.x) || (posX_OnCam > 320) || (posY_OnCam < -entity->size.y) || (posY_OnCam > 224)) {
 		if(entity->onScreen) {
 			if(entity->sprDef) SPR_releaseSprite(entity->spr);
+			return;
 		}
 		entity->onScreen = FALSE;
 		

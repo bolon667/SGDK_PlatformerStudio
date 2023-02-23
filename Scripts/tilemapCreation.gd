@@ -112,7 +112,7 @@ func _on_buildProjectBtn_pressed():
 func _on_Button_pressed():
 	#for field in singleton.get_merged_fieldDef():
 	#	print(field["identifier"])
-	print(singleton.get_merged_fieldDef())
+	print(singleton.get_merged_fieldDefs_v2())
 	pass # Replace with function body.
 
 

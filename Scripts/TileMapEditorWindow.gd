@@ -139,6 +139,7 @@ func clear_entities_on_scene():
 
 func load_entities_on_scene():
 	clear_entities_on_scene()
+	singleton.fix_cur_level_inst_ids()
 	var entity_instantes = singleton.get_entityInstances()
 	for entity_inst in entity_instantes:
 		var sprite_rect: Rect2
@@ -220,6 +221,8 @@ func load_level():
 	load_entities_on_scene()
 	#Fill tilemap with data from json (singleton.entity_types)
 	load_tileMap()
+	
+	
 
 
 func area2d_follow_camera():
@@ -289,7 +292,7 @@ func make_line_temp_tileMap(pos0: Vector2, pos1: Vector2, tile_ind: int):
 func change_entity_trigger_rect_by_instId(instId: int, rect: Rect2):
 	var children = entity_obj_list.get_children()
 	for entity_obj in children:
-		if entity_obj.entityInst_id == instId:
+		if entity_obj.entityInst_id == singleton.cur_entity_instId:
 			entity_obj.triggerAABB = [rect.position.x, rect.position.y, rect.size.x, rect.size.y]
 			entity_obj.get_node("ColorRect").rect_size = rect.size
 			entity_obj.get_node("ColorRect").rect_position = rect.position

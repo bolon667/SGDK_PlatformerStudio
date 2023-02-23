@@ -145,9 +145,9 @@ text = "Change bgB for ALL levels"
 
 [node name="GenCodeBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
 visible = false
-margin_top = 60.0
+margin_top = 120.0
 margin_right = 300.0
-margin_bottom = 80.0
+margin_bottom = 140.0
 text = "Gen Collision Code"
 script = ExtResource( 3 )
 
@@ -190,9 +190,9 @@ text = "Change Current Level"
 
 [node name="Button" type="Button" parent="CanvasLayer/VBoxContainer"]
 visible = false
-margin_top = 192.0
-margin_right = 250.0
-margin_bottom = 212.0
+margin_top = 270.0
+margin_right = 300.0
+margin_bottom = 290.0
 text = "Test Button"
 
 [node name="ChangeTileMode" type="OptionButton" parent="CanvasLayer/VBoxContainer"]
