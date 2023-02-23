@@ -46,6 +46,7 @@ void playerInputChanged() {
 				if (playerBody.climbingStair) {
 					playerBody.climbingStair = FALSE;
 				}else {
+					
 					currentJumpBufferTime = jumpBufferTime;
 				}
 			}else if (playerBody.jumping && playerBody.velocity.fixY < 0) {

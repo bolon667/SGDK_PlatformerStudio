@@ -47,4 +47,4 @@ func _on_FileDialog_file_selected(path: String):
 
 
 func _on_TextEdit_text_changed():
-	singleton.change_fiendInst_by_instId($HBoxContainer/Label.text, $HBoxContainer/VBoxContainer/TextEdit.text)
+	singleton.change_fiendInst_by_instId(singleton.cur_entity_inst_ind, $HBoxContainer/Label.text, $HBoxContainer/VBoxContainer/TextEdit.text)
