@@ -697,9 +697,9 @@ public class buidProject : Node
 			switch (bgaMode)
 			{
 				case 0: //map mode
-					bgaMapResName = "&" + fileName + "_map";
-					bgaTilesetResName = "&" + fileName + "_tileset";
-					bgaPalResName = "&" + fileName + "_pal";
+					bgaMapResName = "&map_" + fileName;
+					bgaTilesetResName = "&tileset_" + fileName;
+					bgaPalResName = "&pal_" + fileName;
 					break;
 				case 1: //image mode
 					bgaImageName = "&img_" + fileName;
@@ -714,9 +714,9 @@ public class buidProject : Node
 			switch (bgbMode)
 			{
 				case 0: //map mode
-					bgbMapResName = "&" + fileName + "_map";
-					bgbTilesetResName = "&" + fileName + "_tileset";
-					bgbPalResName = "&" + fileName + "_pal";
+					bgbMapResName = "&map_" + fileName;
+					bgbTilesetResName = "&tileset_" + fileName;
+					bgbPalResName = "&pal_" + fileName;
 					break;
 				case 1: //image mode
 					bgbImageName = "&img_" + fileName;
@@ -1077,8 +1077,16 @@ public class buidProject : Node
 
 		//Bullet count
 		int bulletAmount = 10;
+		//AdditionalSlots count		
+		String additionalSlots = singleton.Call("get_addEntityMergedSlots").ToString();
 		//Entity count
 		int entityAmount = (int)singleton.Call("get_entityInstanAmount_by_levelNum", curLevel);
+		//Trigger count
+		int triggerAmount = (int)singleton.Call("get_TriggerAmount_by_levelNum", curLevel);
+		//Gen code
+		//Additional slots
+		result += additionalSlots + ", ";
+
 		//Bullet
 		result += bulletAmount.ToString() + ", ";
 		result += "NULL, ";
@@ -1086,7 +1094,7 @@ public class buidProject : Node
 		result += entityAmount.ToString() + ", ";
 		result += $"&EntityMerged_arr_Level_{curLevel.ToString()}, ";
 		//Trigger
-		result += entityAmount.ToString() + ", ";
+		result += triggerAmount.ToString() + ", ";
 		result += $"&Trigger_arr_Level_{curLevel.ToString()}, ";
 
 

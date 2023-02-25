@@ -294,8 +294,8 @@ func change_entity_trigger_rect_by_instId(instId: int, rect: Rect2):
 	for entity_obj in children:
 		if entity_obj.entityInst_id == singleton.cur_entity_instId:
 			entity_obj.triggerAABB = [rect.position.x, rect.position.y, rect.size.x, rect.size.y]
-			entity_obj.get_node("ColorRect").rect_size = rect.size
 			entity_obj.get_node("ColorRect").rect_position = rect.position
+			entity_obj.get_node("ColorRect").rect_size = Vector2(rect.size.x-rect.position.x, rect.size.y-rect.position.y)
 			break
 	pass
 

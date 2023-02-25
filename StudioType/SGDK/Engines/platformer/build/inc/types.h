@@ -85,6 +85,7 @@ typedef struct {
 //$entityMergedStruct$
 
 typedef struct {
+	u16 additionalEntityMergedSlots;
     u16 Bullet_size;
 	Bullet* Bullet_arr;
 	u16 EntityMerged_size;

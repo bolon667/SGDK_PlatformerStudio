@@ -49,6 +49,6 @@ void playerInit(u16 positionNum) {
 		);
 
 	//Setup the jump SFX with an index between 64 and 255
-	XGM_setPCM(64, jump, sizeof(jump));
+	XGM_setPCM(64, sfx_jump, sizeof(sfx_jump));
 	
 }

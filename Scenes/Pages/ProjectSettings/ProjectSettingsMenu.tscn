@@ -101,17 +101,41 @@ margin_bottom = 38.0
 size_flags_horizontal = 3
 text = "Run from current level"
 
-[node name="runFromCurLevelBtn" type="CheckButton" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
+[node name="HboxContainer3" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
 margin_top = 72.0
 margin_right = 1024.0
-margin_bottom = 110.0
+margin_bottom = 92.0
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer3"]
+margin_right = 192.0
+margin_bottom = 20.0
+text = "Add EntityMerged Slots"
+
+[node name="addSlotsSlider" type="HSlider" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer3"]
+margin_left = 196.0
+margin_right = 980.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+rounded = true
+
+[node name="addSlotsLabel" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer3"]
+margin_left = 984.0
+margin_right = 1024.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 40, 0 )
+text = "0"
+
+[node name="runFromCurLevelBtn" type="CheckButton" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
+margin_top = 96.0
+margin_right = 1024.0
+margin_bottom = 134.0
 size_flags_horizontal = 3
 text = "Debug on"
 
 [node name="debugContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
-margin_top = 114.0
+margin_top = 138.0
 margin_right = 1024.0
-margin_bottom = 152.0
+margin_bottom = 176.0
 
 [node name="showTriggerRectsBtn" type="CheckButton" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/debugContainer"]
 margin_right = 1024.0
@@ -121,4 +145,5 @@ text = "Show trigger rects"
 
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer2/ExitBtn" to="." method="_on_ExitBtn_button_down"]
 [connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HBoxContainer/runFromCurLevelBtn" to="." method="_on_runFromCurLevelBtn_toggled"]
+[connection signal="value_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer3/addSlotsSlider" to="." method="_on_addSlotsSlider_value_changed"]
 [connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/debugContainer/showTriggerRectsBtn" to="." method="_on_showTriggerRectsBtn_toggled"]

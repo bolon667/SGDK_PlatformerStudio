@@ -16,7 +16,7 @@ int main(bool resetType) {
 	JOY_init();
 	SPR_init();
 
-	VDP_setHilightShadow(1);
+	//VDP_setHilightShadow(1);
 
 	//Setup the basic things we need for this demo
 	loadLevel($curLevel$, 0);

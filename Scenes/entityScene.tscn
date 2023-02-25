@@ -48,13 +48,13 @@ func _ready():
 	$CollisionShape2D.position = Vector2(sprite_size.x/2, sprite_size.y/2)
 	fixed_toggle_point = get_viewport().get_mouse_position()
 	$ColorRect.rect_position = Vector2(triggerAABB[0], triggerAABB[1])
-	$ColorRect.rect_size = Vector2(triggerAABB[2], triggerAABB[3])
+	$ColorRect.rect_size = Vector2(triggerAABB[2]-$ColorRect.rect_position.x, triggerAABB[3]-$ColorRect.rect_position.y)
 	_draw()
 
 func change_collision_rect(rect: Rect2):
 	triggerAABB = [rect.position.x, rect.position.y, rect.size.x, rect.size.y]
 	$ColorRect.rect_position = Vector2(triggerAABB[0], triggerAABB[1])
-	$ColorRect.rect_size = Vector2(triggerAABB[2], triggerAABB[3])
+	$ColorRect.rect_size = Vector2(triggerAABB[2]-$ColorRect.rect_position.x, triggerAABB[3]-$ColorRect.rect_position.y)
 	
 
 func change_sprite_rect(rect: Rect2):

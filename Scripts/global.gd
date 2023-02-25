@@ -54,6 +54,7 @@ var entity_types = {
 	"isOneScreen": false, #mb, i will delete that
 	"runFromCurrentLevel": false,
 	"defaultGridSize": 16,
+	"addEntityMergedSlots": 10,
 	"defs": 
 	{
 		"layers":
@@ -188,6 +189,16 @@ const field_def_hp = {
 	"hasStruct": true,
 }
 
+const field_def_damaged = {
+	"identifier": "damaged",
+	"__type": "Bool",
+	"inCodeType": "bool",
+	"fieldId": -1,
+	"canBeNull": true,
+	"defaultValue": "FALSE",
+	"canBeDeleted": false,
+	"hasStruct": true,
+}
 const entity_def_template = {
 	"identifier": "testEntity",
 	"pos": [0,0],
@@ -783,8 +794,13 @@ func get_positionInst_by_instId(instId: int):
 			return entity_inst
 
 func get_entityInst_ind_by_id(entityInst_id: int):
+	var layer_ind: int = 0
+	for layer in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if layer["__type"] == "Entity":
+			break
+		layer_ind += 1
 	var result_ind: int = 0
-	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][layer_ind]["entityInstances"]:
 		if entity_inst["instId"] == entityInst_id:
 			return result_ind
 		result_ind += 1
@@ -961,6 +977,25 @@ func get_entityInstanAmount_by_levelNum(level_num: int):
 	if entity_layer_ind < 0:
 		return
 	return len(entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["entityInstances"])
+
+func get_TriggerAmount_by_levelNum(level_num: int):
+	var temp_entity_layer_ind: int = 0
+	var entity_layer_ind: int = -1
+	for layer in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if layer["__type"] == "Entity":
+			entity_layer_ind = temp_entity_layer_ind
+			break
+		temp_entity_layer_ind += 1
+	if entity_layer_ind < 0:
+		return
+	#Find amount of triggers
+	var triggerAmount:int = 0
+	for entityInstance in entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["entityInstances"]:
+		if entityInstance.has("addTrigger"):
+			if(entityInstance["addTrigger"]):
+				triggerAmount += 1
+	return triggerAmount
+
 
 func get_messagePacks_by_levelNum(level_num: int):
 	if(entity_types["levels"][level_num].has("messagePacks")):
@@ -1188,6 +1223,8 @@ func add_entity_def(entity_name: String):
 	add_fieldDef_to_entity(field_def_triggerValue2)
 	add_fieldDef_to_entity(field_def_triggerValue3)
 	add_fieldDef_to_entity(field_def_hp)
+	add_fieldDef_to_entity(field_def_damaged)
+	
 	
 	print(entity_def_data)
 	
@@ -1313,6 +1350,11 @@ func is_entity_have_field(entity_name: String, field_name: String):
 		cur_field_ind += 1
 	
 	return false
+
+func get_addEntityMergedSlots():
+	if !entity_types.has("addEntityMergedSlots"):
+		entity_types["addEntityMergedSlots"] = 10
+	return entity_types["addEntityMergedSlots"]
 
 func get_entityDefs():
 	return entity_types["defs"]["entities"]
