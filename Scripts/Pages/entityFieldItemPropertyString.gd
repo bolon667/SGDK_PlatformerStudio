@@ -4,6 +4,8 @@ extends HBoxContainer
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
+var defId: int = -1;
+var fieldName: String = "";
 
 
 # Called when the node enters the scene tree for the first time.
@@ -19,7 +21,7 @@ func _ready():
 func _on_TextEdit_text_changed():
 	var fieldPropertyName: String = $Label.text
 	var fieldPropertyValue: String = $TextEdit.text
-	var fieldName: String = singleton.get_cur_fieldDef_name()
+	#var fieldName: String = singleton.get_cur_fieldDef_name()
 
 	singleton.change_cur_field(fieldPropertyName, fieldPropertyValue)
 	match fieldPropertyName:
@@ -37,3 +39,15 @@ func _on_TextEdit_text_changed():
 			singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["triggerValue"] = int(fieldPropertyValue)
 	#Change spritePath if entity
 	#singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["spritePath"] = path
+
+
+func _on_applyToAllBtn_button_down():
+	$ConfirmationDialog.popup_centered()
+
+
+func _on_ConfirmationDialog_confirmed():
+	var fieldPropertyName: String = $Label.text
+	var fieldPropertyValue: String = $TextEdit.text
+	var fieldName: String = singleton.get_cur_fieldDef_name()
+	singleton.change_property_all_entityInst_by_defId(fieldName, fieldPropertyValue, defId)
+	pass # Replace with function body.

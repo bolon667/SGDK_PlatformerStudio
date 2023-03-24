@@ -4,6 +4,7 @@ onready var mainController = $"../../../../"
 onready var camera2D = $"../../../../Camera2D"
 
 var entityInst_id = -1
+var level_ind = 0
 var cur_index: int
 
 var can_move = false
@@ -17,12 +18,13 @@ var sprite_size: Vector2 = Vector2(32,32)
 func _ready():
 	pass # Replace with function body.
 	cur_index = get_index()
-	var entityInst_info = singleton.get_positionInst_by_instId(entityInst_id)
+	var entityInst_info = singleton.get_positionInst_by_instId(entityInst_id, level_ind)
 	fixed_toggle_point = get_viewport().get_mouse_position()
 	updateCurMessage()
 	_draw()
 
 func updateCurMessage():
+	yield(get_tree(), "idle_frame")
 	$posNum.text = str(get_index())
 	
 func _draw():
@@ -45,12 +47,19 @@ func _process(delta):
 		_draw()
 
 
+func _is_on_top():
+	for entity in get_tree().get_nodes_in_group("position_hovered"):
+		if entity.get_index() > get_index():
+			return false
+	return true
+
 func move_entity():
 	if(!can_move):
+		highlight = false
 		return
-	
+	highlight = _is_on_top()
 	var ref = get_viewport().get_mouse_position()
-	if(Input.is_action_just_pressed("mouse1")):
+	if(Input.is_action_just_pressed("mouse1") and highlight):
 		is_moving = true
 		singleton.cur_entity_inst_ind = entityInst_id
 		print("cur entity inst id: ", singleton.cur_entity_inst_ind)
@@ -60,9 +69,9 @@ func move_entity():
 	if(Input.is_action_just_released("mouse1")):
 		is_moving = false
 	if(Input.is_action_pressed("mouse2") and highlight):
-		singleton.delete_entityInstance(entityInst_id)
-		singleton.can_create_entity_obj = true
-		var children = get_parent().get_children()
+		singleton.delete_entityInstance(entityInst_id, level_ind)
+		for pos in get_parent().get_children():
+			pos.updateCurMessage()
 
 		queue_free()
 
@@ -73,15 +82,14 @@ func move_entity():
 
 func _on_Area2D_mouse_entered():
 	if(singleton.cur_editor_mode == singleton.EditorMode.POSITION):
+		add_to_group("position_hovered")
 		updateCurMessage()
 		can_move = true
-		highlight = true
-		singleton.can_create_entity_obj = false
 
 func _on_Area2D_mouse_exited():
 	if(!is_moving):
 		if(singleton.cur_editor_mode == singleton.EditorMode.POSITION):
-			highlight = false
+			remove_from_group("position_hovered")
+			
 			can_move = false
 			singleton.save_entityInst_pos(entityInst_id, [position.x, position.y])
-			singleton.can_create_entity_obj = true

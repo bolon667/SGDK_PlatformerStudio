@@ -7,7 +7,7 @@
 [sub_resource type="RectangleShape2D" id=3]
 extents = Vector2( 16, 16 )
 
-[node name="Area2D" type="Area2D"]
+[node name="Area2D" type="Area2D" groups=["positionScene"]]
 collision_mask = 0
 script = ExtResource( 2 )
 

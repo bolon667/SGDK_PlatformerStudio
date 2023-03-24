@@ -5,18 +5,20 @@ extends Control
 # var a = 2
 # var b = "text"
 var cur_aabb:Array =  [0,0,0,0]
-
+var level_ind = 0
+var entityInst_id = 0
+var entity_scene
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
 	load_aabb()
-	print("help me")
-	print("cur_inst_id: ", singleton.cur_entity_inst_ind)
-	print("inst_len: ", len(singleton.entity_types["levels"][singleton.cur_level_ind]["layerInstances"][0]["entityInstances"]))
+	#print("help me")
+	#print("cur_inst_id: ", singleton.cur_entity_inst_ind)
+	#print("inst_len: ", len(singleton.entity_types["levels"][singleton.cur_level_ind]["layerInstances"][0]["entityInstances"]))
 	#Found a weird bug, idk how to reproduce it, but, i know, that if i check this,
 	
-	print("identifier: ",singleton.entity_types["levels"][singleton.cur_level_ind]["layerInstances"][0]["entityInstances"][singleton.cur_entity_inst_ind]["__identifier"])
+	#print("identifier: ",singleton.entity_types["levels"][singleton.cur_level_ind]["layerInstances"][0]["entityInstances"][singleton.cur_entity_inst_ind]["__identifier"])
 	
 	#And crush happens, this bug is appeared
 	#Something with new on/off add trigger, crap..
@@ -39,12 +41,16 @@ func load_aabb():
 
 func update_trigger_rect():
 	#singleton.get_cur_entityInstance_t()
-	get_tree().call_group("tilemapEditorWindow", "change_entity_trigger_rect_by_instId", singleton.cur_entity_inst_ind, Rect2(cur_aabb[0], cur_aabb[1], cur_aabb[2], cur_aabb[3]))
+	var rect = Rect2(cur_aabb[0], cur_aabb[1], cur_aabb[2], cur_aabb[3])
+	print(entity_scene.change_collision_rect(rect))
+	#get_parent().entity_scene.change_collision_rect(rect)
+	#get_tree().call_group("tilemapEditorWindow", "change_entity_trigger_rect_by_instId", entityInst_id, Rect2(cur_aabb[0], cur_aabb[1], cur_aabb[2], cur_aabb[3]))
 	var new_val:String = "{" + str(cur_aabb[0]) + "," + str(cur_aabb[1]) + "," + str(cur_aabb[2]) + "," + str(cur_aabb[3]) + "}"
-	singleton.change_fiendInst_value("Trigger rect", new_val)
-	singleton.change_cur_entityInstTriggerAABB(cur_aabb)
+	singleton.change_fiendInst_value_by_levelInd_entityInstId("Trigger rect", new_val, level_ind, entityInst_id)
+	singleton.change_entityInstTriggerAABB(cur_aabb, level_ind, entityInst_id)
 	print("cur_aabb")
 	print(cur_aabb)
+	print("cur_level: ", level_ind)
 	$HBoxContainer/VBoxContainer/realVal.text = new_val
 	pass
 

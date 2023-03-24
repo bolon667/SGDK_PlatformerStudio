@@ -16,6 +16,7 @@ func _ready():
 	pass # Replace with function body.
 	$loadProjectDialog.current_path = cur_path
 	load_project_last_paths(singleton.load_project_last_paths(cur_path))
+	$VBoxContainer/logohbox/versionLabel.text = singleton.entity_types["__header__"]["appVersion"]
 
 func load_prev_project(project_name: String):
 	singleton.cur_project_folder_path = cur_path + project_name

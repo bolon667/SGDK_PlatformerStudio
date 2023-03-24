@@ -60,6 +60,36 @@ public class buidProject : Node
 		}
 	}
 
+	private void enumsH_CodeReplacer()
+	{
+		GD.Print("Replacing enums.c code");
+		Node singleton = (Node)GetNode("/root/singleton");
+
+		String enumsHPath = fullEngineRootPath + "/build/inc/enums.h";
+		String enumsHCode = System.IO.File.ReadAllText(enumsHPath);
+		String enumCodePaste = "";
+		enumCodePaste += genTriggerEnumCode();
+
+		enumsHCode = enumsHCode.Replace("//$Enums$", enumCodePaste);
+		System.IO.File.WriteAllText(enumsHPath, enumsHCode);
+		
+	}
+
+	private String genTriggerEnumCode()
+	{
+		String triggerTypeTemplatesPath = fullEngineRootPath + "/code_template/triggerType/";
+		String enumCode = "";
+		enumCode += "typedef enum {\n";
+		foreach (string newPath in System.IO.Directory.GetFiles(triggerTypeTemplatesPath, "*.*", SearchOption.AllDirectories))
+		{
+
+			String fileName = System.IO.Path.GetFileNameWithoutExtension(newPath);
+			enumCode += "  TRIGGER_TYPE_" + fileName + ",\n";
+		}
+		enumCode += "} triggetType;\n";
+		return enumCode;
+	}
+
 	private void typesH_CodeReplacer()
 	{
 		Node singleton = (Node)GetNode("/root/singleton");
@@ -135,8 +165,15 @@ public class buidProject : Node
 			//Add entity_trigger default const
 			if((bool)entityDef["addTrigger"])
 			{
+				String triggerType = "0";
+				if (entityDef.Contains("triggerTypeName"))
+				{
+					if(entityDef["triggerTypeName"].ToString().Length > 0)
+					{
+						triggerType = "TRIGGER_TYPE_" + entityDef["triggerTypeName"].ToString();
+					}
+				}
 				Godot.Collections.Array aabb = (Godot.Collections.Array)entityDef["triggerAABB"];
-				String triggerType = entityDef["triggerType"].ToString();
 				String triggerValue = entityDef["triggerValue"].ToString();
 				String triggerValue2 = entityDef["triggerValue2"].ToString();
 				String triggerValue3 = entityDef["triggerValue3"].ToString();
@@ -225,8 +262,7 @@ public class buidProject : Node
 			makeNewProjectFromTemplate();
 
 			copyRes();
-
-
+			
 			codeReplacer();
 			applyMods();
 			//return;
@@ -374,9 +410,13 @@ public class buidProject : Node
 		mapsC_CodeReplacer();
 		mapsH_CodeReplacer();
 		playerC_CodeReplacer();
+		updatePlayerC_CodeReplacer();
+		playerInitC_CodeReplacer();
 
 		levelsC_CodeReplacer();
 		typesH_CodeReplacer();
+
+		enumsH_CodeReplacer();
 
 		entityHandlerC_CodeReplacer();
 
@@ -472,8 +512,36 @@ public class buidProject : Node
 		entityHandlerCode = entityHandlerCode.Replace("//$entityDefaultConsts$", genDefaultEntityConstCode());
 		entityHandlerCode = entityHandlerCode.Replace("//$showEntityFuncs$", genShowEntityCodeAll());
 		entityHandlerCode = entityHandlerCode.Replace("//$addNewEntityFuncs$", genAddNewEntityCodeAll());
+		entityHandlerCode = entityHandlerCode.Replace("//$triggerTypeFuncs$", genTriggerTypeCodeAll());
+		
 		System.IO.File.WriteAllText(entityHandlerC_path, entityHandlerCode);
 		GD.Print("entityHandler.c code replaced");
+	}
+
+	private String genTriggerTypeCodeAll()
+	{
+		GD.Print("genTriggerTypeCodeAll");
+		String result = "";
+		String funcCode = "";
+		String arrCode = "";
+		Node singleton = (Node)GetNode("/root/singleton");
+
+		String sourcePath = fullEngineRootPath + "/code_template/triggerType/";
+		//Putting this funcs in arr
+		arrCode += "void(* triggerTypeFuncArr[])(Trigger*, AABB*) = {";
+		foreach (string newPath in System.IO.Directory.GetFiles(sourcePath, "*.*", SearchOption.AllDirectories))
+		{
+			
+			String fileName = System.IO.Path.GetFileNameWithoutExtension(newPath);
+			arrCode += "triggerTypeFunc_" + fileName + ", ";
+
+			funcCode += "void triggerTypeFunc_" + fileName + "(Trigger* trigger, AABB* triggerBounds) {\n";
+			funcCode += System.IO.File.ReadAllText(newPath) + "\n";
+			funcCode += "}\n";
+		}
+		arrCode += "};\n";
+		result = funcCode + arrCode;
+		return result;
 	}
 
 	private String genAddNewEntityCodeAll()
@@ -802,6 +870,22 @@ public class buidProject : Node
 		return result;
 	}
 
+	private Godot.Collections.Array mergeGodotArrays(Godot.Collections.Array arr1, Godot.Collections.Array arr2)
+	{
+		Godot.Collections.Array resultArray = new Godot.Collections.Array();
+		foreach (var val in arr1)
+		{
+			resultArray.Add(val);
+
+		}
+		foreach (var val in arr2)
+		{
+			resultArray.Add(val);
+
+		}
+		return resultArray;
+	}
+
 	private String genEntityMergedCode(int curLevel)
 	{
 		GD.Print("Gen EntityMerged Code...");
@@ -814,6 +898,14 @@ public class buidProject : Node
 		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict");
 		//Getting entityInstances in curLevel
 		Godot.Collections.Array entityInstances = (Godot.Collections.Array)singleton.Call("get_entityInstances_by_levelNum", curLevel);
+		//Adding gates
+		Godot.Collections.Array gateInstances = (Godot.Collections.Array)singleton.Call("get_gateInstances_by_levelNum", curLevel);
+		//Merging them
+		entityInstances = mergeGodotArrays(entityInstances, gateInstances);
+		//entityInstances.Add(gateInstances);
+
+		//Getting gate entityInstance
+		//Godot.Collections.Dictionary gateInst_t = (Godot.Collections.Dictionary)singleton.Call("get_entityInstance_t_defId", 0);
 		//GD.Print(2);
 		result += $"const EntityMerged const EntityMerged_arr_Level_{curLevel.ToString()}[] = ";
 
@@ -952,7 +1044,11 @@ public class buidProject : Node
 		
 		//Getting entityInstances in curLevel
 		Godot.Collections.Array entityInstances = (Godot.Collections.Array)singleton.Call("get_entityInstances_by_levelNum", curLevel);
-		
+		//Adding gates
+		Godot.Collections.Array gateInstances = (Godot.Collections.Array)singleton.Call("get_gateInstances_by_levelNum", curLevel);
+		//Merging them
+		entityInstances = mergeGodotArrays(entityInstances, gateInstances);
+
 		result += $"const Trigger const Trigger_arr_Level_{curLevel.ToString()}[] = ";
 
 		//Opening Trigger_arr block
@@ -991,11 +1087,13 @@ public class buidProject : Node
 
 			}
 			//GD.Print(4);
-			int triggerType = 0;
-			if (entityInst.Contains("triggerType")) {
-				
-				triggerType = (int)int.Parse(entityInst["triggerType"].ToString());
-
+			String triggerType = "0";
+			if (entityInst.Contains("triggerTypeName"))
+			{
+				if (entityInst["triggerTypeName"].ToString().Length > 0)
+				{
+					triggerType = "TRIGGER_TYPE_" + entityInst["triggerTypeName"].ToString();
+				}
 			}
 			//GD.Print(4.5);
 			int triggerValue = 0;
@@ -1045,6 +1143,9 @@ public class buidProject : Node
 			result += $"{triggerValue2}, "; //triggerValue2
 			result += $"{triggerValue3}, "; //triggerValue3
 			result += "1, "; //triggerHp
+			result += "TRUE, "; //activated
+			result += "TRUE, "; //prevActivated
+
 
 			//Closing Trigger block
 			result += "}, ";
@@ -1180,6 +1281,46 @@ public class buidProject : Node
 		System.IO.File.WriteAllText(mapsH_path, mapsCode);
 		GD.Print("maps.h code replaced");
 
+	}
+
+	private void playerInitC_CodeReplacer()
+	{
+		Node singleton = (Node)GetNode("/root/singleton");
+		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
+
+		String codePath = engineRootPath + "/build/src/playerInit.c";
+		String codeText = System.IO.File.ReadAllText(codePath);
+
+		if (showTriggerRects)
+		{
+			String replaceText = "playerBody.debugSpr1 = SPR_addSprite(&spr_debugLeftTopCorner, levelStartPos.x, levelStartPos.y, TILE_ATTR(PAL3, 11, FALSE, FALSE));\n" +
+			"playerBody.debugSpr2 = SPR_addSprite(&spr_debugRightBottom, levelStartPos.x, levelStartPos.y, TILE_ATTR(PAL3, 11, FALSE, FALSE));\n";
+			codeText = codeText.Replace("//$showTriggerRects$", replaceText);
+
+		}
+
+		System.IO.File.WriteAllText(codePath, codeText);
+		GD.Print("playerInit.c code replaced");
+	}
+
+	private void updatePlayerC_CodeReplacer()
+	{
+		Node singleton = (Node)GetNode("/root/singleton");
+		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
+
+		String codePath = engineRootPath + "/build/src/updatePlayer.c";
+		String codeText = System.IO.File.ReadAllText(codePath);
+
+		if (showTriggerRects)
+		{
+			String replaceText = "SPR_setPosition(playerBody.debugSpr1, playerBody.position.x+playerBody.aabb.min.x, playerBody.position.y+playerBody.aabb.min.y);\n" +
+			"SPR_setPosition(playerBody.debugSpr2, playerBody.position.x+playerBody.aabb.max.x-8, playerBody.position.y+playerBody.aabb.max.y-8);\n";
+			codeText = codeText.Replace("//$showTriggerRects$", replaceText);
+			
+		}
+
+		System.IO.File.WriteAllText(codePath, codeText);
+		GD.Print("updatePlayer.c code replaced");
 	}
 
 	private void playerC_CodeReplacer()

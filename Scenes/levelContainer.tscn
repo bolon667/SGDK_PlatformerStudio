@@ -1,0 +1,122 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://TileSets/8x8TileSet.tres" type="TileSet" id=1]
+[ext_resource path="res://Scripts/levelContainer.gd" type="Script" id=2]
+[ext_resource path="res://Styles/style1.tres" type="Theme" id=3]
+
+[sub_resource type="RectangleShape2D" id=6]
+resource_local_to_scene = true
+
+[sub_resource type="RectangleShape2D" id=7]
+resource_local_to_scene = true
+
+[sub_resource type="RectangleShape2D" id=3]
+resource_local_to_scene = true
+
+[sub_resource type="RectangleShape2D" id=4]
+resource_local_to_scene = true
+
+[sub_resource type="RectangleShape2D" id=5]
+resource_local_to_scene = true
+
+[node name="LevelContainer" type="Node2D" groups=["levelContainer"]]
+script = ExtResource( 2 )
+
+[node name="bgB" type="Sprite" parent="."]
+z_index = -200
+centered = false
+
+[node name="bgA" type="Sprite" parent="."]
+centered = false
+
+[node name="TileMap" type="TileMap" parent="."]
+modulate = Color( 1, 1, 1, 0.905882 )
+tile_set = ExtResource( 1 )
+cell_size = Vector2( 8, 8 )
+cell_quadrant_size = 8
+cell_custom_transform = Transform2D( 0, 0, 0, 0, 0, 0 )
+format = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="tempTileMap" type="TileMap" parent="."]
+modulate = Color( 1, 1, 1, 0.905882 )
+tile_set = ExtResource( 1 )
+cell_size = Vector2( 8, 8 )
+cell_quadrant_size = 8
+cell_custom_transform = Transform2D( 0, 0, 0, 0, 0, 0 )
+format = 1
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="EntityList" type="Node2D" parent="."]
+
+[node name="PositionList" type="Node2D" parent="."]
+
+[node name="AreaLevel" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaLevel"]
+shape = SubResource( 6 )
+
+[node name="AreaLeft" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaLeft"]
+shape = SubResource( 7 )
+disabled = true
+
+[node name="AreaRight" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaRight"]
+shape = SubResource( 3 )
+disabled = true
+
+[node name="AreaUp" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaUp"]
+shape = SubResource( 4 )
+disabled = true
+
+[node name="AreaDown" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaDown"]
+shape = SubResource( 5 )
+disabled = true
+
+[node name="Gates" type="Node2D" parent="."]
+
+[node name="Left" type="Node2D" parent="Gates"]
+
+[node name="Right" type="Node2D" parent="Gates"]
+
+[node name="Up" type="Node2D" parent="Gates"]
+
+[node name="Down" type="Node2D" parent="Gates"]
+
+[node name="Label" type="Label" parent="."]
+margin_right = 40.0
+margin_bottom = 14.0
+theme = ExtResource( 3 )
+text = "curLevel"
+
+[connection signal="mouse_entered" from="AreaLevel" to="." method="_on_Area2D_mouse_entered"]
+[connection signal="mouse_exited" from="AreaLevel" to="." method="_on_Area2D_mouse_exited"]
+[connection signal="area_entered" from="AreaLeft" to="." method="_on_AreaLeft_area_entered"]
+[connection signal="area_exited" from="AreaLeft" to="." method="_on_AreaLeft_area_exited"]
+[connection signal="area_entered" from="AreaRight" to="." method="_on_AreaRight_area_entered"]
+[connection signal="area_exited" from="AreaRight" to="." method="_on_AreaRight_area_exited"]
+[connection signal="area_entered" from="AreaUp" to="." method="_on_AreaUp_area_entered"]
+[connection signal="area_exited" from="AreaUp" to="." method="_on_AreaUp_area_exited"]
+[connection signal="area_entered" from="AreaDown" to="." method="_on_AreaDown_area_entered"]
+[connection signal="area_exited" from="AreaDown" to="." method="_on_AreaDown_area_exited"]

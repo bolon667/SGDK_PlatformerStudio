@@ -9,6 +9,7 @@ onready var runFromCurLevelBtn = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxCh
 onready var showTriggerRectsBtn = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/debugContainer/showTriggerRectsBtn
 onready var addSlotsLabel = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer3/addSlotsLabel
 onready var addSlotsSlider = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer3/addSlotsSlider
+onready var turnOnGates = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/turnOnGatesBtn
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -16,6 +17,7 @@ func _ready():
 	load_run_from_cur_level()
 	load_shot_trigger_rects()
 	load_add_EntityMerged_slots()
+	load_turnOnGates()
 
 func load_run_from_cur_level():
 	if(singleton.entity_types.has("runFromCurrentLevel")):
@@ -28,6 +30,10 @@ func load_shot_trigger_rects():
 func load_add_EntityMerged_slots():
 	if(singleton.entity_types.has("addEntityMergedSlots")):
 		addSlotsSlider.value = singleton.entity_types["addEntityMergedSlots"]
+		
+func load_turnOnGates():
+	if(singleton.entity_types.has("turnOnGates")):
+		turnOnGates.pressed = singleton.entity_types["turnOnGates"]
 
 
 func _on_ExitBtn_button_down():
@@ -49,3 +55,7 @@ func _on_addSlotsSlider_value_changed(value):
 	var int_val: int = int(value)
 	addSlotsLabel.text = str(int_val)
 	singleton.entity_types["addEntityMergedSlots"] = int_val
+
+
+func _on_turnOnGatesBtn_toggled(button_pressed):
+	singleton.entity_types["turnOnGates"] = button_pressed

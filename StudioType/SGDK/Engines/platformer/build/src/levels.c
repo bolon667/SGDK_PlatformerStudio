@@ -1,6 +1,7 @@
 #include "../inc/levels.h"
 
 #include "../inc/maps.h"
+#include "../inc/enums.h"
 #include "../inc/global.h"
 #include "../inc/player.h"
 #include "../inc/customScripts.h"
@@ -22,7 +23,7 @@ u16 palette_full[64];
 //$levelFullArr$
 
 Vect2D_s16 getLevelPos(u16 posNum) {
-	return curLvlData->posArr[posNum];
+	return LevelFull_arr[levelNum].lvl->posArr[posNum];
 }
 
 void updateRoomSize(Level* lvl){

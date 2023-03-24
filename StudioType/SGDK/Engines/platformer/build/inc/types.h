@@ -47,10 +47,12 @@ typedef struct {
 	Vect2D_s16 pos;
 	AABB rect;
 	u8 type;
-	u8 val1;
-	u8 val2;
-	u8 val3;
+	s16 val1;
+	s16 val2;
+	s16 val3;
 	s16 triggerHp;
+	bool activated;
+	bool prevActivated;
 } Trigger;
 
 typedef struct {

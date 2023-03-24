@@ -1,0 +1,1 @@
+out/res/music.o: res/music.res

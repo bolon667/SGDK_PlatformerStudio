@@ -1,0 +1,1 @@
+trigger->alive = FALSE;

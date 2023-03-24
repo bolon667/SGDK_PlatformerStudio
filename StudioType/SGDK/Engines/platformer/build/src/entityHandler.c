@@ -3,6 +3,7 @@
 #include "../inc/maps.h"
 #include "../inc/messages.h"
 #include "../inc/global.h"
+#include "../inc/enums.h"
 
 #include "../res/resources.h"
 #include "../res/gfx.h"
@@ -113,88 +114,39 @@ void showBullet(Bullet* entity){
     }
 }
 
-void forcePlayerUp(Trigger* trigger){
-	if((playerBody.globalPosition.y+playerBody.aabb.max.y) > (trigger->pos.y+trigger->rect.min.y)) {
-		playerBody.globalPosition.y = trigger->pos.y-playerBody.aabb.max.y+1;
-		playerBody.curAmountOfJumps = playerBody.maxAmountOfJumps;
-		playerBody.velocity.fixY = 0;
-		playerBody.onGround = TRUE;
-	}
-}
-
-void forcePlayerDown(Trigger* trigger){
-	if((playerBody.globalPosition.y+playerBody.aabb.min.y) < (trigger->pos.y+trigger->rect.max.y)) {
-		playerBody.globalPosition.y = trigger->pos.y+trigger->rect.max.y-playerBody.aabb.min.y+1;
-		playerBody.velocity.fixY = 0;
-	}
-}
-
-void forcePlayerLeft(Trigger* trigger){
-	if((playerBody.globalPosition.x+playerBody.aabb.max.x) > (trigger->pos.x+trigger->rect.min.x)) {
-		playerBody.globalPosition.x = trigger->pos.x+trigger->rect.min.x-playerBody.aabb.max.x-1;
-	}
-}
-
-void forcePlayerRight(Trigger* trigger){
-	if((playerBody.globalPosition.x+playerBody.aabb.min.x) < (trigger->pos.x+trigger->rect.max.x)) {
-		playerBody.globalPosition.x = trigger->pos.x+trigger->rect.max.x-playerBody.aabb.min.x;
-	}
-}
+//$triggerTypeFuncs$
 
 void checkTriggerForPlayer(Trigger* trigger){
 	if(!trigger->alive){
 		return;
 	}
-	
 	AABB triggerBounds = newAABB(
 		trigger->pos.x + trigger->rect.min.x,
 		trigger->pos.x + trigger->rect.max.x,
 		trigger->pos.y + trigger->rect.min.y,
 		trigger->pos.y + trigger->rect.max.y
 	);
+	trigger->prevActivated = trigger->activated;
 	if((playerBounds.min.x < triggerBounds.max.x) && (playerBounds.max.x > triggerBounds.min.x)){
 		if((playerBounds.min.y < triggerBounds.max.y) && (playerBounds.max.y > triggerBounds.min.y)){
+			
+			trigger->activated = TRUE;
+			
+			KLog_S1("trigger->activated: ", trigger->activated);
+			KLog_S1("trigger->prevActivated: ", trigger->prevActivated);
 			KLog_S1("trigger->type: ", trigger->type);
+			KLog_S1("trigger->val1: ", trigger->val1);
+			KLog_S1("trigger->val2: ", trigger->val2);
+			KLog_S1("trigger->val3: ", trigger->val3);
 			//KLog_S1("trigger->value: ", trigger->value);
-			switch(trigger->type) {
-				case 0: //Load level and player position
-					PAL_fadeOutAll(5,FALSE);
-					loadLevel(trigger->val1, trigger->val2);
-					break;
-				case 1: //got something
-					trigger->alive = FALSE;
-					break;
-				case 2: //damaged
-					//playerBody.damaged = TRUE;
-					playerBody.animMode = 1;
-					break;
-				case 3: //show message
-					trigger->alive = FALSE;
-					KLog_S1("curMessagePacks->len: ", curMessagePacks[trigger->val1].len);
-					for(s16 i=0; i<curMessagePacks[trigger->val1].len; i++){
-						printMessage(curMessagePacks[trigger->val1].messages[i].str);
-					}
-					
-					break;
-				case 4: //execute custom script
-					customScriptArr[trigger->val1]();
-					break;
-				case 5: //semi-solid Up
-					forcePlayerUp(trigger);
-					break;
-				case 6: //semi-solid Down
-					forcePlayerDown(trigger);
-					break;
-				case 7: //semi-solid Left
-					forcePlayerLeft(trigger);
-					break;
-				case 8: //semi-solid Right
-					forcePlayerRight(trigger);
-					break;
-			}
+			triggerTypeFuncArr[trigger->type](trigger, &triggerBounds);
+			return;
 		}
 	}
+	trigger->activated = FALSE;
 }
+
+
 
 //$showEntityFuncs$
 

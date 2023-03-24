@@ -5,6 +5,8 @@ extends Control
 # var a = 2
 # var b = "text"
 var root_path: String
+var level_ind = 0
+var entityInst_id = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -36,15 +38,15 @@ func _on_FileDialog_file_selected(path: String):
 	$HBoxContainer/VBoxContainer/TextEdit.text = spr_name
 	
 	#update value in database
-	singleton.change_fiendInst_by_instId($HBoxContainer/Label.text, spr_name)
+	singleton.change_cur_fieldInst($HBoxContainer/Label.text, spr_name)
 	singleton.change_sprite_by_instId(path)
 	
 	#change entity obj sprite
-	get_tree().call_group("tilemapEditorWindow", "change_cur_entity_pic", path)
+	get_tree().call_group("levelContainer", "change_cur_entity_pic", path, level_ind, entityInst_id)
 	#var temp_str = "StudioType/SGDK/Engines/" + singleton.cur_engine + "/build"
 	#print(root_path)
 	pass # Replace with function body.
 
 
 func _on_TextEdit_text_changed():
-	singleton.change_fiendInst_by_instId(singleton.cur_entity_inst_ind, $HBoxContainer/Label.text, $HBoxContainer/VBoxContainer/TextEdit.text)
+	singleton.change_cur_fieldInst($HBoxContainer/Label.text, $HBoxContainer/VBoxContainer/TextEdit.text)

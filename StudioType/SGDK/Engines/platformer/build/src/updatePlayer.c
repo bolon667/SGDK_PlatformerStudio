@@ -74,6 +74,7 @@ void updatePlayer() {
 	playerBody.position.x = playerBody.globalPosition.x - cameraPosition.x;
 	playerBody.position.y = playerBody.globalPosition.y - cameraPosition.y;
 	SPR_setPosition(playerBody.sprite, playerBody.position.x, playerBody.position.y);
+	//$showTriggerRects$
 	
 
 	//Reset when falling off the screen

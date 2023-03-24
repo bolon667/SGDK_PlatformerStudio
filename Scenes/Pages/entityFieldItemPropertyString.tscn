@@ -16,9 +16,24 @@ text = "Test text: "
 
 [node name="TextEdit" type="TextEdit" parent="."]
 margin_left = 68.0
-margin_right = 1024.0
+margin_right = 936.0
 margin_bottom = 600.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
+[node name="applyToAllBtn" type="Button" parent="."]
+margin_left = 940.0
+margin_right = 1024.0
+margin_bottom = 600.0
+text = "Apply to all"
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+margin_left = 537.0
+margin_right = 1024.0
+margin_bottom = 70.0
+window_title = " "
+dialog_text = "Are you sure? This action will change this property to ALL objects in game"
+
 [connection signal="text_changed" from="TextEdit" to="." method="_on_TextEdit_text_changed"]
+[connection signal="button_down" from="applyToAllBtn" to="." method="_on_applyToAllBtn_button_down"]
+[connection signal="confirmed" from="ConfirmationDialog" to="." method="_on_ConfirmationDialog_confirmed"]

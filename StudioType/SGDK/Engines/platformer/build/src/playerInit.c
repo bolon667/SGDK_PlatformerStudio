@@ -9,10 +9,12 @@
 #include "../res/resources.h"
 
 
-void playerInit(u16 positionNum) {
+void playerInit(Vect2D_s16 levelStartPos) {
 	//Create the sprite and palette for the player
-	Vect2D_s16 levelStartPos = getLevelPos(positionNum);
+	
+	//$showTriggerRects$
 	playerBody.sprite = SPR_addSprite(&spr_player, levelStartPos.x, levelStartPos.y, TILE_ATTR(PLAYER_PALETTE, FALSE, FALSE, FALSE));
+	
 
 	SPR_setHFlip(playerBody.sprite, facingRight);
 

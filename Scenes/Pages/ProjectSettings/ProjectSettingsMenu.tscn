@@ -126,11 +126,19 @@ rect_min_size = Vector2( 40, 0 )
 text = "0"
 
 [node name="runFromCurLevelBtn" type="CheckButton" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
+visible = false
 margin_top = 96.0
 margin_right = 1024.0
 margin_bottom = 134.0
 size_flags_horizontal = 3
 text = "Debug on"
+
+[node name="turnOnGatesBtn" type="CheckButton" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
+margin_top = 96.0
+margin_right = 1024.0
+margin_bottom = 134.0
+size_flags_horizontal = 3
+text = "Turn on gates"
 
 [node name="debugContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
 margin_top = 138.0
@@ -146,4 +154,5 @@ text = "Show trigger rects"
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer2/ExitBtn" to="." method="_on_ExitBtn_button_down"]
 [connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HBoxContainer/runFromCurLevelBtn" to="." method="_on_runFromCurLevelBtn_toggled"]
 [connection signal="value_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer3/addSlotsSlider" to="." method="_on_addSlotsSlider_value_changed"]
+[connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/turnOnGatesBtn" to="." method="_on_turnOnGatesBtn_toggled"]
 [connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/debugContainer/showTriggerRectsBtn" to="." method="_on_showTriggerRectsBtn_toggled"]

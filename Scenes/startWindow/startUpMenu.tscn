@@ -138,7 +138,7 @@ texture = ExtResource( 2 )
 expand = true
 stretch_mode = 6
 
-[node name="Label" type="Label" parent="VBoxContainer/logohbox"]
+[node name="versionLabel" type="Label" parent="VBoxContainer/logohbox"]
 margin_left = 678.0
 margin_top = 70.0
 margin_right = 984.0

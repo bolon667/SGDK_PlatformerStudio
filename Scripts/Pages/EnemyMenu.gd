@@ -5,6 +5,7 @@ onready var entity_item_t = preload("res://Scenes/Pages/entityListItem.tscn")
 onready var entity_field_t = preload("res://Scenes/Pages/entityFieldItem.tscn")
 onready var field_property_string_t = preload("res://Scenes/Pages/entityFieldItemPropertyString.tscn")
 onready var field_property_sprite_t = preload("res://Scenes/Pages/entityFieldItemSprite.tscn")
+onready var field_property_triggerType_t = preload("res://Scenes/Pages/entityFieldItemTriggerType.tscn")
 
 
 onready var entity_field_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/ScrollContainer/ContainerChooseField 
@@ -68,6 +69,7 @@ func clear_field_properties():
 func load_field_properties(entity_name: String, field_name: String):
 	
 	clear_field_properties()
+	var defId = singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["defId"]
 	var field_data = singleton.get_cur_entity_one_field()
 	match field_data["identifier"]:
 		"sprDef":
@@ -81,12 +83,25 @@ func load_field_properties(entity_name: String, field_name: String):
 			field_property_node.get_node("HBoxContainer/Label").text = key
 			field_property_node.get_node("HBoxContainer/VBoxContainer/TextEdit").text = str(val)
 			field_properties_container.add_child(field_property_node)
+		"Trigger type":
+			var key
+			var val
+			var field_property_node
+			
+			key = "defaultValue"
+			val = field_data[key]
+			field_property_node = field_property_triggerType_t.instance()
+			#field_property_node.get_node("HBoxContainer/Label").text = key
+			#field_property_node.get_node("HBoxContainer/VBoxContainer/TextEdit").text = str(val)
+			field_properties_container.add_child(field_property_node)
 		_:
 			for key in field_data:
 				if key == "fieldId":
 					continue
 				var val = field_data[key]
 				var field_property_node = field_property_string_t.instance()
+				field_property_node.defId = defId
+				field_property_node.fieldName = field_name
 				field_property_node.get_node("Label").text = key
 				field_property_node.get_node("TextEdit").text = str(val)
 				field_properties_container.add_child(field_property_node)
@@ -196,7 +211,7 @@ func _on_AddNewEntityField_button_down():
 				break
 			i+=1
 	
-	singleton.add_field_to_entity(singleton.cur_entity_type, final_field_name)
+	singleton.add_field_to_entity_def(singleton.cur_entity_type, final_field_name)
 	load_entity_fields()
 	
 	#Adding this field to database
@@ -242,7 +257,8 @@ func _on_addTriggerActivate_button_down():
 		add_trigger_btn.text = "On"
 	else:
 		add_trigger_btn.text = "Off"
-
+	var defId = singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["defId"]
+	singleton.change_addTrigger_all_entityInst_by_defId(defId, add_trigger_activated)
 
 func _on_canAddNewEntityBtn_toggled(button_pressed):
 	#can_add_new_entity change_amount_of_entity
@@ -258,5 +274,6 @@ func _on_canAddNewEntityBtn_toggled(button_pressed):
 
 func _on_changeAmountOfEntity_text_changed():
 	var val: int = int(change_amount_of_entity.text)
+	
 	singleton.entity_types["defs"]["entities"][singleton.cur_entity_type_ind]["amountOfEntity"] = val
 	pass # Replace with function body.

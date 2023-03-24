@@ -8,7 +8,8 @@
     ".NETFramework,Version=v4.7.2": []
   },
   "packageFolders": {
-    "C:\\Users\\bolon667\\.nuget\\packages\\": {}
+    "C:\\Users\\bolon667\\.nuget\\packages\\": {},
+    "C:\\Users\\bolon667\\AppData\\Roaming\\Godot\\mono\\GodotNuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
@@ -19,8 +20,12 @@
       "packagesPath": "C:\\Users\\bolon667\\.nuget\\packages\\",
       "outputPath": "C:\\Users\\bolon667\\Documents\\GitHub\\SGDK_OneScreenPlatformerStudio\\.mono\\temp\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Users\\bolon667\\AppData\\Roaming\\Godot\\mono\\GodotNuGetFallbackFolder"
+      ],
       "configFilePaths": [
         "C:\\Users\\bolon667\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\bolon667\\AppData\\Roaming\\NuGet\\config\\Godot.Offline.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

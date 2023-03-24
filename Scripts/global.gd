@@ -5,6 +5,7 @@ enum EditorMode {
   COLLISION,
   ENTITY,
   POSITION,
+  LEVEL_MOVE,
 }
 
 var cell_size: int = 8
@@ -17,6 +18,8 @@ var cur_project_folder_path: String = ""
 var cur_editor_mode: int = EditorMode.NONE
 var prev_editor_mode: int = EditorMode.NONE
 
+var in_modal_window: bool = false
+
 var cur_entity_type: String
 var cur_entity_type_ind: int = -1
 var cur_entity_field_ind: int
@@ -25,6 +28,8 @@ var cur_entity_inst_ind: int
 var cur_entity_instId: int
 var cur_messagePack_ind: int = -1
 var cur_message_ind: int = -1
+
+var draw_tile_ind:int = 0
 
 var cur_level_ind: int = 0
 var cur_level_layer_ind: int = 0
@@ -36,8 +41,8 @@ var cur_level: int = 1
 var entity_snap_to_grid: bool = false
 
 var mergedFieldArr: Array
+var level_move_mode: bool = false
 
-var can_create_entity_obj: bool = true
 
 var entity_types = {
 	"__header__": 
@@ -46,7 +51,7 @@ var entity_types = {
 		"app": "SGDK Studio",
 		"doc": "???",
 		"appAuthor": "bolon667",
-		"appVersion": "1.0 alpha",
+		"appVersion": "1.2 alpha",
 		"url": "https://github.com/bolon667/SGDK_PlatformerStudio",
 	},
 	"jsonVersion": "1.0.0",
@@ -55,6 +60,7 @@ var entity_types = {
 	"runFromCurrentLevel": false,
 	"defaultGridSize": 16,
 	"addEntityMergedSlots": 10,
+	"turnOnGates": false,
 	"defs": 
 	{
 		"layers":
@@ -199,6 +205,17 @@ const field_def_damaged = {
 	"canBeDeleted": false,
 	"hasStruct": true,
 }
+
+const field_def_onGround = {
+	"identifier": "onGround",
+	"__type": "Bool",
+	"inCodeType": "bool",
+	"fieldId": -1,
+	"canBeNull": true,
+	"defaultValue": "FALSE",
+	"canBeDeleted": false,
+	"hasStruct": true,
+}
 const entity_def_template = {
 	"identifier": "testEntity",
 	"pos": [0,0],
@@ -211,6 +228,7 @@ const entity_def_template = {
 	"addTrigger": false,
 	"triggerAABB": [0,0,8,8],
 	"triggerType": 1,
+	"triggerTypeName": "",
 	"triggerValue": 1,
 	"triggerValue2": 1,
 	"triggerValue3": 1,
@@ -271,7 +289,7 @@ const level_template = {
 }
 
 const level_layer_template = {
-	"__identifier": "tLayer",
+	"__identifier": "Layer",
 	"__type": "Collision",
 	"__cWid": 320,
 	"__cHei": 224,
@@ -279,7 +297,8 @@ const level_layer_template = {
 	"__tilesetRelPath": "",
 	"visible": true,
 	"intGridCsv": [],
-	"entityInstances": []
+	"entityInstances": [],
+	"gateInstances": [],
 }
 
 const entity_inst_template = {
@@ -330,22 +349,22 @@ func change_load_image_mode_bgb_all_levels():
 	for level_ind in range(len(entity_types["levels"])):
 		entity_types["levels"][level_ind]["bgbMode"] = entity_types["levels"][cur_level_ind]["bgbMode"]
 
-func change_load_image_mode_bga(mode: int):
-	entity_types["levels"][cur_level_ind]["bgaMode"] = mode
-func change_load_image_mode_bgb(mode: int):
-	entity_types["levels"][cur_level_ind]["bgbMode"] = mode
+func change_load_image_mode_bga(mode: int, level_ind:int):
+	entity_types["levels"][level_ind]["bgaMode"] = mode
+func change_load_image_mode_bgb(mode: int, level_ind:int):
+	entity_types["levels"][level_ind]["bgbMode"] = mode
 
 func get_level_attr(attr: String):
 	if(!entity_types["levels"][cur_level_ind].has(attr)):
 		entity_types["levels"][cur_level_ind][attr] = ""
 	return entity_types["levels"][cur_level_ind][attr]
 		
-func get_load_modes():
-	if(!entity_types["levels"][cur_level_ind].has("bgaMode")):
-		entity_types["levels"][cur_level_ind]["bgaMode"] = 0
-	if(!entity_types["levels"][cur_level_ind].has("bgbMode")):
-		entity_types["levels"][cur_level_ind]["bgbMode"] = 0
-	return[entity_types["levels"][cur_level_ind]["bgaMode"], entity_types["levels"][cur_level_ind]["bgbMode"]];
+func get_load_modes(level_ind: int):
+	if(!entity_types["levels"][level_ind].has("bgaMode")):
+		entity_types["levels"][level_ind]["bgaMode"] = 0
+	if(!entity_types["levels"][level_ind].has("bgbMode")):
+		entity_types["levels"][level_ind]["bgbMode"] = 0
+	return[entity_types["levels"][level_ind]["bgaMode"], entity_types["levels"][level_ind]["bgbMode"]];
 
 func change_all_level_attr(attr: String, val):
 	for level_ind in range(len(entity_types["levels"])):
@@ -373,10 +392,10 @@ func add_trigger_enum():
 		if cur_enum["identifier"] == "trigger":
 			entity_types["defs"]["enums"] = []
 			break
-	#DEBUG stuff to autoupdate all projects to new enum trigger
+	#Autoupdating project to new enum trigger
 	var new_enum = enum_template.duplicate(true)
 	new_enum["identifier"] = "trigger"
-	var enum_default_val_names: Array = ["change_level", "got_something", "got_damage", "show_message", "execute_custom_script", "force_player_up", "force_player_down", "force_player_left", "force_player_right"]
+	var enum_default_val_names: Array = get_files_no_ext(cur_project_folder_path + "/code_template/triggerType/")
 	for enum_val_name in enum_default_val_names:
 		var temp_enum_val = enum_val_template.duplicate(true)
 		temp_enum_val["name"] = enum_val_name
@@ -423,7 +442,7 @@ func change_cell_size(new_size: int):
 	entity_types["defaultGridSize"] = cell_size
 
 func _ready():
-	add_level()
+	add_level(Vector2.ZERO)
 
 func is_level_layer_exists(level_num: int, layer_type):
 	for layer in entity_types["levels"][level_num]["layerInstances"]:
@@ -432,7 +451,49 @@ func is_level_layer_exists(level_num: int, layer_type):
 	
 	return false
 
+func change_addTrigger_all_entityInst_by_defId(defId: int, val: bool):
+	for level in entity_types["levels"]:
+		#Finding EntityLayer
+		for layer in level["layerInstances"]:
+			if layer["__identifier"] != "Entity":
+				continue
+			for entityInst in layer["entityInstances"]:
+				if entityInst["defId"] != defId:
+					continue
+				entityInst["addTrigger"] = val
+	print("addTrigger for ALL defId=", defId, " changed to ", val)
 
+func change_property_all_entityInst_by_defId(property_name: String, property_value, defId: int):
+	for level in entity_types["levels"]:
+		#Finding EntityLayer
+		for layer in level["layerInstances"]:
+			if layer["__identifier"] != "Entity":
+				continue
+			for entityInst in layer["entityInstances"]:
+				if entityInst["defId"] != defId:
+					continue
+				if(property_name == "Trigger rect"):
+					var temp_str: String = property_value.substr(1, property_value.rfind("}"))
+					var rect_arr = temp_str.split(",")
+					var result_arr = [int(rect_arr[0]),int(rect_arr[1]),int(rect_arr[2]),int(rect_arr[3])]
+					entityInst["triggerAABB"] = result_arr
+				if(property_name == "Trigger type"):
+					entityInst["triggerType"] = int(property_value)
+				if(property_name == "Trigger type name"):
+					entityInst["triggerTypeName"] = str(property_value)
+				if(property_name == "Trigger value"):
+					entityInst["triggerValue"] = int(property_value)
+				if(property_name == "Trigger value2"):
+					entityInst["triggerValue2"] = int(property_value)
+				if(property_name == "Trigger value3"):
+					entityInst["triggerValue3"] = int(property_value)
+			
+				for fieldInst in entityInst["fieldInstances"]:
+					if fieldInst["__identifier"] == property_name:
+						fieldInst["__value"] = property_value
+						break
+	
+	print("Property ", property_name, " for ALL defId=", defId, " changed to ", property_value)
 
 func load_project(projectPath: String):
 	var dict = {}
@@ -466,6 +527,20 @@ func get_sprite_size_from_path(path:String):
 				
 		result = Vector2(t_width*8, t_height*8)
 	return result
+
+func get_files_no_ext(path):
+	var files = []
+	var dir = Directory.new()
+	dir.open(path)
+	dir.list_dir_begin(true)
+
+	var file = dir.get_next()
+	while file != '':
+		file = file.substr(0, file.find("."))
+		files += [file]
+		file = dir.get_next()
+
+	return files
 
 func load_project_last_paths(projects_path: String):
 	var paths = {
@@ -560,17 +635,17 @@ func save_project():
 	
 
 
-func save_collisionMap(tile_map, size: Vector2):
+func save_collisionMap(tile_map, size: Vector2, level_ind: int):
 	var intGridCsv_arr: Array = []
 	for y in range(size.y):
 		for x in range(size.x):
 			intGridCsv_arr.append(tile_map.get_cell(x,y)+1)
 	var collision_layer_ind: int = 0
-	for layer_inst in entity_types["levels"][cur_level_ind]["layerInstances"]:
+	for layer_inst in entity_types["levels"][level_ind]["layerInstances"]:
 		if(layer_inst["__type"] == "Collision"):
 			break
 		collision_layer_ind += 1
-	entity_types["levels"][cur_level_ind]["layerInstances"][collision_layer_ind]["intGridCsv"] = intGridCsv_arr
+	entity_types["levels"][level_ind]["layerInstances"][collision_layer_ind]["intGridCsv"] = intGridCsv_arr
 	pass
 
 func change_start_pos(start_pos_coord: Vector2):
@@ -582,9 +657,9 @@ func get_start_pos():
 func get_start_pos_for_level(l_ind: int):
 	return entity_types["levels"][l_ind]["startPos"]
 
-func change_level_size(size: Vector2):
-	entity_types["levels"][cur_level_ind]["pxWid"] = size.x
-	entity_types["levels"][cur_level_ind]["pxHei"] = size.y
+func change_level_size(level_ind, size: Vector2):
+	entity_types["levels"][level_ind]["pxWid"] = size.x
+	entity_types["levels"][level_ind]["pxHei"] = size.y
 	
 func get_level_size(levelNum):
 	return Vector2(entity_types["levels"][levelNum]["pxWid"], entity_types["levels"][levelNum]["pxHei"]);
@@ -597,28 +672,36 @@ func change_bgRelPath2_all_levels():
 	for level_ind in range(len(entity_types["levels"])):
 		entity_types["levels"][level_ind]["bgRelPath2"] = entity_types["levels"][cur_level_ind]["bgRelPath2"]
 
-func change_bgRelPath(new_bg_path: String):
-	entity_types["levels"][cur_level_ind]["bgRelPath"] = new_bg_path
+func change_bgRelPath(new_bg_path: String, level_ind: int):
+	entity_types["levels"][level_ind]["bgRelPath"] = new_bg_path
 	
-func change_bgRelPath2(new_bg_path: String):
+func change_bgRelPath2(new_bg_path: String, level_ind: int):
 	entity_types["levels"][cur_level_ind]["bgRelPath2"] = new_bg_path
 
-func get_bgRelPath():
-	return entity_types["levels"][cur_level_ind]["bgRelPath"]
-func get_bgRelPath2():
-	return entity_types["levels"][cur_level_ind]["bgRelPath2"]
+func get_bgRelPath(level_ind: int):
+	return entity_types["levels"][level_ind]["bgRelPath"]
+func get_bgRelPath2(level_ind: int):
+	return entity_types["levels"][level_ind]["bgRelPath2"]
 	
 func get_bgRelPathForLevel(levelNum:int):
 	return entity_types["levels"][levelNum]["bgRelPath"]
 
-func get_collisionMap():
+func get_worldPos_vector2(level_ind: int):
+	var resultPos: Vector2 = Vector2(entity_types["levels"][level_ind]["worldX"], entity_types["levels"][level_ind]["worldY"])
+	#Make sure that the levels are in different positions on world map
+	#For that, checking every level position
+	#Fix world position, just in case
+	#entity_types["levels"][level_ind]["worldX"] = resultPos.x
+	return resultPos
+
+func get_collisionMap(level_ind: int):
 	var collision_layer_ind: int = 0
 	#find collision_layer index in array
-	for layer_inst in entity_types["levels"][cur_level_ind]["layerInstances"]:
+	for layer_inst in entity_types["levels"][level_ind]["layerInstances"]:
 		if(layer_inst["__type"] == "Collision"):
 			break
 		collision_layer_ind += 1
-	return entity_types["levels"][cur_level_ind]["layerInstances"][collision_layer_ind]["intGridCsv"]
+	return entity_types["levels"][level_ind]["layerInstances"][collision_layer_ind]["intGridCsv"]
 
 func get_collisionMapForLevel(levelNum:int):
 	var collision_layer_ind: int = 0
@@ -629,33 +712,34 @@ func get_collisionMapForLevel(levelNum:int):
 		collision_layer_ind += 1
 	return entity_types["levels"][levelNum]["layerInstances"][collision_layer_ind]["intGridCsv"]
 
-
-func fix_cur_level_inst_ids():
+func remove_gates(level_ind: int):
+	entity_types["levels"][level_ind]["layerInstances"][0]["gateInstances"] = []
+func fix_level_inst_ids(level_ind):
 	var entity_layer_ind: int = -1
 	var temp_entity_layer_ind: int = 0
-	for layer_inst in entity_types["levels"][cur_level_ind]["layerInstances"]:
+	for layer_inst in entity_types["levels"][level_ind]["layerInstances"]:
 		if(layer_inst["__type"] == "Entity"):
 			entity_layer_ind = temp_entity_layer_ind
 			break
 		temp_entity_layer_ind += 1
-	var entityInst_amount:int = len(entity_types["levels"][cur_level_ind]["layerInstances"][entity_layer_ind]["entityInstances"])
+	var entityInst_amount:int = len(entity_types["levels"][level_ind]["layerInstances"][entity_layer_ind]["entityInstances"])
 	var cur_ind: int = 0
 	while cur_ind < entityInst_amount:
-		entity_types["levels"][cur_level_ind]["layerInstances"][entity_layer_ind]["entityInstances"][cur_ind]["instId"] = cur_ind
+		entity_types["levels"][level_ind]["layerInstances"][entity_layer_ind]["entityInstances"][cur_ind]["instId"] = cur_ind
 		cur_ind += 1
-	print("InstIds are fixed on level ", cur_level_ind)
+	print("InstIds are fixed on level ", level_ind)
 
-func change_cur_entityInstTriggerAABB(aabb: Array):
+func change_entityInstTriggerAABB(aabb: Array, level_ind: int, entityInst_id: int):
 	var entity_layer_ind: int = -1
 	var temp_entity_layer_ind: int = 0
-	for layer_inst in entity_types["levels"][cur_level_ind]["layerInstances"]:
+	for layer_inst in entity_types["levels"][level_ind]["layerInstances"]:
 		if(layer_inst["__type"] == "Entity"):
 			entity_layer_ind = temp_entity_layer_ind
 			break
 		temp_entity_layer_ind += 1
 	if entity_layer_ind == -1:
 		return
-	entity_types["levels"][cur_level_ind]["layerInstances"][entity_layer_ind]["entityInstances"][cur_entity_inst_ind]["triggerAABB"] = aabb
+	entity_types["levels"][level_ind]["layerInstances"][entity_layer_ind]["entityInstances"][entityInst_id]["triggerAABB"] = aabb
 
 func change_cur_entityInst(key: String, val):
 	var entity_layer_ind: int = 0
@@ -687,6 +771,12 @@ func change_entityInstName_by_defId(entity_name: String, defId: int):
 				entity_inst["__identifier"] = entity_name
 			continue
 
+func change_cur_fieldInst(field_name: String, field_val):
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+		for field_inst in entity_inst["fieldInstances"]:
+			if field_inst["__identifier"] == field_name:
+				field_inst["__value"] = field_val
+
 func change_entityInstFieldName_by_fieldId(field_name: String, fieldId: int):
 	print(entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"])
 	print("THIS")
@@ -708,6 +798,15 @@ func get_unique_entity_fieldId():
 	return fieldId
 	
 
+func get_unique_gate_instId(level_ind: int):
+	var instId = 0
+	if(!entity_types["levels"][level_ind]["layerInstances"][0].has("gateInstances")):
+		entity_types["levels"][level_ind]["layerInstances"][0]["gateInstances"] = []
+	for gate_inst in entity_types["levels"][level_ind]["layerInstances"][0]["gateInstances"]:
+		if gate_inst["instId"] == instId:
+			instId += 1
+		continue
+	return instId
 
 func get_unique_entity_instId():
 	var instId = 0
@@ -725,11 +824,31 @@ func get_unique_entity_defId():
 		continue
 	return defId
 
-func delete_entityInstance(instId: int):
+
+
+func delete_gateInstance(level_ind:int, instId: int):
 	var posInArray: int = 0
-	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+	if(!entity_types["levels"][level_ind]["layerInstances"][cur_level_layer_ind].has("gateInstances")):
+		entity_types["levels"][level_ind]["layerInstances"][cur_level_layer_ind]["gateInstances"] = []
+	for gate_inst in entity_types["levels"][level_ind]["layerInstances"][cur_level_layer_ind]["gateInstances"]:
+		if gate_inst["instId"] == instId:
+			entity_types["levels"][level_ind]["layerInstances"][cur_level_layer_ind]["gateInstances"].remove(posInArray)
+		posInArray += 1
+
+func delete_entityInstance(instId: int, level_ind: int):
+	var posInArray: int = 0
+	for entity_inst in entity_types["levels"][level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
 		if entity_inst["instId"] == instId:
-			entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"].remove(posInArray)
+			entity_types["levels"][level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"].remove(posInArray)
+		posInArray += 1
+
+func save_gateInst_pos(instId: int, posPx: Array):
+	var posInArray: int = 0
+	for gate_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["gateInstances"]:
+		if gate_inst["instId"] == instId:
+			gate_inst["px"] = [int(posPx[0]), int(posPx[1])]
+			entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["gateInstances"][posInArray]["px"] = [int(posPx[0]), int(posPx[1])]
+			break
 		posInArray += 1
 
 func save_entityInst_pos(instId: int, posPx: Array):
@@ -748,11 +867,11 @@ func get_level_count():
 	return level_count
 
 
-func get_positionInstances():
+func get_positionInstances(level_ind: int):
 	#Finding entity layer
 	var temp_cur_ind:int = 0
 	var cur_ind: int = -1
-	for val in entity_types["levels"][cur_level_ind]["layerInstances"]:
+	for val in entity_types["levels"][level_ind]["layerInstances"]:
 		if val["__type"] == "Position":
 			cur_ind = temp_cur_ind
 			break
@@ -760,36 +879,36 @@ func get_positionInstances():
 	if cur_ind == -1:
 		return []
 		
-	return entity_types["levels"][cur_level_ind]["layerInstances"][cur_ind]["entityInstances"]
+	return entity_types["levels"][level_ind]["layerInstances"][cur_ind]["entityInstances"]
 
-func get_entityInstances():
+func get_entityInstances(level_ind: int):
 	#Finding entity layer
 	var cur_ind: int = 0
-	for val in entity_types["levels"][cur_level_ind]["layerInstances"]:
+	for val in entity_types["levels"][level_ind]["layerInstances"]:
 		if val["__type"] == "Entity":
 			break
 		cur_ind += 1
-	return entity_types["levels"][cur_level_ind]["layerInstances"][cur_ind]["entityInstances"]
+	return entity_types["levels"][level_ind]["layerInstances"][cur_ind]["entityInstances"]
 
-func change_entityInst_by_instId(instId: int, key:String, val):
+func change_entityInst_by_instId(instId: int, level_ind: int, key:String, val):
 	var cur_InstInd:int = 0
-	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+	for entity_inst in entity_types["levels"][level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
 		if entity_inst["instId"] == instId:
 			print("instId found")
 			print(val)
 			print(key)
-			entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_InstInd][key] = val
+			entity_types["levels"][level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_InstInd][key] = val
 			break
 		cur_InstInd+=1
 
-func get_positionInst_by_instId(instId: int):
+func get_positionInst_by_instId(instId: int, level_ind: int):
 	#Getting entity layer
 	var cur_ind: int = 0
-	for layer in entity_types["levels"][cur_level_ind]["layerInstances"]:
+	for layer in entity_types["levels"][level_ind]["layerInstances"]:
 		if layer["__type"] == "Position":
 			break
 		cur_ind += 1
-	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_ind]["entityInstances"]:
+	for entity_inst in entity_types["levels"][level_ind]["layerInstances"][cur_ind]["entityInstances"]:
 		if entity_inst["instId"] == instId:
 			return entity_inst
 
@@ -805,28 +924,38 @@ func get_entityInst_ind_by_id(entityInst_id: int):
 			return result_ind
 		result_ind += 1
 
-func get_cur_entityInst():
+func get_entityInst_by_instInd_levelInd(instId:int, levelInd:int):
 	#Getting entity layer
-	var temp_cur_ind: int = 0
-	var cur_ind: int = -1
-	for layer in entity_types["levels"][cur_level_ind]["layerInstances"]:
+	var temp_entity_layer_ind: int = 0
+	var entity_layer_ind: int = -1
+	for layer in entity_types["levels"][levelInd]["layerInstances"]:
 		if layer["__type"] == "Entity":
-			cur_ind = temp_cur_ind
+			entity_layer_ind = temp_entity_layer_ind
 			break
-		temp_cur_ind += 1
-	return entity_types["levels"][cur_level_ind]["layerInstances"][cur_ind]["entityInstances"][cur_entity_inst_ind]
+		temp_entity_layer_ind += 1
+	#Getting entity_inst_ind
+	var entity_inst_ind: int = -1
+	var temp_entity_inst_ind: int = 0
+	for entityInst in entity_types["levels"][levelInd]["layerInstances"][entity_layer_ind]["entityInstances"]:
+		if entityInst["instId"] == instId:
+			entity_inst_ind = temp_entity_inst_ind
+			break
+		temp_entity_inst_ind += 1
+	if(entity_inst_ind == -1):
+		return
+	return entity_types["levels"][levelInd]["layerInstances"][entity_layer_ind]["entityInstances"][entity_inst_ind]
 
 	
 
 
-func change_fiendInst_value(fieldName: String, fieldValue):
+func change_fiendInst_value_by_levelInd_entityInstId(fieldName: String, fieldValue, level_ind, entityInst_id):
 	print("changed ", fieldName, "value to ", fieldValue)
 	var cur_fieldInst_ind: int = 0
-	for fieldInst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_entity_inst_ind]["fieldInstances"]:
+	for fieldInst in entity_types["levels"][level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][entityInst_id]["fieldInstances"]:
 		if fieldInst["__identifier"] == fieldName:
 			break
 		cur_fieldInst_ind += 1
-	entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][cur_entity_inst_ind]["fieldInstances"][cur_fieldInst_ind]["__value"] = fieldValue
+	entity_types["levels"][level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][entityInst_id]["fieldInstances"][cur_fieldInst_ind]["__value"] = fieldValue
 	
 func change_sprite_by_instId(spritePath: String):
 	var instId = cur_entity_inst_ind
@@ -873,6 +1002,23 @@ func add_cur_entityInstance():
 	var entity_instance = get_cur_entityInstance_t()
 	entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"].append(entity_instance)
 	return entity_instance
+	
+func add_gateInstance(level_ind: int, gate_node):
+	var gate_instance = get_gateInstance_t_defId(0, level_ind)
+	gate_instance["triggerAABB"] = gate_node.triggerAABB
+	gate_instance["height"] = gate_node.triggerAABB[3]
+	gate_instance["width"] = gate_node.triggerAABB[2]	
+	gate_instance["px"] = [int(gate_node.position.x), int(gate_node.position.y)]
+	gate_instance["triggerValue"] = gate_node.to_level_id
+	gate_instance["triggerValue2"] = gate_node.side_id
+	gate_instance["triggerValue3"] = gate_node.side_offset
+	
+	var layer_ind = 0
+	if(!entity_types["levels"][level_ind]["layerInstances"][layer_ind].has("gateInstances")):
+		entity_types["levels"][level_ind]["layerInstances"][layer_ind]["gateInstances"] = []
+	entity_types["levels"][level_ind]["layerInstances"][layer_ind]["gateInstances"].append(gate_instance)
+	return gate_instance
+	
 
 func add_level_layer(level_num: int, layer_name: String, layer_type: String):
 	var level_layer_data = level_layer_template.duplicate(true)
@@ -883,16 +1029,14 @@ func add_level_layer(level_num: int, layer_name: String, layer_type: String):
 func get_level_name(level_num: int):
 	return entity_types["levels"][level_num]["identifier"]
 
-func add_level():
+func add_level(level_world_pos: Vector2):
 	var level_data = level_template.duplicate(true)
 	level_data["identifier"] = "Level_" + str(cur_level_ind)
 	level_data["bgRelPath"] = ProjectSettings.globalize_path("res://") + "InternalData/defaultBG.png"
-	#if len(entity_types["levels"]) > 0:
-	#	var prev_level = entity_types["levels"][cur_level_ind]
-	#	level_data["pxHei"] = prev_level["pxHei"]
-	#	level_data["pxWid"] = prev_level["pxWid"]
-	#	level_data["bgRelPath"] = prev_level["bgRelPath"]
-	#	level_data["bgRelPath2"] = prev_level["bgRelPath2"]
+			
+	level_data["worldX"] = level_world_pos.x
+	level_data["worldY"] = level_world_pos.y
+	
 	
 	entity_types["levels"].append(level_data)
 	
@@ -909,15 +1053,13 @@ func add_level():
 	#cur_level_ind += 1
 	#cur_level += 1
 
-func delete_cur_level():
+func delete_level(level_ind: int):
 	var level_count: int = get_level_count()
 	if(level_count < 2):
 		#You must have at least one level
 		return
-	entity_types["levels"].remove(cur_level_ind)
+	entity_types["levels"].remove(level_ind)
 	level_count = get_level_count()
-	if(cur_level_ind > level_count-1):
-		cur_level_ind = level_count-1
 	
 
 func change_cur_field(field_property_name: String, field_property_value: String):
@@ -960,6 +1102,7 @@ func get_level(curLevel: int):
 func get_cur_level():
 	return entity_types["levels"][cur_level_ind]
 
+
 func get_cur_entityDef():
 	return entity_types["defs"]["entities"][cur_entity_type_ind]
 
@@ -976,7 +1119,9 @@ func get_entityInstanAmount_by_levelNum(level_num: int):
 		temp_entity_layer_ind += 1
 	if entity_layer_ind < 0:
 		return
-	return len(entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["entityInstances"])
+	var amount = len(entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["entityInstances"])
+	amount += len(entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["gateInstances"])
+	return amount
 
 func get_TriggerAmount_by_levelNum(level_num: int):
 	var temp_entity_layer_ind: int = 0
@@ -994,6 +1139,7 @@ func get_TriggerAmount_by_levelNum(level_num: int):
 		if entityInstance.has("addTrigger"):
 			if(entityInstance["addTrigger"]):
 				triggerAmount += 1
+	triggerAmount += len(entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["gateInstances"])
 	return triggerAmount
 
 
@@ -1027,6 +1173,19 @@ func get_positionInstancesAmount_by_levelNum(level_num: int):
 	
 	return len(entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["entityInstances"])
 
+func get_gateInstances_by_levelNum(level_num: int):
+	var temp_entity_layer_ind: int = 0
+	var entity_layer_ind: int = -1
+	for layer in entity_types["levels"][cur_level_ind]["layerInstances"]:
+		if layer["__type"] == "Entity":
+			entity_layer_ind = temp_entity_layer_ind
+			break
+		temp_entity_layer_ind += 1
+	if entity_layer_ind < 0:
+		return
+	if(!entity_types["levels"][level_num]["layerInstances"][entity_layer_ind].has("gateInstances")):
+		entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["gateInstances"] = []
+	return entity_types["levels"][level_num]["layerInstances"][entity_layer_ind]["gateInstances"]
 
 	
 func get_entityInstances_by_levelNum(level_num: int):
@@ -1123,6 +1282,103 @@ func get_def_entity_names():
 			entity_names.append(entity["identifier"])
 	return entity_names
 
+func get_gateInstance_t_defId(defId: int, level_ind: int):
+	var def = entity_types["defs"]["entities"][defId].duplicate(true)
+	var entity_inst = entity_inst_template.duplicate(true)
+	entity_inst["__identifier"] = def["identifier"]
+	entity_inst["triggerAABB"] = def["triggerAABB"]
+	entity_inst["triggerType"] = def["triggerType"]
+	entity_inst["triggerValue"] = def["triggerValue"]
+	
+	if(!def.has("triggerTypeName")):
+		def["triggerTypeName"] = ""
+	entity_inst["triggerTypeName"] = def["triggerTypeName"]
+	if(!def.has("triggerValue2")):
+		def["triggerValue2"] = 0
+	entity_inst["triggerValue2"] = def["triggerValue2"]
+	if(!def.has("triggerValue3")):
+		def["triggerValue3"] = 0
+	entity_inst["triggerValue3"] = def["triggerValue3"]
+	entity_inst["addTrigger"] = def["addTrigger"]
+	
+	#Loading sprite path
+	entity_inst["__spritePath"] = def["spritePath"]
+	
+	entity_inst["defId"] = def["defId"]
+	entity_inst["instId"] = get_unique_gate_instId(level_ind)
+	var filed_inst_arr = []
+	#Get all fields from entityDef, and copy name,value to fields in entityInstance
+	#Entity definition - template for entity
+	#Entity instance - actual entity
+	for field in def["fieldDefs"]:	
+		var field_inst = field_inst_template.duplicate(true)
+		field_inst["__identifier"] = field["identifier"]
+		field_inst["__value"] = field["defaultValue"]
+		field_inst["__type"] = field["__type"]
+		field_inst["fieldId"] = field["fieldId"]
+		field_inst["__hasStruct"] = field["hasStruct"]
+		filed_inst_arr.append(field_inst)
+		if(field["identifier"] == "Trigger type"):
+			entity_inst["triggerType"] = int(field["defaultValue"])
+		elif(field["identifier"] == "Trigger value"):
+			entity_inst["triggerValue"] = int(field["defaultValue"])
+		elif(field["identifier"] == "Trigger value2"):
+			entity_inst["triggerValue2"] = int(field["defaultValue"])
+		elif(field["identifier"] == "Trigger value3"):
+			entity_inst["triggerValue3"] = int(field["defaultValue"])
+			
+	entity_inst["fieldInstances"] = filed_inst_arr
+	entity_inst["addTrigger"] = true
+	entity_inst["triggerTypeName"] = "changeLevelv2"
+	return entity_inst
+
+func get_entityInstance_t_defId(defId: int):
+	var def = entity_types["defs"]["entities"][defId].duplicate(true)
+	var entity_inst = entity_inst_template.duplicate(true)
+	entity_inst["__identifier"] = def["identifier"]
+	entity_inst["triggerAABB"] = def["triggerAABB"]
+	entity_inst["triggerType"] = def["triggerType"]
+	entity_inst["triggerValue"] = def["triggerValue"]
+	
+	if(!def.has("triggerTypeName")):
+		def["triggerTypeName"] = ""
+	entity_inst["triggerTypeName"] = def["triggerTypeName"]
+	if(!def.has("triggerValue2")):
+		def["triggerValue2"] = 0
+	entity_inst["triggerValue2"] = def["triggerValue2"]
+	if(!def.has("triggerValue3")):
+		def["triggerValue3"] = 0
+	entity_inst["triggerValue3"] = def["triggerValue3"]
+	entity_inst["addTrigger"] = def["addTrigger"]
+	
+	#Loading sprite path
+	entity_inst["__spritePath"] = def["spritePath"]
+	
+	entity_inst["defId"] = def["defId"]
+	entity_inst["instId"] = get_unique_entity_instId()
+	var filed_inst_arr = []
+	#Get all fields from entityDef, and copy name,value to fields in entityInstance
+	#Entity definition - template for entity
+	#Entity instance - actual entity
+	for field in def["fieldDefs"]:	
+		var field_inst = field_inst_template.duplicate(true)
+		field_inst["__identifier"] = field["identifier"]
+		field_inst["__value"] = field["defaultValue"]
+		field_inst["__type"] = field["__type"]
+		field_inst["fieldId"] = field["fieldId"]
+		field_inst["__hasStruct"] = field["hasStruct"]
+		filed_inst_arr.append(field_inst)
+		if(field["identifier"] == "Trigger type"):
+			entity_inst["triggerType"] = int(field["defaultValue"])
+		elif(field["identifier"] == "Trigger value"):
+			entity_inst["triggerValue"] = int(field["defaultValue"])
+		elif(field["identifier"] == "Trigger value2"):
+			entity_inst["triggerValue2"] = int(field["defaultValue"])
+		elif(field["identifier"] == "Trigger value3"):
+			entity_inst["triggerValue3"] = int(field["defaultValue"])
+			
+	entity_inst["fieldInstances"] = filed_inst_arr
+	return entity_inst
 
 func get_cur_entityInstance_t():
 	var def = entity_types["defs"]["entities"][cur_entity_type_ind].duplicate(true)
@@ -1131,6 +1387,10 @@ func get_cur_entityInstance_t():
 	entity_inst["triggerAABB"] = def["triggerAABB"]
 	entity_inst["triggerType"] = def["triggerType"]
 	entity_inst["triggerValue"] = def["triggerValue"]
+	
+	if(!def.has("triggerTypeName")):
+		def["triggerTypeName"] = ""
+	entity_inst["triggerTypeName"] = def["triggerTypeName"]
 	if(!def.has("triggerValue2")):
 		def["triggerValue2"] = 0
 	entity_inst["triggerValue2"] = def["triggerValue2"]
@@ -1191,7 +1451,7 @@ func get_entityDef(entity_name: String):
 func add_fieldDef_to_entity(fieldDef: Dictionary):
 	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"].append(fieldDef.duplicate(true))
 
-func add_field_to_entity(entity_name: String, field_name:String):
+func add_field_to_entity_def(entity_name: String, field_name:String):
 	var ent_ind:int = -1
 	var temp_ent_ind:int = 0
 	#find entity ind by name
@@ -1206,7 +1466,24 @@ func add_field_to_entity(entity_name: String, field_name:String):
 	field_def_data["identifier"] = field_name
 	field_def_data["fieldId"] = get_unique_entity_fieldId()
 	entity_types["defs"]["entities"][ent_ind]["fieldDefs"].append(field_def_data)
-
+	
+	#Doing same thing to all entityInstances of this type in game
+	add_field_all_entityInst(field_name)
+	
+func add_field_all_entityInst(field_name:String):
+	for level in entity_types["levels"]:
+		#finding entity layer
+		for layer in level["layerInstances"]:
+			if(layer["__identifier"] == "Entity"):
+				#Finding entity of this type
+				for entityInst in layer["entityInstances"]:
+					if(entityInst["defId"] == cur_entity_type_ind):
+						#entity found
+						var field_def_data = field_inst_template.duplicate(true)
+						field_def_data["__identifier"] = field_name
+						entityInst["fieldInstances"].append(field_def_data)
+						
+				break
 
 func add_entity_def(entity_name: String):
 	var entity_def_data = entity_def_template.duplicate(true)
@@ -1224,6 +1501,7 @@ func add_entity_def(entity_name: String):
 	add_fieldDef_to_entity(field_def_triggerValue3)
 	add_fieldDef_to_entity(field_def_hp)
 	add_fieldDef_to_entity(field_def_damaged)
+	add_fieldDef_to_entity(field_def_onGround)
 	
 	
 	print(entity_def_data)
@@ -1289,8 +1567,30 @@ func get_merged_fieldDefs_v2():
 	return result
 
 func delete_fieldDef(field_ind: int):
+	print("Deleting ", field_ind, " from game")
+	var fieldName: String = entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][field_ind]["identifier"]
 	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"].remove(field_ind)
 	
+	delete_all_fieldInst_by_fieldId(fieldName)
+
+func delete_all_fieldInst_by_fieldId(fieldName: String):
+	
+	for level in entity_types["levels"]:
+		#finding entity layer
+		for layer in level["layerInstances"]:
+			if(layer["__identifier"] == "Entity"):
+				#Finding entity of this type
+				for entityInst in layer["entityInstances"]:
+					if(entityInst["defId"] == cur_entity_type_ind):
+						#entity found
+						var temp_fieldInstances = []
+						for fieldInst in entityInst["fieldInstances"]:
+							if(fieldInst["__identifier"] != fieldName):
+								temp_fieldInstances.append(fieldInst)
+						entityInst["fieldInstances"] = temp_fieldInstances.duplicate(true)
+						
+				break
+				
 
 func delete_entityDef(entity_name: String):
 	var entity_def = get_entityDef(entity_name)
