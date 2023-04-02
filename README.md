@@ -19,5 +19,13 @@ Studio wihich allows you easily create platformers for **Sega Genesis**, heavily
 # Warning
 This programm in early development, if you will get bugs, tell me about them in **Issues** tab
 
+# Games created on this studio.
+
+**[Platformer Test1](https://bolon667.itch.io/platformer-test1)**
+
+![Platformer Test1 Logo](https://github.com/bolon667/SGDK_PlatformerStudio/blob/main/Images/platformerTest1Logo.png)
+
+Right now, only one games is created. It's a test platformer, just a test of capabilites.
+
 # LICENCE
 MIT
