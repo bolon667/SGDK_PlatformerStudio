@@ -19,7 +19,7 @@ Studio wihich allows you easily create platformers for **Sega Genesis**, heavily
 # Warning
 This programm in early development, if you will get bugs, tell me about them in **Issues** tab
 
-# Games created on this studio.
+# Games created in this studio.
 
 **[Platformer Test1](https://bolon667.itch.io/platformer-test1)**
 
