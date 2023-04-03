@@ -4,13 +4,13 @@ onready var layer_list = $VBoxContainer/LayerList
 onready var button_list = $VBoxContainer/ButtonList
 onready var layer_value_list = $VBoxContainer/LayerValuesList/LayerValuesContainer
 
-onready var entity_menu_t = preload("res://Scenes/Pages/EntityMenu.tscn")
+onready var entity_menu_t = preload("res://Scenes/Pages/EntityMenu/EntityMenu.tscn")
+onready var bullet_menu_t = preload("res://Scenes/Pages/BulletMenu/BulletMenu.tscn")
 onready var msg_packs_menu_t = preload("res://Scenes/Pages/MessagePack/MessagePacksMenu.tscn")
 onready var level_settings_menu_t = preload("res://Scenes/Pages/LevelSettings/LevelSettingsMenu.tscn")
 onready var project_settings_menu_t = preload("res://Scenes/Pages/ProjectSettings/ProjectSettingsMenu.tscn")
 onready var layer_button_t = preload("res://Scenes/LayerButton.tscn")
 
-onready var change_start_pos_t = preload("res://Scenes/Pages/changeStartPos.tscn")
 
 onready var entity_layer_value_btn_t = preload("res://Scenes/EntityLayerValueButton.tscn")
 
@@ -38,7 +38,7 @@ func load_layer_values(btn: Button):
 		"Entity":
 			singleton.cur_editor_mode = singleton.EditorMode.ENTITY
 			print("Entity mode")
-			var entity_names = singleton.get_entity_names()
+			var entity_names = singleton.get_entity_names("entities")
 			for entity_name in entity_names:
 				var entity_layer_value_btn_node = entity_layer_value_btn_t.instance()
 				entity_layer_value_btn_node.text = entity_name
@@ -62,13 +62,6 @@ func _on_addNewEntityTypeBtn_button_down():
 
 
 
-
-func _on_changeStartPosBtn_button_down():
-	print("start pos")
-	var start_pos_node = change_start_pos_t.instance()
-	add_child(start_pos_node)
-
-
 func _on_msgPacksBtn_button_down():
 	var msg_packs_node = msg_packs_menu_t.instance()
 	add_child(msg_packs_node)
@@ -81,4 +74,9 @@ func _on_lvlSettingsBtn_button_down():
 
 func _on_projectSettingsBtn_button_down():
 	var node = project_settings_menu_t.instance()
+	add_child(node)
+
+
+func _on_bulletDefinitionsBtn_button_down():
+	var node = bullet_menu_t.instance()
 	add_child(node)

@@ -11,6 +11,7 @@
 #include "../res/sprites.h"
 #include "../res/sounds.h"
 #include "../res/music.h"
+#include "../res/palette.h"
 #include "../res/images.h"
 
 u16 levelNum = 0;

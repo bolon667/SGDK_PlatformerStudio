@@ -15,7 +15,11 @@
 
 //$entityDefaultConsts$
 
+//$entityBulletDefaultConsts$
+
 //$addNewEntityFuncs$
+
+//$addNewEntityBulletFuncs$
 
 void entityCheckForBullet(EntityMerged* entity){
 	entity->damaged = FALSE;
@@ -25,16 +29,16 @@ void entityCheckForBullet(EntityMerged* entity){
 		entity->trigger->pos.y + entity->trigger->rect.min.y,
 		entity->trigger->pos.y + entity->trigger->rect.max.y
 	);
-	for(u16 i = 0; i < curEntityAll->Bullet_size; i++){
-		Bullet* curBullet = &curEntityAll->Bullet_arr[i];
+	for(u16 i = 0; i < curEntityAll->EntityBulletMerged_size; i++){
+		EntityBulletMerged* curBullet = &curEntityAll->EntityBulletMerged_arr[i];
 		if(!curBullet->alive){
 			continue;
 		}
 		AABB bulletBounds = newAABB(
-			curBullet->posInt.x + curBullet->rect.min.x,
-			curBullet->posInt.x + curBullet->rect.max.x,
-			curBullet->posInt.y + curBullet->rect.min.y,
-			curBullet->posInt.y + curBullet->rect.max.y
+			curBullet->posInt.x + curBullet->aabb.min.x,
+			curBullet->posInt.x + curBullet->aabb.max.x,
+			curBullet->posInt.y + curBullet->aabb.min.y,
+			curBullet->posInt.y + curBullet->aabb.max.y
 		);
 		if((bulletBounds.min.x < entityTriggerBounds.max.x) && (bulletBounds.max.x > entityTriggerBounds.min.x)){
 			if((bulletBounds.min.y < entityTriggerBounds.max.y) && (bulletBounds.max.y > entityTriggerBounds.min.y)){
@@ -47,72 +51,32 @@ void entityCheckForBullet(EntityMerged* entity){
 	}
 }
 
-void addNewBullet(Bullet entity){
-	for(u16 i = 0; i < curEntityAll->Bullet_size; i++){
-		if(!curEntityAll->Bullet_arr[i].alive){
-			curEntityAll->Bullet_arr[i] = entity;
+void deleteEntityMergedTriggerByInstId(u16 instId){
+	for(u16 i = 0; i < curEntityAll->EntityMerged_size; i++){
+		EntityMerged* curEntityMerged = &curEntityAll->EntityMerged_arr[i];
+		if(!curEntityMerged->alive){
+			continue;
+		}
+		if(curEntityMerged->instId == instId){
+			curEntityMerged->trigger->alive = FALSE;
 			break;
 		}
 	}
 }
 
-void showBullet(Bullet* entity){
-    if(!entity->alive){
-		return;
+EntityMerged* getEntityMergedByInstId(u16 instId){
+	for(u16 i = 0; i < curEntityAll->EntityMerged_size; i++){
+		EntityMerged* curEntityMerged = &curEntityAll->EntityMerged_arr[i];
+		if(!curEntityMerged->alive){
+			continue;
+		}
+		if(curEntityMerged->instId == instId){
+			return curEntityMerged;
+		}
 	}
-	if(entity->preDeath){
-		if(entity->spr)	SPR_releaseSprite(entity->spr);
-		if(entity->spr2) SPR_releaseSprite(entity->spr2);
-		if(entity->spr3) SPR_releaseSprite(entity->spr3);
-		entity->alive = FALSE;
-		return;
-	}
-
-    s16 posX_OnCam = entity->posInt.x-cameraPosition.x;
-	s16 posY_OnCam = entity->posInt.y-cameraPosition.y;
-
-	//$updatePosition_Entity_always$
-	if ((posX_OnCam < -entity->size.x) || (posX_OnCam > 320) || (posY_OnCam < -entity->size.y) || (posY_OnCam > 224)) {
-		if(entity->onScreen) {
-			entity->preDeath = TRUE;
-			return;
-		}
-		entity->onScreen = FALSE;
-		
-	}
-    else
-    {
-		if(!entity->onScreen) {
-			if(entity->sprDef) {
-				entity->spr = SPR_addSprite(entity->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(ENEMY_PALETTE, 15, FALSE, FALSE));
-				
-			}
-			entity->spr2 = SPR_addSprite(&spr_debugLeftTopCorner, posX_OnCam, posY_OnCam, TILE_ATTR(PAL3, 11, FALSE, FALSE));
-			entity->spr3 = SPR_addSprite(&spr_debugRightBottom, posX_OnCam, posY_OnCam, TILE_ATTR(PAL3, 11, FALSE, FALSE));
-			
-		}
-        if(entity->sprDef){
-			SPR_setPosition(entity->spr, posX_OnCam, posY_OnCam);
-			
-			
-			//Update position
-			entity->pos.x += entity->spd.x;
-			entity->pos.y += entity->spd.y;
-			entity->posInt.x = fix16ToInt(entity->pos.x);
-			entity->posInt.y = fix16ToInt(entity->pos.y);
-
-		}
-		SPR_setPosition(entity->spr2, posX_OnCam, posY_OnCam);
-		SPR_setPosition(entity->spr3, posX_OnCam+entity->size.x-8, posY_OnCam+entity->size.y-8);
-		entity->lifeTime--;
-		if(entity->lifeTime < 0){
-			entity->preDeath = TRUE;
-			return;
-		}
-		
-		entity->onScreen = TRUE;
-    }
+	return NULL;
 }
+
 
 //$triggerTypeFuncs$
 
@@ -146,9 +110,13 @@ void checkTriggerForPlayer(Trigger* trigger){
 	trigger->activated = FALSE;
 }
 
-
+//$showEntityBulletFuncs$
 
 //$showEntityFuncs$
+
+void showEntityBulletMerged(EntityBulletMerged* entity){
+	showEntityBulletFuncArr[entity->entityType](entity);
+}
 
 void showEntityMerged(EntityMerged* entity){
 	showEntityFuncArr[entity->entityType](entity);
@@ -159,8 +127,8 @@ void showEntityAll(){
 		playerBody.animMode = 0;
 	}
 	
-	for(u16 i=0; i<curEntityAll->Bullet_size; i++){
-		showBullet(&curEntityAll->Bullet_arr[i]);
+	for(u16 i=0; i<curEntityAll->EntityBulletMerged_size; i++){
+		showEntityBulletMerged(&curEntityAll->EntityBulletMerged_arr[i]);
 	}
 	for(u16 i=0; i<curEntityAll->Trigger_size; i++){
 		checkTriggerForPlayer(&curEntityAll->Trigger_arr[i]);

@@ -58,7 +58,7 @@ void playerInputChanged() {
 						pos = playerBody.globalPosition;
 						pos.x += 32;
 					}
-					addNewBullet((Bullet){TRUE, FALSE, pos, {FIX16(pos.x), FIX16(pos.y)}, {0,0}, {32,32}, {0,0,32,32}, FALSE, 50, NULL, NULL, 3});
+					//addNewBullet((Bullet){TRUE, FALSE, pos, {FIX16(pos.x), FIX16(pos.y)}, {0,0}, {32,32}, {0,0,32,32}, FALSE, 50, NULL, NULL, 3});
 				}
 				
 			}

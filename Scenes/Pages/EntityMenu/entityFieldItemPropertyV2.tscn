@@ -1,0 +1,57 @@
+[gd_scene format=2]
+
+[node name="entityFieldItemPropertyV2" type="HBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Label" type="Label" parent="."]
+margin_top = 293.0
+margin_right = 64.0
+margin_bottom = 307.0
+text = "Test text: "
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = 68.0
+margin_right = 1024.0
+margin_bottom = 600.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_right = 956.0
+margin_bottom = 566.0
+rect_min_size = Vector2( 200, 30 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+margin_top = 276.0
+margin_right = 87.0
+margin_bottom = 290.0
+text = "Actual Value: "
+
+[node name="TextEdit" type="TextEdit" parent="VBoxContainer/HBoxContainer"]
+margin_left = 91.0
+margin_right = 956.0
+margin_bottom = 566.0
+size_flags_horizontal = 3
+text = "dasdasdasd"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 570.0
+margin_right = 956.0
+margin_bottom = 600.0
+rect_min_size = Vector2( 200, 30 )
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer2"]
+margin_top = 8.0
+margin_right = 106.0
+margin_bottom = 22.0
+text = "Generate Value: "
+
+[node name="TextEdit" type="Button" parent="VBoxContainer/HBoxContainer2"]
+margin_left = 110.0
+margin_right = 956.0
+margin_bottom = 30.0
+size_flags_horizontal = 3
+text = "Change Value"

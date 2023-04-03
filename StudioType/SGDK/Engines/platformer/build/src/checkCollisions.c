@@ -224,6 +224,10 @@ void checkCollisions() {
 			stairLeftEdge = getTileLeftEdge(rx);
 			collidingAgainstStair = TRUE;
 		}
+		else if (rTileValue == DEATH_TILE) {
+			PAL_fadeOutAll(3,FALSE);
+			loadLevel(levelNum, (Vect2D_s16)getLevelPos(0));
+		}
 
 		//Left position constant as a helper
 		const s16 lx = minTilePos.x;
@@ -266,6 +270,9 @@ void checkCollisions() {
 		else if (lTileValue == LADDER_TILE) {
 			stairLeftEdge = getTileLeftEdge(lx);
 			collidingAgainstStair = TRUE;
+		} else if (lTileValue == DEATH_TILE) {
+			PAL_fadeOutAll(3,FALSE);
+			loadLevel(levelNum, (Vect2D_s16)getLevelPos(0));
 		}
 	}
 
@@ -397,6 +404,9 @@ void checkCollisions() {
 					levelLimits.max.y = bottomEdgePos;
 					break;
 				}
+			} else if (bottomTileValue == DEATH_TILE) {
+				PAL_fadeOutAll(3,FALSE);
+				loadLevel(levelNum, (Vect2D_s16)getLevelPos(0));
 			}
 		}
 	} else {
@@ -434,6 +444,9 @@ void checkCollisions() {
 			else if (topTileValue == LADDER_TILE) {
 				stairLeftEdge = getTileLeftEdge(x);
 				collidingAgainstStair = TRUE;
+			} else if (topTileValue == DEATH_TILE) {
+				PAL_fadeOutAll(3,FALSE);
+				loadLevel(levelNum, (Vect2D_s16)getLevelPos(0));
 			}
 		}
 	}

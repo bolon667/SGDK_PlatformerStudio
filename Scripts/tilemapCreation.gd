@@ -2,7 +2,7 @@ extends Node2D
 
 var id_of_current_entity = 0
 
-onready var entity_menu_t = preload("res://Scenes/Pages/EntityMenu.tscn")
+onready var entity_menu_t = preload("res://Scenes/Pages/EntityMenu/EntityMenu.tscn")
 
 onready var TileMapEditorWindow = $TileMapEditorWindow
 onready var TileMapEditorWindow_roomSize = $TileMapEditorWindow/World/roomSize
@@ -102,7 +102,7 @@ func _on_buildProjectBtn_pressed():
 func _on_Button_pressed():
 	#for field in singleton.get_merged_fieldDef():
 	#	print(field["identifier"])
-	print(singleton.get_merged_fieldDefs_v2())
+	#print(singleton.get_merged_fieldDefs_v2())
 	pass # Replace with function body.
 
 

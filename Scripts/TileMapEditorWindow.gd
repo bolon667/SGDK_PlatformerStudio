@@ -22,7 +22,6 @@ var level_size
 var map_size_px:Vector2
 var map_size_tiles:Vector2
 
-
 var levelContainer_t = preload("res://Scenes/levelContainer.tscn")
 onready var VBoxContainerRight: VBoxContainer = $"../CanvasLayer/ContainerRight/VBoxContainerRight"
 onready var ContainerRight: Control = $"../CanvasLayer/ContainerRight"
@@ -43,7 +42,63 @@ func clean_levels():
 	for levelContainer in world.get_children():
 		levelContainer.queue_free()
 
+func list_files_in_directory_png(path):
+	var files = []
+	var dir = Directory.new()
+	dir.open(path)
+	dir.list_dir_begin()
+
+	while true:
+		var file = dir.get_next()
+		if file == "":
+			break
+		elif not file.begins_with("."):
+			if file.ends_with(".png"):
+				files.append(file)
+
+	dir.list_dir_end()
+
+	return files
+
+func generate_tilesets():
+	var baseBath = singleton.cur_project_folder_path + "/code_template/collisionMapTypes/"
+	if(singleton.cell_size == 8):
+		var ts = TileSet.new()
+		var filePaths = list_files_in_directory_png(baseBath + "/8x8/")
+		for filePath in filePaths:
+			print(filePath)
+			var id = int(filePath)-1
+			#var id = ts.get_last_unused_tile_id()
+			ts.create_tile(id)
+			ts.tile_set_name(id, str(id))
+			
+			var texture = ImageTexture.new()
+			var image = Image.new()
+			image.load(baseBath + "/8x8/" + filePath)
+			texture.create_from_image(image)
+			
+			ts.tile_set_texture(id, texture)
+		ResourceSaver.save("res://TileSets/8x8TileSet.tres", ts)
+	if(singleton.cell_size == 16):
+		var ts = TileSet.new()
+		var filePaths = list_files_in_directory_png(baseBath + "/16x16/")
+		for filePath in filePaths:
+			print(filePath)
+			var id = int(filePath)-1
+			#var id = ts.get_last_unused_tile_id()
+			ts.create_tile(id)
+			ts.tile_set_name(id, str(id))
+			
+			var texture = ImageTexture.new()
+			var image = Image.new()
+			image.load(baseBath + "/16x16/" + filePath)
+			texture.create_from_image(image)
+			
+			ts.tile_set_texture(id, texture)
+		ResourceSaver.save("res://TileSets/16x16TileSet.tres", ts)
+
 func load_levels():
+	generate_tilesets()
 	clean_levels()
 	print("load levels")
 	singleton.cur_entity_inst_ind = 0
@@ -69,19 +124,14 @@ func move_map_around():
 	camera.global_position.y -= (ref.y - fixed_toggle_point.y)*camera.zoom.y
 	fixed_toggle_point = ref
 
-
 func _ready():
 	var window_size = get_viewport_rect().size
 	print(window_size)
 	$Area2D/CollisionShape2D.shape.extents = window_size
 	load_levels()
-	
-
 
 func area2d_follow_camera():
 	$Area2D.global_position = camera.global_position
-
-
 
 func move_camera(delta):
 	var move_x = 0
@@ -96,7 +146,7 @@ func move_camera(delta):
 		move_y += 1
 	if(Input.is_action_pressed("ui_up")):
 		move_y -= 1
-	if(Input.is_action_just_released("wheel_up") && !singleton.in_modal_window):
+	if(Input.is_action_just_released("wheel_up") && !singleton.in_modal_window && focused_editor_window):
 		print("wheel_up")
 		print("camera.zoom", camera.zoom)
 		if(zoom == move_mode_trigger_zoom):
@@ -110,7 +160,7 @@ func move_camera(delta):
 		camera.zoom = Vector2(zoom, zoom)
 		var window_size = get_viewport_rect().size
 		$Area2D/CollisionShape2D.shape.extents = Vector2((window_size.x*zoom)-2, window_size.y*zoom)
-	if(Input.is_action_just_released("wheel_down")):
+	if(Input.is_action_just_released("wheel_down") && focused_editor_window):
 		zoom += zoom_step
 		if(zoom > move_mode_trigger_zoom):
 			zoom = move_mode_trigger_zoom
@@ -135,7 +185,6 @@ func move_camera(delta):
 	
 	#camera.position += Vector2(move_x*camera_speed*delta, move_y*camera_speed*delta)
 
-
 func _physics_process(delta):
 	move_camera(delta)
 	area2d_follow_camera()
@@ -144,7 +193,6 @@ func _on_Area2D_mouse_entered():
 	print("area entered")
 	focused_editor_window = true
 	pass # Replace with function body.
-
 
 func _on_Area2D_mouse_exited():
 	print("area existed")

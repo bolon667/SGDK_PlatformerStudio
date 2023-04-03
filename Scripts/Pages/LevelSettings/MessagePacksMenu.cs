@@ -9,7 +9,7 @@ public class MessagePacksMenu : Control
 	public override void _Ready()
 	{
 		singleton = (Node)GetNode("/root/singleton");
-		settingsContainer = (VBoxContainer)GetNode("CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer");
+		settingsContainer = (VBoxContainer)GetNode("CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer");
 
 		loadSettings();
 

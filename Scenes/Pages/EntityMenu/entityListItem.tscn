@@ -1,0 +1,47 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Styles/style1.tres" type="Theme" id=1]
+[ext_resource path="res://Scripts/Pages/EntityMenu/entityListItem.gd" type="Script" id=2]
+
+[node name="EntityTypeContainer" type="Control"]
+anchor_right = 1.0
+margin_left = 5.0
+margin_top = 5.0
+margin_right = -5.0
+margin_bottom = 5.0
+rect_min_size = Vector2( 0, 40 )
+theme = ExtResource( 1 )
+script = ExtResource( 2 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="TextBtn" type="Button" parent="HBoxContainer"]
+margin_right = 962.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+text = "Test Text"
+
+[node name="DeleteBtn" type="Button" parent="HBoxContainer"]
+margin_left = 966.0
+margin_right = 1014.0
+margin_bottom = 40.0
+text = "  X  "
+align = 2
+
+[node name="ConfirmationDialogDelete" type="ConfirmationDialog" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -100.0
+margin_top = -35.0
+margin_right = 100.0
+margin_bottom = 35.0
+window_title = "Are you sure?"
+dialog_text = "You really want to delete this entity? Keep in mind, this operation will delete ALL entity of this type in game."
+
+[connection signal="button_down" from="HBoxContainer/TextBtn" to="." method="_on_TextBtn_button_down"]
+[connection signal="button_down" from="HBoxContainer/DeleteBtn" to="." method="_on_DeleteBtn_button_down"]
+[connection signal="confirmed" from="ConfirmationDialogDelete" to="." method="_on_ConfirmationDialogDelete_confirmed"]

@@ -23,7 +23,7 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 	SPR_reset();
 
 	//Deallocate prev entityData to avoid memory leak
-	MEM_free(curEntityAll->Bullet_arr);
+	MEM_free(curEntityAll->EntityBulletMerged_arr);
 	MEM_free(curEntityAll->EntityMerged_arr);
 	MEM_free(curEntityAll->Trigger_arr);
 	MEM_free(curEntityAll);
@@ -53,10 +53,11 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 	memcpy(curEntityAll, LevelFull_arr[levelNum].entityAll_arr, sizeof(EntityAll));
 
 	//allocate Bullet for entityAll
-	curEntityAll->Bullet_arr = MEM_alloc(sizeof(Bullet)*LevelFull_arr[levelNum].entityAll_arr->Bullet_size);
-	//Gen data for Bullet_arr
-	for(u16 i=0; i < LevelFull_arr[levelNum].entityAll_arr->Bullet_size; i++){
-		curEntityAll->Bullet_arr[i] = (Bullet){FALSE, {0,0}, {0,0}, {0,0}, {0,0}, {0,0,0,0}, FALSE, NULL, NULL};
+	curEntityAll->EntityBulletMerged_arr = MEM_alloc(sizeof(EntityBulletMerged)*LevelFull_arr[levelNum].entityAll_arr->EntityBulletMerged_size);
+
+	for(u16 i=0; i < curEntityAll->EntityBulletMerged_size; i++){
+		curEntityAll->EntityBulletMerged_arr[i].alive = FALSE;
+		curEntityAll->EntityBulletMerged_arr[i].entityType = FALSE;
 	}
 
 	//duplicate entityMerged_arr for entityAll
@@ -91,7 +92,10 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 	
 	
 	if(curLvlData->foregroundTileset != NULL){
-		memcpy(&palette_full[16],  curLvlData->foregroundPallete->data, 16 * 2);
+		if(curLvlData->pal1 == NULL){
+			curLvlData->pal1 = curLvlData->foregroundPallete;
+		}
+		memcpy(&palette_full[16],  curLvlData->pal1->data, 16 * 2);
 		VDP_loadTileSet(curLvlData->foregroundTileset, VDPTilesFilled, DMA);
 		bga = MAP_create(curLvlData->foregroundMap, BG_A, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, VDPTilesFilled));
 		VDPTilesFilled += curLvlData->foregroundTileset->numTile;
@@ -100,7 +104,10 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 	}
 	
 	if(curLvlData->backgroundTileset != NULL){
-		memcpy(&palette_full[0], curLvlData->backgroundPallete->data, 16 * 2);
+		if(curLvlData->pal0 == NULL){
+			curLvlData->pal0 = curLvlData->backgroundPallete;
+		}
+		memcpy(&palette_full[0],  curLvlData->pal0->data, 16 * 2);
 		VDP_loadTileSet(curLvlData->backgroundTileset, VDPTilesFilled, DMA);
 		bgb = MAP_create(curLvlData->backgroundMap, BG_B, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, VDPTilesFilled));
 		VDPTilesFilled += curLvlData->backgroundTileset->numTile;
@@ -109,18 +116,30 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 	}
 
 	if(curLvlData->foregroundImage != NULL){
-		memcpy(&palette_full[16],  curLvlData->foregroundImage->palette->data, 16 * 2);
+		if(curLvlData->pal1 == NULL){
+			curLvlData->pal1 = curLvlData->foregroundImage->palette;
+		}
+		memcpy(&palette_full[16],  curLvlData->pal1->data, 16 * 2);
 		VDP_drawImageEx(BG_A, curLvlData->foregroundImage, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, VDPTilesFilled), 0, 0, FALSE, TRUE);
 		VDPTilesFilled += curLvlData->foregroundImage->tileset->numTile;
 	}
 	if(curLvlData->backgroundImage != NULL){
-		memcpy(&palette_full[0],  curLvlData->backgroundImage->palette->data, 16 * 2);
+		if(curLvlData->pal0 == NULL){
+			curLvlData->pal0 = curLvlData->backgroundImage->palette;
+		}
+		memcpy(&palette_full[0],  curLvlData->pal0->data, 16 * 2);
 		VDP_drawImageEx(BG_B, curLvlData->backgroundImage, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, VDPTilesFilled), 0, 0, FALSE, TRUE);
 		VDPTilesFilled += curLvlData->backgroundImage->tileset->numTile;
 	}
 
-	memcpy(&palette_full[PLAYER_PALETTE*16], spr_player.palette->data, 16 * 2);
-	memcpy(&palette_full[ENEMY_PALETTE*16], spr_coin.palette->data, 16 * 2);
+	if(curLvlData->pal2 == NULL){
+		curLvlData->pal2 = spr_player.palette;
+	}
+	memcpy(&palette_full[PAL2*16], curLvlData->pal2->data, 16 * 2);
+	if(curLvlData->pal3 == NULL){
+		curLvlData->pal3 = spr_coin.palette;
+	}
+	memcpy(&palette_full[PAL3*16], curLvlData->pal3->data, 16 * 2);
 
 	//addNewBullet((Bullet){TRUE, {2,2}, {0,0}, {FIX16(0.5),0}, {32,32}, {0,0,32,32}, FALSE, 1, NULL, &spr_noSpr});
 	

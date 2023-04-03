@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://Scenes/Pages/addNewButton.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scenes/Pages/EntityMenu/addNewButton.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scripts/Pages/MessagePack/MessagePacksMenu.gd" type="Script" id=2]
 [ext_resource path="res://Styles/style1.tres" type="Theme" id=3]
 

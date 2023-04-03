@@ -38,7 +38,10 @@ typedef struct {
 	void (*beforeLevelFunc)(void);
 	void (*everyFrameFunc)(void);
 	void (*afterLevelFunc)(void);
-
+	Palette* pal0;
+	Palette* pal1;
+	Palette* pal2;
+	Palette* pal3;
 } Level;
 
 
@@ -55,6 +58,7 @@ typedef struct {
 	bool prevActivated;
 } Trigger;
 
+/*
 typedef struct {
 	bool alive;
 	bool preDeath;
@@ -72,6 +76,7 @@ typedef struct {
 	Sprite* spr2;
 	Sprite* spr3;
 } Bullet;
+*/
 
 typedef struct {
 	char* str;
@@ -84,12 +89,14 @@ typedef struct {
 	char* name
 } MessagePack;
 
+//$entityBulletMergedStruct$
+
 //$entityMergedStruct$
 
 typedef struct {
 	u16 additionalEntityMergedSlots;
-    u16 Bullet_size;
-	Bullet* Bullet_arr;
+    u16 EntityBulletMerged_size;
+	EntityBulletMerged* EntityBulletMerged_arr;
 	u16 EntityMerged_size;
 	EntityMerged* EntityMerged_arr;
 	u16 Trigger_size;

@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Styles/style1.tres" type="Theme" id=1]
+[ext_resource path="res://Scripts/Pages/EntityMenu/entityFieldItem.gd" type="Script" id=2]
+
+[node name="EntityTypeContainer" type="HBoxContainer"]
+anchor_right = 1.0
+margin_left = 5.0
+margin_top = 5.0
+margin_right = -5.0
+margin_bottom = 5.0
+rect_min_size = Vector2( 100, 40 )
+theme = ExtResource( 1 )
+script = ExtResource( 2 )
+
+[node name="TextBtn" type="Button" parent="."]
+margin_right = 962.0
+margin_bottom = 40.0
+size_flags_horizontal = 3
+text = "Test Text"
+
+[node name="DeleteBtn" type="Button" parent="."]
+margin_left = 966.0
+margin_right = 1014.0
+margin_bottom = 40.0
+text = "  X  "
+align = 2
+
+[connection signal="button_down" from="TextBtn" to="." method="_on_TextBtn_button_down"]
+[connection signal="button_down" from="DeleteBtn" to="." method="_on_DeleteBtn_button_down"]

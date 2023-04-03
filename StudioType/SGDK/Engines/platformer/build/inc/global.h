@@ -26,7 +26,10 @@
 #define SLOPE_45_RIGHT2_UP 14
 #define SLOPE_45_LEFT2_UP 15
 #define SLOPE_45_LEFT1_UP 16
+#define DEATH_TILE 17
 
+extern s16 backXScroll;
+extern s16 backYScroll;
 
 extern const fix16 gravityScale;
 

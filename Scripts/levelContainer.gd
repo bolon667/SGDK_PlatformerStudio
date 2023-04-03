@@ -79,7 +79,7 @@ func turn_off_highlight():
 	highlight = false
 	update()
 
-func change_bga(imgPath: String):
+func change_bga(imgPath: String, bgaMode: int):
 	singleton.change_bgRelPath(imgPath, cur_level_ind)
 	print("bgA on level ", cur_level_ind, " has changed")
 	var bgImage = Image.new()
@@ -87,11 +87,13 @@ func change_bga(imgPath: String):
 	var imgTex = ImageTexture.new()
 	imgTex.create_from_image(bgImage, 1)
 	$bgA.texture = imgTex;
-	map_size_px = $bgA.texture.get_size()
-	singleton.change_level_size(cur_level_ind, map_size_px)
+	if(bgaMode == 0):
+		map_size_px = $bgA.texture.get_size()
+		map_size_tiles = Vector2(map_size_px.x/singleton.cell_size, map_size_px.y/singleton.cell_size)
+		singleton.change_level_size(cur_level_ind, map_size_px)
 	updateAreas()
 
-func change_bgb(imgPath: String):
+func change_bgb(imgPath: String, bgbMode: int):
 	singleton.change_bgRelPath2(imgPath, cur_level_ind)
 	print("bgB on level ", cur_level_ind, " has changed")
 	var bgImage = Image.new()
@@ -99,8 +101,10 @@ func change_bgb(imgPath: String):
 	var imgTex = ImageTexture.new()
 	imgTex.create_from_image(bgImage, 1)
 	$bgB.texture = imgTex;
-	map_size_px = $bgB.texture.get_size()
-	singleton.change_level_size(cur_level_ind, map_size_px)
+	if(bgbMode == 0):
+		map_size_px = $bgB.texture.get_size()
+		map_size_tiles = Vector2(map_size_px.x/singleton.cell_size, map_size_px.y/singleton.cell_size)
+		singleton.change_level_size(cur_level_ind, map_size_px)
 	updateAreas()
 
 func move_level():
@@ -232,7 +236,7 @@ func clear_entities_on_scene():
 
 func load_entities_on_scene():
 	clear_entities_on_scene()
-	singleton.fix_level_inst_ids(cur_level_ind)
+	#singleton.fix_level_inst_ids(cur_level_ind)
 	singleton.remove_gates(cur_level_ind)
 	var entity_instantes = singleton.get_entityInstances(cur_level_ind)
 	for entity_inst in entity_instantes:
@@ -356,6 +360,7 @@ func move_level_off():
 func move_level_on():
 	if(singleton.entity_types["turnOnGates"]):
 		enable_side_areas()
+	clean_temp_tileMap()
 	disable_position_list()
 	disable_entity_list()
 	
@@ -733,6 +738,8 @@ func _physics_process(delta):
 func _on_Area2D_mouse_entered():
 	print("level ", cur_level_ind, " entered")
 	singleton.cur_level_ind = cur_level_ind
+	prev_cell_pos = $TileMap.world_to_map(get_local_mouse_position())
+	cell_pos = prev_cell_pos
 	add_to_group("level_hovered")
 	mouse_on_level = true
 	pass # Replace with function body.
@@ -924,43 +931,68 @@ func _on_AreaUp_area_entered(area):
 	var trigger_width = 1
 	is_moving = false
 	#global_position.y = levelContainerAdjacent.global_position.y + levelContainerAdjacent.map_size_px.y
-	var pos_x_diff = (levelContainerAdjacent.global_position.x - global_position.x)
+	
+	var pos_x_start = global_position.x
+	var pos_x_end = global_position.x + map_size_px.x
+	var pos_x_start_2 = levelContainerAdjacent.global_position.x
+	var pos_x_end_2 = levelContainerAdjacent.global_position.x + levelContainerAdjacent.map_size_px.x
+	
+	var first_diff = pos_x_start_2 - pos_x_start
+	var last_diff = pos_x_end_2 - pos_x_end
 
 	#Put gates on this levelContainer
 	var gate_node = gate_obj_t.instance()
-	gate_node.side_offset = int(pos_x_diff)
+	gate_node.side_offset = int(first_diff)
 	gate_node.to_level_id = levelContainerAdjacent.cur_level_ind
 	gate_node.side_id = 2
 	gate_node.get_node("Sprite").rotation_degrees = 90
-	if(pos_x_diff > 0):
-		gate_node.triggerAABB = [pos_x_diff, 0, map_size_px.x, trigger_width]
-		gate_node.get_node("Sprite").position.x = (map_size_px.x+pos_x_diff)/2
+	if(first_diff > 0):
+		if(last_diff > 0):
+			last_diff = 0
+		var gate_size = map_size_px.x - first_diff + last_diff
+		gate_node.position.x = first_diff
+		gate_node.triggerAABB = [0, 0, gate_size, trigger_width]
+		gate_node.get_node("Sprite").position.x = (gate_size/2)
 	else:
-		gate_node.triggerAABB = [0, 0, map_size_px.x+pos_x_diff, trigger_width]
-		gate_node.get_node("Sprite").position.x = (map_size_px.x+pos_x_diff)/2
+		first_diff = 0
+		if(last_diff > 0):
+			last_diff = 0
+		var gate_size = map_size_px.x - first_diff + last_diff
+		gate_node.position.x = first_diff
+		gate_node.triggerAABB = [0, 0, gate_size, trigger_width]
+		gate_node.get_node("Sprite").position.x = (gate_size/2)
 	$Gates/Up.add_child(gate_node)
 	var gate_inst_dict = singleton.add_gateInstance(cur_level_ind, gate_node)
 	gate_node.inst_id = gate_inst_dict["instId"]
 	
 	#Put gates on adjacent levelContainer
 	
-	var pos_x_diff_mirr = (global_position.x-levelContainerAdjacent.global_position.x)
+	var first_diff_mirr = pos_x_start - pos_x_start_2
+	var last_diff_mirr = pos_x_end - pos_x_end_2
 	#var size_y_diff_mirr = ((levelContainerAdjacent.global_position.y+levelContainerAdjacent.map_size_px.y) - (global_position.y + map_size_px.y))
 	
 	var gate_node_adjacent = gate_obj_t.instance()
-	gate_node_adjacent.side_offset = int(pos_x_diff_mirr)
+	gate_node_adjacent.side_offset = int(first_diff_mirr)
 	gate_node_adjacent.to_level_id = cur_level_ind
 	gate_node_adjacent.side_id = 3
 	gate_node_adjacent.get_node("Sprite").rotation_degrees = -90
-	gate_node_adjacent.position.y = levelContainerAdjacent.map_size_px.y-trigger_width
-	if(pos_x_diff_mirr > 0):
-		gate_node_adjacent.triggerAABB = [pos_x_diff_mirr, 0, map_size_px.x, trigger_width]
-		gate_node_adjacent.get_node("Sprite").position.x = (map_size_px.x+pos_x_diff_mirr)/2
+	gate_node_adjacent.position.y = (levelContainerAdjacent.map_size_px.y-trigger_width)
+	
+	if(first_diff_mirr > 0):
+		if(last_diff_mirr > 0):
+			last_diff_mirr = 0
+		var gate_size = levelContainerAdjacent.map_size_px.x - first_diff_mirr + last_diff_mirr
+		gate_node_adjacent.position.x = first_diff_mirr
+		gate_node_adjacent.triggerAABB = [0, 0, gate_size, trigger_width]
+		gate_node_adjacent.get_node("Sprite").position.x = (gate_size/2)
 	else:
-		gate_node_adjacent.triggerAABB = [0, 0, levelContainerAdjacent.map_size_px.x+pos_x_diff_mirr, trigger_width]
-		gate_node_adjacent.get_node("Sprite").position.x = (map_size_px.x+pos_x_diff_mirr)/2
-		#gate_node_adjacent.triggerAABB = [0, 0, trigger_width, levelContainerAdjacent.map_size_px.y+pos_x_diff_mirr]
-		#gate_node_adjacent.get_node("Sprite").position.y = (map_size_px.y+pos_x_diff_mirr)/2
+		first_diff_mirr = 0
+		if(last_diff_mirr > 0):
+			last_diff_mirr = 0
+		var gate_size = levelContainerAdjacent.map_size_px.x - first_diff_mirr + last_diff_mirr
+		gate_node_adjacent.position.x = first_diff_mirr
+		gate_node_adjacent.triggerAABB = [0, 0, gate_size, trigger_width]
+		gate_node_adjacent.get_node("Sprite").position.x = (gate_size/2)
 	
 	var adjacent_gates = levelContainerAdjacent.get_node("Gates/Down")
 	if(adjacent_gates == null):
@@ -979,45 +1011,68 @@ func _on_AreaDown_area_entered(area):
 		return
 	var trigger_width = 1
 	is_moving = false
-	#global_position.y = levelContainerAdjacent.global_position.y - levelContainerAdjacent.map_size_px.y
-	var pos_x_diff = (levelContainerAdjacent.global_position.x - global_position.x)
+	
+	var pos_x_start = global_position.x
+	var pos_x_end = global_position.x + map_size_px.x
+	var pos_x_start_2 = levelContainerAdjacent.global_position.x
+	var pos_x_end_2 = levelContainerAdjacent.global_position.x + levelContainerAdjacent.map_size_px.x
+	
+	var first_diff = pos_x_start_2 - pos_x_start
+	var last_diff = pos_x_end_2 - pos_x_end
 
 	#Put gates on this levelContainer
 	var gate_node = gate_obj_t.instance()
-	gate_node.side_offset = int(pos_x_diff)
-	gate_node.to_level_id = levelContainerAdjacent.cur_level_ind
+	gate_node.side_offset = int(first_diff)
+	gate_node.to_level_id = cur_level_ind
 	gate_node.side_id = 3
-	gate_node.position.y = levelContainerAdjacent.map_size_px.y-trigger_width
 	gate_node.get_node("Sprite").rotation_degrees = -90
-	if(pos_x_diff > 0):
-		gate_node.triggerAABB = [pos_x_diff, 0, map_size_px.x, trigger_width]
-		gate_node.get_node("Sprite").position.x = (map_size_px.x+pos_x_diff)/2
+	gate_node.position.y = (map_size_px.y-trigger_width)
+	
+	if(first_diff > 0):
+		if(last_diff > 0):
+			last_diff = 0
+		var gate_size = map_size_px.x - first_diff + last_diff
+		gate_node.position.x = first_diff
+		gate_node.triggerAABB = [0, 0, gate_size, trigger_width]
+		gate_node.get_node("Sprite").position.x = (gate_size/2)
 	else:
-		gate_node.triggerAABB = [0, 0, map_size_px.x+pos_x_diff, trigger_width]
-		gate_node.get_node("Sprite").position.x = (map_size_px.x+pos_x_diff)/2
+		first_diff = 0
+		if(last_diff > 0):
+			last_diff = 0
+		var gate_size = map_size_px.x - first_diff + last_diff
+		gate_node.position.x = first_diff
+		gate_node.triggerAABB = [0, 0, gate_size, trigger_width]
+		gate_node.get_node("Sprite").position.x = (gate_size/2)
 	$Gates/Down.add_child(gate_node)
 	var gate_inst_dict = singleton.add_gateInstance(cur_level_ind, gate_node)
 	gate_node.inst_id = gate_inst_dict["instId"]
 	
 	#Put gates on adjacent levelContainer
 	
-	var pos_x_diff_mirr = (global_position.x-levelContainerAdjacent.global_position.x)
-	#var size_y_diff_mirr = ((levelContainerAdjacent.global_position.y+levelContainerAdjacent.map_size_px.y) - (global_position.y + map_size_px.y))
-	
+	var first_diff_mirr = pos_x_start - pos_x_start_2
+	var last_diff_mirr = pos_x_end - pos_x_end_2 
+
+	#Put gates on this levelContainer
 	var gate_node_adjacent = gate_obj_t.instance()
-	gate_node_adjacent.side_offset = int(pos_x_diff_mirr)
-	gate_node_adjacent.to_level_id = cur_level_ind
+	gate_node_adjacent.side_offset = int(first_diff_mirr)
+	gate_node_adjacent.to_level_id = levelContainerAdjacent.cur_level_ind
 	gate_node_adjacent.side_id = 2
 	gate_node_adjacent.get_node("Sprite").rotation_degrees = 90
-	
-	if(pos_x_diff_mirr > 0):
-		gate_node_adjacent.triggerAABB = [pos_x_diff_mirr, 0, map_size_px.x, trigger_width]
-		gate_node_adjacent.get_node("Sprite").position.x = (map_size_px.x+pos_x_diff_mirr)/2
+	if(first_diff_mirr > 0):
+		if(last_diff_mirr > 0):
+			last_diff_mirr = 0
+		var gate_size = levelContainerAdjacent.map_size_px.x - first_diff_mirr + last_diff_mirr
+		gate_node_adjacent.position.x = first_diff_mirr
+		gate_node_adjacent.triggerAABB = [0, 0, gate_size, trigger_width]
+		gate_node_adjacent.get_node("Sprite").position.x = (gate_size/2)
 	else:
-		gate_node_adjacent.triggerAABB = [0, 0, levelContainerAdjacent.map_size_px.x+pos_x_diff_mirr, trigger_width]
-		gate_node_adjacent.get_node("Sprite").position.x = (map_size_px.x+pos_x_diff_mirr)/2
-		#gate_node_adjacent.triggerAABB = [0, 0, trigger_width, levelContainerAdjacent.map_size_px.y+pos_x_diff_mirr]
-		#gate_node_adjacent.get_node("Sprite").position.y = (map_size_px.y+pos_x_diff_mirr)/2
+		first_diff_mirr = 0
+		if(last_diff_mirr > 0):
+			last_diff_mirr = 0
+		var gate_size = levelContainerAdjacent.map_size_px.x - first_diff_mirr + last_diff_mirr
+		gate_node_adjacent.position.x = first_diff_mirr
+		gate_node_adjacent.triggerAABB = [0, 0, gate_size, trigger_width]
+		gate_node_adjacent.get_node("Sprite").position.x = (gate_size/2)
 	
 	var adjacent_gates = levelContainerAdjacent.get_node("Gates/Up")
 	if(adjacent_gates == null):

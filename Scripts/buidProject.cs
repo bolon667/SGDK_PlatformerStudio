@@ -92,14 +92,20 @@ public class buidProject : Node
 
 	private void typesH_CodeReplacer()
 	{
+		GD.Print("typesH_CodeReplacer running...");
 		Node singleton = (Node)GetNode("/root/singleton");
-		Godot.Collections.Array mergedFieldDef_arr = (Godot.Collections.Array)singleton.Call("get_merged_fieldDef");
+		
 
 		String typesH_path = engineRootPath + "/build/inc/types.h";
-		GD.Print("TEST: ", typesH_path);
 		String typesCode = System.IO.File.ReadAllText(typesH_path);
-		String mergedStructCode = genMergedStructCode(mergedFieldDef_arr);
+		//Adding merged struct for entity
+		Godot.Collections.Array mergedFieldDef_arr = (Godot.Collections.Array)singleton.Call("get_merged_fieldDef", "entities");
+		String mergedStructCode = genMergedStructCode_entity(mergedFieldDef_arr);
 		typesCode = typesCode.Replace("//$entityMergedStruct$", mergedStructCode);
+		//Adding merged struct for bullets
+		mergedFieldDef_arr = (Godot.Collections.Array)singleton.Call("get_merged_fieldDef", "bulletEntities");
+		mergedStructCode = genMergedStructCode_bullet(mergedFieldDef_arr);
+		typesCode = typesCode.Replace("//$entityBulletMergedStruct$", mergedStructCode);
 
 		int cellSize = (int)singleton.Call("get_cell_size");
 		GD.Print($"Got cell_size {cellSize}");
@@ -120,16 +126,97 @@ public class buidProject : Node
 		GD.Print("types.h code replaced");
 	}
 
-	private String genDefaultEntityConstCode()
+	private String genDefaultEntityConstCode_bullet()
 	{
 		//Godot.Collections.Array mergedFieldDef_arr
 		String result = "";
 		Node singleton = (Node)GetNode("/root/singleton");
-		Dictionary mergedFieldDefs2 = (Dictionary)singleton.Call("get_merged_fieldDefs_v2");
+		Dictionary mergedFieldDefs2 = (Dictionary)singleton.Call("get_merged_fieldDefs_v2", "bulletEntities");
 		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
-		Godot.Collections.Array entityDefs = (Godot.Collections.Array)singleton.Call("get_entity_defs");
+		Godot.Collections.Array entityDefs = (Godot.Collections.Array)singleton.Call("get_entity_defs", "bulletEntities");
 		//Godot.Collections.Array entityNames = (Godot.Collections.Array)singleton.Call("get_entity_names");
-		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict");
+		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict", "bulletEntities");
+		String entityType = "EntityBulletMerged";
+		
+		foreach (Dictionary entityDef in entityDefs)
+		{
+			String entityName = (String)entityDef["identifier"];
+			//Add entity default const
+			result += $"const {entityType} const {entityName}_default = {{";
+			//Predefined values for const
+			result += $"{mergedIdsDict[entityName]}, "; //entityType
+			result += "FALSE, "; //alive
+			result += "FALSE, "; //preDeath
+			result += "{0,0}, "; //posInt
+			result += "{0,0}, "; //pos
+			result += "{0,0}, "; //spd
+			result += "{0,0}, "; //size
+			result += "FALSE, "; //onScreen
+			result += "{0,0,8,8}, "; //aabb
+			result += "NULL, "; //spr
+			if (showTriggerRects)
+			{
+				result += "NULL, "; //debugSpr1
+				result += "NULL, "; //debugSpr2
+			}
+			foreach (Godot.Collections.Dictionary field in (Godot.Collections.Array)mergedFieldDefs2[entityName])
+			{
+				if (!(bool)field["hasStruct"])
+				{
+					continue;
+				}
+				String fieldVal = (String)field["defaultValue"];
+				result += $"{fieldVal}, ";
+			}
+			result += "};\n";
+			//No trigger for bullet
+			/*
+			//Add entity_trigger default const
+			if ((bool)entityDef["addTrigger"])
+			{
+				String triggerType = "0";
+				if (entityDef.Contains("triggerTypeName"))
+				{
+					if (entityDef["triggerTypeName"].ToString().Length > 0)
+					{
+						triggerType = "TRIGGER_TYPE_" + entityDef["triggerTypeName"].ToString();
+					}
+				}
+				Godot.Collections.Array aabb = (Godot.Collections.Array)entityDef["triggerAABB"];
+				String triggerValue = entityDef["triggerValue"].ToString();
+				String triggerValue2 = entityDef["triggerValue2"].ToString();
+				String triggerValue3 = entityDef["triggerValue3"].ToString();
+
+				result += $"const Trigger const {entityName}_defaultTrigger = {{";
+				result += "FALSE, "; //alive
+				result += "{0, 0}, "; //pos
+				result += "{" + aabb[0].ToString() + ", " + aabb[1].ToString() + ", " + aabb[2].ToString() + ", " + aabb[3].ToString() + "}, "; //rect
+				result += $"{triggerType}, "; //type
+				result += $"{triggerValue}, "; //val1
+				result += $"{triggerValue2}, "; //val2
+				result += $"{triggerValue3}, "; //val3
+				result += "1, "; //triggerHp
+
+
+				result += "};\n";
+			}
+			*/
+
+
+		}
+		return result;
+	}
+
+	private String genDefaultEntityConstCode_entity()
+	{
+		//Godot.Collections.Array mergedFieldDef_arr
+		String result = "";
+		Node singleton = (Node)GetNode("/root/singleton");
+		Dictionary mergedFieldDefs2 = (Dictionary)singleton.Call("get_merged_fieldDefs_v2", "entities");
+		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
+		Godot.Collections.Array entityDefs = (Godot.Collections.Array)singleton.Call("get_entity_defs", "entities");
+		//Godot.Collections.Array entityNames = (Godot.Collections.Array)singleton.Call("get_entity_names");
+		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict", "entities");
 		String entityType = "EntityMerged";
 		foreach (Dictionary entityDef in entityDefs)
 		{
@@ -142,7 +229,7 @@ public class buidProject : Node
 			result += "{0,0}, "; //posInt
 			result += "{0,0}, "; //pos
 			result += "{0,0}, "; //spd
-			result += "{0,0}, "; //size
+			result += "{" + entityDef["width"].ToString() + ", " + entityDef["height"].ToString() + "}, "; //size
 			result += "FALSE, "; //onScreen
 			result += "NULL, "; //trigger
 			result += "0, "; //triggerInd
@@ -197,7 +284,7 @@ public class buidProject : Node
 		return result;
 	}
 
-	private String genMergedStructCode(Godot.Collections.Array mergedFieldDef_arr)
+	private String genMergedStructCode_bullet(Godot.Collections.Array mergedFieldDef_arr)
 	{
 		Node singleton = (Node)GetNode("/root/singleton");
 		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
@@ -207,6 +294,51 @@ public class buidProject : Node
 		//Predefined strct vars
 
 		result += "  u16 entityType;\n";
+		result += "  bool alive;\n";
+		result += "  bool preDeath;\n";
+		result += "  Vect2D_s16 posInt;\n";
+		result += "  Vect2D_f32 pos;\n";
+		result += "  Vect2D_f16 spd;\n";
+		result += "  Vect2D_s16 size;\n";
+		result += "  bool onScreen;\n";
+		result += "  AABB aabb;\n";
+		result += "  Sprite* spr;\n";
+
+		if (showTriggerRects)
+		{
+			result += "  Sprite* debugSpr1;\n";
+			result += "  Sprite* debugSpr2;\n";
+		}
+
+		foreach (Godot.Collections.Dictionary field in mergedFieldDef_arr)
+		{
+			if (!(bool)field["hasStruct"])
+			{
+				continue;
+			}
+			String fieldName = (String)field["identifier"];
+			String fieldType = (String)field["inCodeType"];
+			result += $"  {fieldType} {fieldName};\n";
+
+		}
+
+
+		result += "} EntityBulletMerged;\n";
+
+		return result;
+	}
+
+	private String genMergedStructCode_entity(Godot.Collections.Array mergedFieldDef_arr)
+	{
+		Node singleton = (Node)GetNode("/root/singleton");
+		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
+
+
+		String result = "typedef struct {\n";
+		//Predefined strct vars
+
+		result += "  u16 entityType;\n";
+		result += "  u16 instId;\n";
 		result += "  bool alive;\n";
 		result += "  Vect2D_s16 posInt;\n";
 		result += "  Vect2D_f32 pos;\n";
@@ -261,7 +393,8 @@ public class buidProject : Node
 		{
 			makeNewProjectFromTemplate();
 
-			copyRes();
+			//No need for that, because i changed bgRelPath logic. Now it's no need to copy files, just use existent. Idk, why i didn't done that way in the first place. 
+			//copyRes();
 			
 			codeReplacer();
 			applyMods();
@@ -509,9 +642,12 @@ public class buidProject : Node
 	{
 		String entityHandlerC_path = engineRootPath + "/build/src/entityHandler.c";
 		String entityHandlerCode = System.IO.File.ReadAllText(entityHandlerC_path);
-		entityHandlerCode = entityHandlerCode.Replace("//$entityDefaultConsts$", genDefaultEntityConstCode());
-		entityHandlerCode = entityHandlerCode.Replace("//$showEntityFuncs$", genShowEntityCodeAll());
-		entityHandlerCode = entityHandlerCode.Replace("//$addNewEntityFuncs$", genAddNewEntityCodeAll());
+		entityHandlerCode = entityHandlerCode.Replace("//$entityDefaultConsts$", genDefaultEntityConstCode_entity());
+		entityHandlerCode = entityHandlerCode.Replace("//$entityBulletDefaultConsts$", genDefaultEntityConstCode_bullet()); ;
+		entityHandlerCode = entityHandlerCode.Replace("//$showEntityFuncs$", genShowEntityCodeAll_entity());
+		entityHandlerCode = entityHandlerCode.Replace("//$showEntityBulletFuncs$", genShowEntityCodeAll_bullet());
+		entityHandlerCode = entityHandlerCode.Replace("//$addNewEntityFuncs$", genAddNewEntityCodeAll_entity());
+		entityHandlerCode = entityHandlerCode.Replace("//$addNewEntityBulletFuncs$", genAddNewEntityCodeAll_bullet());
 		entityHandlerCode = entityHandlerCode.Replace("//$triggerTypeFuncs$", genTriggerTypeCodeAll());
 		
 		System.IO.File.WriteAllText(entityHandlerC_path, entityHandlerCode);
@@ -544,11 +680,59 @@ public class buidProject : Node
 		return result;
 	}
 
-	private String genAddNewEntityCodeAll()
+	private String genAddNewEntityCodeAll_bullet()
 	{
 		String result = "";
 		Node singleton = (Node)GetNode("/root/singleton");
-		Godot.Collections.Array entityDefs = (Godot.Collections.Array)singleton.Call("get_entity_defs");
+		Godot.Collections.Array entityDefs = (Godot.Collections.Array)singleton.Call("get_entity_defs", "bulletEntities");
+		//Godot.Collections.Array entityNames = (Godot.Collections.Array)singleton.Call("get_entity_names");
+		//Generating funcs
+		foreach (Dictionary entityDef in entityDefs)
+		{
+			String entityName = (String)entityDef["identifier"];
+			bool entityAddTrigger = (bool)entityDef["addTrigger"];
+			//GD.Print("HI ", entityName, " THERE ", entityAddTrigger);
+			String defaultEntityCodePath = engineRootPath + "/code_template/addNewEntityBullet/addNewDefault.c";
+			String defaultAddEntityTriggerPath = engineRootPath + "/code_template/addNewEntityBullet/addNewDefaultTrigger.c";
+			String checkPath = engineRootPath + "/code_template/addNewEntityBullet/addNew" + entityName + ".c";
+			if (System.IO.File.Exists(checkPath))
+			{
+				String insertData = System.IO.File.ReadAllText(checkPath);
+				insertData = insertData.Replace("$entityName$", entityName);
+				insertData = insertData.Replace("$entityType$", "EntityBulletMerged");
+
+				result += insertData + "\n";
+			}
+			else
+			{
+				String insertData;
+
+				if (entityAddTrigger)
+				{
+					insertData = System.IO.File.ReadAllText(defaultAddEntityTriggerPath);
+				} else
+				{
+					insertData = System.IO.File.ReadAllText(defaultEntityCodePath);
+				}
+		
+				insertData = insertData.Replace("$entityName$", entityName);
+				insertData = insertData.Replace("$entityType$", "EntityBulletMerged");
+
+				System.IO.File.WriteAllText(checkPath, insertData);
+				result += insertData + "\n";
+			}
+		}
+
+		return result;
+	}
+
+
+
+	private String genAddNewEntityCodeAll_entity()
+	{
+		String result = "";
+		Node singleton = (Node)GetNode("/root/singleton");
+		Godot.Collections.Array entityDefs = (Godot.Collections.Array)singleton.Call("get_entity_defs", "entities");
 		//Godot.Collections.Array entityNames = (Godot.Collections.Array)singleton.Call("get_entity_names");
 		//Generating funcs
 		foreach (Dictionary entityDef in entityDefs)
@@ -562,12 +746,6 @@ public class buidProject : Node
 			if (System.IO.File.Exists(checkPath))
 			{
 				String insertData = System.IO.File.ReadAllText(checkPath);
-				if (entityAddTrigger)
-				{
-
-					String addTriggerCode = System.IO.File.ReadAllText(defaultAddEntityTriggerPath);
-					insertData = insertData.Replace("//$addNewTrigger$", addTriggerCode);
-				}
 				insertData = insertData.Replace("$entityName$", entityName);
 				insertData = insertData.Replace("$entityType$", "EntityMerged");
 				
@@ -575,13 +753,17 @@ public class buidProject : Node
 			}
 			else
 			{
-				String insertData = System.IO.File.ReadAllText(defaultEntityCodePath);
+				String insertData;
+
 				if (entityAddTrigger)
 				{
-					
-					String addTriggerCode = System.IO.File.ReadAllText(defaultAddEntityTriggerPath);
-					insertData = insertData.Replace("//$addNewTrigger$", addTriggerCode);
+					insertData = System.IO.File.ReadAllText(defaultAddEntityTriggerPath);
 				}
+				else
+				{
+					insertData = System.IO.File.ReadAllText(defaultEntityCodePath);
+				}
+
 				insertData = insertData.Replace("$entityName$", entityName);
 				insertData = insertData.Replace("$entityType$", "EntityMerged");
 				
@@ -593,12 +775,12 @@ public class buidProject : Node
 		return result;
 	}
 
-	private String genShowEntityCodeAll()
+	private String genShowEntityCodeAll_entity()
 	{
 		String result = "";
 		Node singleton = (Node)GetNode("/root/singleton");
 		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
-		Godot.Collections.Array entityNames = (Godot.Collections.Array)singleton.Call("get_entity_names");
+		Godot.Collections.Array entityNames = (Godot.Collections.Array)singleton.Call("get_entity_names", "entities");
 		//Generating funcs
 		foreach(String entityName in entityNames)
 		{
@@ -635,6 +817,57 @@ public class buidProject : Node
 
 		//Putting this funcs in arr
 		result += "void(* showEntityFuncArr[])(EntityMerged*) = {";
+		foreach (String entityName in entityNames)
+		{
+			result += "show" + entityName + ", ";
+		}
+		result += "};\n";
+		return result;
+	}
+
+	private String genShowEntityCodeAll_bullet()
+	{
+		String result = "";
+		Node singleton = (Node)GetNode("/root/singleton");
+		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
+		Godot.Collections.Array entityNames = (Godot.Collections.Array)singleton.Call("get_entity_names", "bulletEntities");
+		//Generating funcs
+		foreach (String entityName in entityNames)
+		{
+			String defaultEntityCodePath = engineRootPath + "/code_template/showEntityBullet/showDefault.c";
+			String checkPath = engineRootPath + "/code_template/showEntityBullet/show" + entityName + ".c";
+			if (System.IO.File.Exists(checkPath))
+			{
+				String insertData = System.IO.File.ReadAllText(checkPath);
+				insertData = insertData.Replace("$entityName$", entityName);
+				insertData = insertData.Replace("$entityType$", "EntityBulletMerged");
+				if (showTriggerRects)
+				{
+					String releaseSpriteCode = "if(entity->debugSpr1) SPR_releaseSprite(entity->debugSpr1);\n" +
+						"if(entity->debugSpr2) SPR_releaseSprite(entity->debugSpr2);\n";
+					insertData = insertData.Replace("//$showTriggerRects_releaseSprite$", releaseSpriteCode);
+					String addSpriteCode = "entity->debugSpr1 = SPR_addSprite(&spr_debugLeftTopCorner, posX_OnCam, posY_OnCam, TILE_ATTR(PAL3, 11, FALSE, FALSE));\n" +
+						"entity->debugSpr2 = SPR_addSprite(&spr_debugRightBottom, posX_OnCam, posY_OnCam, TILE_ATTR(PAL3, 11, FALSE, FALSE));\n";
+					insertData = insertData.Replace("//$showTriggerRects_addSprite$", addSpriteCode);
+					String moveSpriteCode = "if(entity->debugSpr1) SPR_setPosition(entity->debugSpr1, (entity->posInt.x-cameraPosition.x)+entity->aabb.min.x, (entity->posInt.y-cameraPosition.y)+entity->aabb.min.y);\n" +
+						"if(entity->debugSpr2) SPR_setPosition(entity->debugSpr2, (entity->posInt.x-cameraPosition.x)+entity->aabb.max.x-8, (entity->posInt.y-cameraPosition.y)+entity->aabb.max.y-8);\n";
+					insertData = insertData.Replace("//$showTriggerRects_moveSprite$", moveSpriteCode);
+
+				}
+				result += insertData + "\n";
+			}
+			else
+			{
+				String insertData = System.IO.File.ReadAllText(defaultEntityCodePath);
+				insertData = insertData.Replace("$entityName$", entityName);
+				insertData = insertData.Replace("$entityType$", "EntityBulletMerged");
+				System.IO.File.WriteAllText(checkPath, insertData);
+				result += insertData + "\n";
+			}
+		}
+
+		//Putting this funcs in arr
+		result += "void(* showEntityBulletFuncArr[])(EntityBulletMerged*) = {";
 		foreach (String entityName in entityNames)
 		{
 			result += "show" + entityName + ", ";
@@ -721,6 +954,47 @@ public class buidProject : Node
 		String beforeLevelScriptName = "NULL";
 		String everyFrameScriptName = "emptyScript";
 		String afterLevelScriptName = "NULL";
+		String pal0Name = "NULL";
+		String pal1Name = "NULL";
+		String pal2Name = "NULL";
+		String pal3Name = "NULL";
+
+		
+		if (levelDict.Contains("pal0SpriteName"))
+		{
+			String temp = (String)levelDict["pal0SpriteName"];
+			if (temp.Length > 0)
+			{
+				pal0Name = $"&pal_{temp}";
+			}
+		}
+
+		if (levelDict.Contains("pal1SpriteName"))
+		{
+			String temp = (String)levelDict["pal1SpriteName"];
+			if (temp.Length > 0)
+			{
+				pal1Name = $"&pal_{temp}";
+			}
+		}
+
+		if (levelDict.Contains("pal2SpriteName"))
+		{
+			String temp = (String)levelDict["pal2SpriteName"];
+			if (temp.Length > 0)
+			{
+				pal2Name = $"&pal_{temp}";
+			}
+		}
+
+		if (levelDict.Contains("pal3SpriteName"))
+		{
+			String temp = (String)levelDict["pal3SpriteName"];
+			if (temp.Length > 0)
+			{
+				pal3Name = $"&pal_{temp}";
+			}
+		}
 
 		if (levelDict.Contains("beforeLevelScript"))
 		{
@@ -804,7 +1078,7 @@ public class buidProject : Node
 
 		String levelCode = $"const Level const lvl_Level_{curLevel.ToString()} = {{{bgaMapResName}, {bgbMapResName}, {bgaTilesetResName}, {bgbTilesetResName}, {bgaPalResName}, {bgbPalResName}," +
 			$" {bgaImageName}, {bgbImageName}, {posArrText}, {posAmountText}, {collMapName}, {levelSizePxText}, {levelSizeTilesText}, {musicName}, {beforeLevelScriptName}, {everyFrameScriptName}," +
-			$" {afterLevelScriptName}}};\n";
+			$" {afterLevelScriptName}, {pal0Name}, {pal1Name}, {pal2Name}, {pal3Name},}};\n";
 		return levelCode;
 	}
 
@@ -891,11 +1165,11 @@ public class buidProject : Node
 		GD.Print("Gen EntityMerged Code...");
 		Node singleton = (Node)GetNode("/root/singleton");
 		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
-		Godot.Collections.Array mergedFieldDef_arr = (Godot.Collections.Array)singleton.Call("get_merged_fieldDef");
+		Godot.Collections.Array mergedFieldDef_arr = (Godot.Collections.Array)singleton.Call("get_merged_fieldDef", "entities");
 		//GD.Print(1);
 		String result = "";;
 		//Getting "entity_name: mergedId" pairs
-		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict");
+		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict", "entities");
 		//Getting entityInstances in curLevel
 		Godot.Collections.Array entityInstances = (Godot.Collections.Array)singleton.Call("get_entityInstances_by_levelNum", curLevel);
 		//Adding gates
@@ -931,6 +1205,9 @@ public class buidProject : Node
 			//Studio crashes if you don't do proper conversion.
 			height = (int)int.Parse(entityInst["height"].ToString());
 
+			int instId = 0;
+			instId = (int)int.Parse(entityInst["instId"].ToString());
+
 			int[] spd = { 0, 0 };
 
 			//Opening entityMerged block
@@ -956,6 +1233,7 @@ public class buidProject : Node
 			**********************************/
 
 			result += $"{mergedId.ToString()},"; //mergedId
+			result += $"{instId.ToString()},"; //instId
 			result += $" TRUE, "; //alive 
 			result += "{" + pos[0].ToString() + ", " + pos[1].ToString() + "}, "; //posInt
 			result += "{FIX32(" + pos[0].ToString() + "), FIX32(" + pos[1].ToString() + ")}, "; //pos

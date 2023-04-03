@@ -129,7 +129,7 @@ margin_bottom = 212.0
 alignment = 1
 
 [node name="Logo" type="TextureRect" parent="VBoxContainer/logohbox"]
-margin_right = 674.0
+margin_right = 641.0
 margin_bottom = 212.0
 rect_min_size = Vector2( 0, 212 )
 size_flags_horizontal = 3
@@ -139,14 +139,14 @@ expand = true
 stretch_mode = 6
 
 [node name="versionLabel" type="Label" parent="VBoxContainer/logohbox"]
-margin_left = 678.0
+margin_left = 645.0
 margin_top = 70.0
 margin_right = 984.0
 margin_bottom = 142.0
 custom_colors/font_color = Color( 0, 0, 0, 1 )
 custom_constants/shadow_offset_x = 10
 custom_fonts/font = SubResource( 13 )
-text = "v1.0 alpha"
+text = "version 123"
 
 [node name="ContainerButtons" type="HBoxContainer" parent="VBoxContainer"]
 margin_top = 216.0

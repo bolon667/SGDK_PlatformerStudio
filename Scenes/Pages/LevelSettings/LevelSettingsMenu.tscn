@@ -44,189 +44,363 @@ margin_bottom = 50.0
 rect_min_size = Vector2( 50, 50 )
 text = "  X  "
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VBoxContainer"]
 margin_top = 54.0
 margin_right = 1024.0
 margin_bottom = 600.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="VBoxChooseEntity" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer"]
+margin_right = 1024.0
+margin_bottom = 546.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxChooseEntity" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer"]
 margin_right = 1024.0
 margin_bottom = 546.0
 rect_min_size = Vector2( 200, 0 )
 size_flags_horizontal = 3
 
-[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity"]
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity"]
 margin_right = 1024.0
 margin_bottom = 546.0
 size_flags_vertical = 3
 scroll_horizontal_enabled = false
 
-[node name="SettingsContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer"]
+[node name="SettingsContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer"]
 margin_right = 1024.0
 margin_bottom = 546.0
 rect_min_size = Vector2( 200, 200 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="beforeLevelScript" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
+[node name="beforeLevelScript" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
 margin_bottom = 64.0
 levelAttrName = "beforeLevelScript"
 
-[node name="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript" index="0"]
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript" index="0"]
 margin_right = 170.0
 margin_bottom = 42.0
 
-[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript" index="1"]
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript" index="1"]
 margin_left = 174.0
 margin_bottom = 64.0
 
-[node name="infoLabel" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript/VBoxContainer" index="0"]
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript/VBoxContainer" index="0"]
 margin_right = 850.0
 margin_bottom = 20.0
 
-[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript/VBoxContainer" index="1"]
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript/VBoxContainer" index="1"]
 margin_top = 24.0
 margin_right = 850.0
 margin_bottom = 64.0
 
-[node name="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="0"]
+[node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="0"]
 margin_right = 632.0
 
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="1"]
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="1"]
 margin_left = 636.0
 margin_right = 806.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="2"]
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="2"]
 margin_left = 810.0
 margin_right = 850.0
 
-[node name="FileDialog" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript" index="2"]
+[node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript" index="2"]
 filters = PoolStringArray( "*.c" )
 
-[node name="everyFrameScript" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
+[node name="everyFrameScript" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
 margin_top = 68.0
 margin_bottom = 132.0
 levelAttrName = "everyFrameScript"
 
-[node name="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript" index="0"]
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript" index="0"]
 margin_right = 168.0
 margin_bottom = 42.0
 text = "Every frame script: "
 
-[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript" index="1"]
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript" index="1"]
 margin_left = 172.0
 margin_bottom = 64.0
 
-[node name="infoLabel" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript/VBoxContainer" index="0"]
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript/VBoxContainer" index="0"]
 margin_right = 852.0
 margin_bottom = 20.0
 
-[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript/VBoxContainer" index="1"]
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript/VBoxContainer" index="1"]
 margin_top = 24.0
 margin_right = 852.0
 margin_bottom = 64.0
 
-[node name="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="0"]
+[node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="0"]
 margin_right = 634.0
 
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="1"]
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="1"]
 margin_left = 638.0
 margin_right = 808.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="2"]
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="2"]
 margin_left = 812.0
 margin_right = 852.0
 
-[node name="FileDialog" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript" index="2"]
+[node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript" index="2"]
 margin_left = 612.0
 margin_right = 1012.0
 filters = PoolStringArray( "*.c" )
 
-[node name="afterLevelScript" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
+[node name="afterLevelScript" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
 margin_top = 136.0
 margin_bottom = 200.0
 levelAttrName = "afterLevelScript"
 
-[node name="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript" index="0"]
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript" index="0"]
 margin_right = 157.0
 margin_bottom = 42.0
 text = "After level script: "
 
-[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript" index="1"]
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript" index="1"]
 margin_left = 161.0
 margin_bottom = 64.0
 
-[node name="infoLabel" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript/VBoxContainer" index="0"]
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript/VBoxContainer" index="0"]
 margin_right = 863.0
 margin_bottom = 20.0
 
-[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript/VBoxContainer" index="1"]
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript/VBoxContainer" index="1"]
 margin_top = 24.0
 margin_right = 863.0
 margin_bottom = 64.0
 
-[node name="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="0"]
+[node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="0"]
 margin_right = 645.0
 
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="1"]
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="1"]
 margin_left = 649.0
 margin_right = 819.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="2"]
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="2"]
 margin_left = 823.0
 margin_right = 863.0
 
-[node name="FileDialog" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript" index="2"]
+[node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript" index="2"]
 margin_left = 612.0
 margin_right = 1012.0
 filters = PoolStringArray( "*.c" )
 
-[node name="chooseMusic" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
+[node name="chooseMusic" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
 margin_top = 204.0
 margin_bottom = 268.0
 levelAttrName = "musicName"
 fileDialogLocalPath = "/build/res/music/"
 
-[node name="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic" index="0"]
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic" index="0"]
 margin_right = 127.0
 margin_bottom = 42.0
 text = "Change music: "
 
-[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic" index="1"]
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic" index="1"]
 margin_left = 131.0
 margin_bottom = 64.0
 
-[node name="infoLabel" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer" index="0"]
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer" index="0"]
 margin_right = 893.0
 margin_bottom = 20.0
 
-[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer" index="1"]
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer" index="1"]
 margin_top = 24.0
 margin_right = 893.0
 margin_bottom = 64.0
 
-[node name="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="0"]
+[node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="0"]
 margin_right = 675.0
 text = "Choose vgm"
 
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="1"]
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="1"]
 margin_left = 679.0
 margin_right = 849.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="2"]
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="2"]
 margin_left = 853.0
 margin_right = 893.0
 
-[node name="FileDialog" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic" index="2"]
+[node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic" index="2"]
 margin_left = 612.0
 margin_right = 1012.0
 filters = PoolStringArray( "*.vgm" )
 
+[node name="pal0" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
+margin_top = 272.0
+margin_bottom = 336.0
+levelAttrName = "pal0SpriteName"
+fileDialogLocalPath = "/build/res/palette/"
+
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal0" index="0"]
+margin_right = 110.0
+margin_bottom = 42.0
+text = "Change PAL0:"
+
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal0" index="1"]
+margin_left = 114.0
+margin_bottom = 64.0
+
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal0/VBoxContainer" index="0"]
+margin_right = 910.0
+margin_bottom = 20.0
+
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal0/VBoxContainer" index="1"]
+margin_top = 24.0
+margin_right = 910.0
+margin_bottom = 64.0
+
+[node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal0/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 692.0
+text = "Choose png"
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal0/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 696.0
+margin_right = 866.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal0/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 870.0
+margin_right = 910.0
+
+[node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal0" index="2"]
+margin_left = 612.0
+margin_right = 1012.0
+filters = PoolStringArray( "*.png", "*.pal", "*.bmp" )
+
+[node name="pal1" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
+margin_top = 340.0
+margin_bottom = 404.0
+levelAttrName = "pal1SpriteName"
+fileDialogLocalPath = "/build/res/palette/"
+
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal1" index="0"]
+margin_right = 106.0
+margin_bottom = 42.0
+text = "Change PAL1:"
+
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal1" index="1"]
+margin_left = 110.0
+margin_bottom = 64.0
+
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal1/VBoxContainer" index="0"]
+margin_right = 914.0
+margin_bottom = 20.0
+
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal1/VBoxContainer" index="1"]
+margin_top = 24.0
+margin_right = 914.0
+margin_bottom = 64.0
+
+[node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal1/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 696.0
+text = "Choose png"
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal1/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 700.0
+margin_right = 870.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal1/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 874.0
+margin_right = 914.0
+
+[node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal1" index="2"]
+margin_left = 612.0
+margin_right = 1012.0
+filters = PoolStringArray( "*.png", "*.bmp", "*.pal" )
+
+[node name="pal2" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
+margin_top = 408.0
+margin_bottom = 472.0
+levelAttrName = "pal2SpriteName"
+fileDialogLocalPath = "/build/res/palette/"
+
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal2" index="0"]
+margin_right = 110.0
+margin_bottom = 42.0
+text = "Change PAL2:"
+
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal2" index="1"]
+margin_left = 114.0
+margin_bottom = 64.0
+
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal2/VBoxContainer" index="0"]
+margin_right = 910.0
+margin_bottom = 20.0
+
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal2/VBoxContainer" index="1"]
+margin_top = 24.0
+margin_right = 910.0
+margin_bottom = 64.0
+
+[node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal2/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 692.0
+text = "Choose png"
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal2/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 696.0
+margin_right = 866.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal2/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 870.0
+margin_right = 910.0
+
+[node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal2" index="2"]
+margin_left = 612.0
+margin_right = 1012.0
+filters = PoolStringArray( "*.png", "*.bmp", "*.pal" )
+
+[node name="pal3" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
+margin_top = 476.0
+margin_bottom = 540.0
+levelAttrName = "pal3SpriteName"
+fileDialogLocalPath = "/build/res/palette/"
+
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal3" index="0"]
+margin_right = 109.0
+margin_bottom = 42.0
+text = "Change PAL3:"
+
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal3" index="1"]
+margin_left = 113.0
+margin_bottom = 64.0
+
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal3/VBoxContainer" index="0"]
+margin_right = 911.0
+margin_bottom = 20.0
+
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal3/VBoxContainer" index="1"]
+margin_top = 24.0
+margin_right = 911.0
+margin_bottom = 64.0
+
+[node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal3/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 693.0
+text = "Choose png"
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal3/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 697.0
+margin_right = 867.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal3/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 871.0
+margin_right = 911.0
+
+[node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal3" index="2"]
+margin_left = 612.0
+margin_right = 1012.0
+filters = PoolStringArray( "*.png", "*.bmp", "*.pal" )
+
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/HBoxContainer2/ExitBtn" to="." method="_on_ExitBtn_pressed"]
 
-[editable path="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript"]
-[editable path="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript"]
-[editable path="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript"]
-[editable path="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/beforeLevelScript"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/everyFrameScript"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/afterLevelScript"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/chooseMusic"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal0"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal1"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal2"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/pal3"]
