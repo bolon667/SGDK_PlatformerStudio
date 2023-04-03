@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/14-Slope45UpRight2.png-a5c29f38ca7522243da861c7c600b6b2.stex"
+path="res://.import/17.png-5a481e41f6b91add9784d23a8fce043b.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://StudioType/SGDK/Engines/platformer/code_template/collisionMapTypes/16x16/14-Slope45UpRight2.png"
-dest_files=[ "res://.import/14-Slope45UpRight2.png-a5c29f38ca7522243da861c7c600b6b2.stex" ]
+source_file="res://StudioType/SGDK/Engines/platformer/code_template/collisionMapTypes/16x16/17.png"
+dest_files=[ "res://.import/17.png-5a481e41f6b91add9784d23a8fce043b.stex" ]
 
 [params]
 

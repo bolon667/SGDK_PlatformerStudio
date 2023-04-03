@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/2.png-d738d909480036608c6ba11ec2b2c280.stex"
+path="res://.import/2.png-92b68a5ea6bc186ee509af30ccd1fb2b.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://TileSets/16x16/2.png"
-dest_files=[ "res://.import/2.png-d738d909480036608c6ba11ec2b2c280.stex" ]
+source_file="res://StudioType/SGDK/Engines/platformer/code_template/collisionMapTypes/16x16/2.png"
+dest_files=[ "res://.import/2.png-92b68a5ea6bc186ee509af30ccd1fb2b.stex" ]
 
 [params]
 

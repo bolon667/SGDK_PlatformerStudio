@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/2-Ladder.png-08f7342c199979dfb7026f95c0874b26.stex"
+path="res://.import/2-Ladder.png-2b1a34f94b52d56e92040fa4d84ef697.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://StudioType/SGDK/Engines/platformer/code_template/collisionMapTypes/16x16/2-Ladder.png"
-dest_files=[ "res://.import/2-Ladder.png-08f7342c199979dfb7026f95c0874b26.stex" ]
+source_file="res://StudioType/SGDK/Projects/PlatformerChallenge/code_template/collisionMapTypes/16x16/2-Ladder.png"
+dest_files=[ "res://.import/2-Ladder.png-2b1a34f94b52d56e92040fa4d84ef697.stex" ]
 
 [params]
 

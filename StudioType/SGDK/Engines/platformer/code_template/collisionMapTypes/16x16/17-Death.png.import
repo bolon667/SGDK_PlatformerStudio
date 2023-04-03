@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/17-Death.png-7725f3edaf3bdffcc6f790e1c309b9d5.stex"
+path="res://.import/17-Death.png-2574d66793202e80f2ad8c15008bd430.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://StudioType/SGDK/Engines/platformer/code_template/collisionMapTypes/16x16/17-Death.png"
-dest_files=[ "res://.import/17-Death.png-7725f3edaf3bdffcc6f790e1c309b9d5.stex" ]
+source_file="res://StudioType/SGDK/Projects/PlatformerChallenge/code_template/collisionMapTypes/16x16/17-Death.png"
+dest_files=[ "res://.import/17-Death.png-2574d66793202e80f2ad8c15008bd430.stex" ]
 
 [params]
 
