@@ -51,7 +51,7 @@ var entity_types = {
 		"app": "Platformer Studio For SGDK",
 		"doc": "???",
 		"appAuthor": "bolon667",
-		"appVersion": "1.3 alpha",
+		"appVersion": "1.4 alpha",
 		"url": "https://github.com/bolon667/SGDK_PlatformerStudio",
 	},
 	"jsonVersion": "1.0.0",
