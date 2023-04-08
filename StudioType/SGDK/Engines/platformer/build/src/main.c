@@ -31,11 +31,13 @@ int main(bool resetType) {
 	while (TRUE) {
 		//First we update all the things that have to be updated each frame
 		
+		
 		updatePlayer();
 		updateCamera();
 		
 
 		showEntityAll();
+		
 
 		//Update the player animations
 		updateAnimations();
@@ -44,6 +46,7 @@ int main(bool resetType) {
 		SPR_update();
 		SYS_doVBlankProcess();
 		(*curLvlData->everyFrameFunc)();
+		//$chunkLoadFunc$
 	}
 
 	return 0;

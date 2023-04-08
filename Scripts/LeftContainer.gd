@@ -10,7 +10,7 @@ onready var msg_packs_menu_t = preload("res://Scenes/Pages/MessagePack/MessagePa
 onready var level_settings_menu_t = preload("res://Scenes/Pages/LevelSettings/LevelSettingsMenu.tscn")
 onready var project_settings_menu_t = preload("res://Scenes/Pages/ProjectSettings/ProjectSettingsMenu.tscn")
 onready var layer_button_t = preload("res://Scenes/LayerButton.tscn")
-
+onready var variables_menu_t = preload("res://Scenes/Pages/GlobalVariablesMenu/VariablesMenu.tscn")
 
 onready var entity_layer_value_btn_t = preload("res://Scenes/EntityLayerValueButton.tscn")
 
@@ -60,23 +60,15 @@ func _on_addNewEntityTypeBtn_button_down():
 	var inst = entity_menu_t.instance()
 	add_child(inst)
 
-
-
-func _on_msgPacksBtn_button_down():
-	var msg_packs_node = msg_packs_menu_t.instance()
-	add_child(msg_packs_node)
-
-
-func _on_lvlSettingsBtn_button_down():
-	var node = level_settings_menu_t.instance()
-	add_child(node)
-
-
 func _on_projectSettingsBtn_button_down():
 	var node = project_settings_menu_t.instance()
 	add_child(node)
 
-
 func _on_bulletDefinitionsBtn_button_down():
 	var node = bullet_menu_t.instance()
+	add_child(node)
+
+
+func _on_GlobalVariablesBtn_button_down():
+	var node = variables_menu_t.instance()
 	add_child(node)

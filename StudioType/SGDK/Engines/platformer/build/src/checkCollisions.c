@@ -462,6 +462,7 @@ void checkCollisions() {
 		}else {
 			playerBody.onStair = onStair;
 			playerBody.onGround = TRUE;
+			playerBody.curAmountOfJumps = playerBody.maxAmountOfJumps;
 			playerBody.climbingStair = FALSE;
 			currentCoyoteTime = coyoteTime;
 			playerBody.jumping = FALSE;

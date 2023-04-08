@@ -1,5 +1,8 @@
 #include "../inc/levels.h"
 #include "../inc/loadLevel.h"
+#include "../inc/deallocLevel.h"
+#include "../inc/allocLevel.h"
+
 
 #include "../inc/maps.h"
 #include "../inc/global.h"
@@ -23,72 +26,23 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 	SPR_reset();
 
 	//Deallocate prev entityData to avoid memory leak
-	MEM_free(curEntityAll->EntityBulletMerged_arr);
-	MEM_free(curEntityAll->EntityMerged_arr);
-	MEM_free(curEntityAll->Trigger_arr);
-	MEM_free(curEntityAll);
-
-	MEM_free(bga);
-	MEM_free(bgb);
+	deallocLevel();
+	allocLevel();
 
 	PAL_setColors(0, palette_black, 64, DMA);
 	SYS_doVBlankProcess();
 
 	VDPTilesFilled = TILE_USER_INDEX;
-	
-	//playerBody.globalPosition = getLevelStartPos();
-	curLvlData = LevelFull_arr[levelNum].lvl;
-	curMessagePacks = LevelFull_arr[levelNum].messagePacks;
 
+	
+	
 	if(curLvlData->beforeLevelFunc != NULL){
 		(*curLvlData->beforeLevelFunc)();
 	}
 
 	playerInit((Vect2D_s16)startPos);
-
-	//memcpy(&palette_full[16],  curLvlData->foregroundPallete->data, 16 * 2);
-
-	//duplicate entityAll
-	curEntityAll = MEM_alloc(sizeof(EntityAll));
-	memcpy(curEntityAll, LevelFull_arr[levelNum].entityAll_arr, sizeof(EntityAll));
-
-	//allocate Bullet for entityAll
-	curEntityAll->EntityBulletMerged_arr = MEM_alloc(sizeof(EntityBulletMerged)*LevelFull_arr[levelNum].entityAll_arr->EntityBulletMerged_size);
-
-	for(u16 i=0; i < curEntityAll->EntityBulletMerged_size; i++){
-		curEntityAll->EntityBulletMerged_arr[i].alive = FALSE;
-		curEntityAll->EntityBulletMerged_arr[i].entityType = FALSE;
-	}
-
-	//duplicate entityMerged_arr for entityAll
-	//and allocate additional slots
+	updateCamera();
 	
-	curEntityAll->EntityMerged_arr = MEM_alloc(sizeof(EntityMerged)*(LevelFull_arr[levelNum].entityAll_arr->EntityMerged_size+LevelFull_arr[levelNum].entityAll_arr->additionalEntityMergedSlots));
-	//Since i possibly can add additional slots, i need to clean this slots to avoid unexpected behavior.
-	for(u16 i=0; i < curEntityAll->EntityMerged_size+curEntityAll->additionalEntityMergedSlots; i++){
-		curEntityAll->EntityMerged_arr[i].alive = FALSE;
-		curEntityAll->EntityMerged_arr[i].entityType = FALSE;
-	}
-	//And then, put entity data for level
-	memcpy(curEntityAll->EntityMerged_arr, LevelFull_arr[levelNum].entityAll_arr->EntityMerged_arr, sizeof(EntityMerged)*LevelFull_arr[levelNum].entityAll_arr->EntityMerged_size);
-	//Data is now OK, changing the size
-	curEntityAll->EntityMerged_size += LevelFull_arr[levelNum].entityAll_arr->additionalEntityMergedSlots;
-	//duplicate Trigger_arr for entityAll
-	//and allocate additional slots for EntityMerged
-	curEntityAll->Trigger_arr = MEM_alloc(sizeof(Trigger)*(LevelFull_arr[levelNum].entityAll_arr->Trigger_size+LevelFull_arr[levelNum].entityAll_arr->additionalEntityMergedSlots));
-	//Since i possibly can add additional slots, i need to clean this slots to avoid unexpected behavior.
-	for(u16 i=0; i < curEntityAll->Trigger_size+curEntityAll->additionalEntityMergedSlots; i++){
-		curEntityAll->Trigger_arr[i].alive = FALSE;
-	}
-	//And then, put trigger data for level
-	memcpy(curEntityAll->Trigger_arr, LevelFull_arr[levelNum].entityAll_arr->Trigger_arr, sizeof(Trigger)*LevelFull_arr[levelNum].entityAll_arr->Trigger_size);
-	//Data is now OK, changing the size
-	curEntityAll->Trigger_size += curEntityAll->additionalEntityMergedSlots;
-
-	//update trigger reference in entityMerged_arr
-	for(u16 i=0 ; i < curEntityAll->EntityMerged_size; i++){
-		curEntityAll->EntityMerged_arr[i].trigger =  &curEntityAll->Trigger_arr[curEntityAll->EntityMerged_arr[i].triggerInd];
-	}
 	
 	
 	if(curLvlData->foregroundTileset != NULL){

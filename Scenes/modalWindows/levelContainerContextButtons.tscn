@@ -86,6 +86,24 @@ margin_right = 300.0
 margin_bottom = 26.0
 text = " X "
 
+[node name="MessagePacksBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
+margin_top = 120.0
+margin_right = 300.0
+margin_bottom = 146.0
+text = "Message Packs"
+
+[node name="LevelSettingsBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
+margin_top = 150.0
+margin_right = 300.0
+margin_bottom = 176.0
+text = "Level Settings"
+
+[node name="LocalVariablesBtn2" type="Button" parent="CanvasLayer/VBoxContainer"]
+margin_top = 180.0
+margin_right = 300.0
+margin_bottom = 206.0
+text = "Local Variables"
+
 [node name="CanvasLayer2" type="CanvasLayer" parent="."]
 
 [node name="LoadBGFile" type="FileDialog" parent="CanvasLayer2"]
@@ -106,4 +124,7 @@ filters = PoolStringArray( "*.png", "*.bmp" )
 [connection signal="item_selected" from="CanvasLayer/VBoxContainer/HBoxContainer2/loadImageOptionBgb" to="." method="_on_loadImageOptionBgb_item_selected"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/HBoxContainer2/ChangeBgbBtn" to="." method="_on_ChangeBgbBtn_pressed"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/HBoxContainer2/DeleteBgbBtn" to="." method="_on_DeleteBgbBtn_pressed"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/MessagePacksBtn" to="." method="_on_MessagePacksBtn_button_down"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/LevelSettingsBtn" to="." method="_on_LevelSettingsBtn_button_down"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/LocalVariablesBtn2" to="." method="_on_LocalVariablesBtn2_button_down"]
 [connection signal="file_selected" from="CanvasLayer2/LoadBGFile" to="." method="_on_LoadBGFile_file_selected"]

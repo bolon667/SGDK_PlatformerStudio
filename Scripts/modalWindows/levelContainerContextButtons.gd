@@ -7,8 +7,16 @@ var layer_id: int = 0
 var image_mode_bga: int = 0
 var image_mode_bgb: int = 0
 
+var leftContainer
+
+onready var msg_packs_menu_t = preload("res://Scenes/Pages/MessagePack/MessagePacksMenu.tscn")
+onready var level_settings_menu_t = preload("res://Scenes/Pages/LevelSettings/LevelSettingsMenu.tscn")
+onready var local_vars_menu_t = preload("res://Scenes/Pages/LocalVariablesMenu/VariablesMenu.tscn")
+
 func _ready():
 	singleton.in_modal_window = true
+	leftContainer = get_tree().get_nodes_in_group("levelContainer")[0]
+	$CanvasLayer/ColorRect.rect_size = $CanvasLayer/VBoxContainer.rect_size
 	init_pos()
 	load_image_modes()
 
@@ -98,3 +106,24 @@ func _on_DeleteBgaBtn_pressed():
 
 func _on_DeleteBgbBtn_pressed():
 	level_container.delete_bgb()
+
+
+func _on_MessagePacksBtn_button_down():
+	var node = msg_packs_menu_t.instance()
+	node.level_ind = level_container.cur_level_ind
+	leftContainer.add_child(node)
+	queue_free()
+
+
+func _on_LevelSettingsBtn_button_down():
+	var node = level_settings_menu_t.instance()
+	node.level_ind = level_container.cur_level_ind
+	leftContainer.add_child(node)
+	queue_free()
+
+
+func _on_LocalVariablesBtn2_button_down():
+	var node = local_vars_menu_t.instance()
+	node.level_ind = level_container.cur_level_ind
+	leftContainer.add_child(node)
+	queue_free()

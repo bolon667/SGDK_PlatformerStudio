@@ -89,9 +89,9 @@ text = "Snap entity to 8x8 grid"
 
 [node name="Button" type="Button" parent="CanvasLayer/VBoxContainer"]
 visible = false
-margin_top = 216.0
+margin_top = 60.0
 margin_right = 300.0
-margin_bottom = 236.0
+margin_bottom = 80.0
 text = "Test Button"
 
 [node name="ChangeTileMode" type="OptionButton" parent="CanvasLayer/VBoxContainer"]

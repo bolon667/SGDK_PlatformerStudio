@@ -30,7 +30,8 @@
 
 extern s16 backXScroll;
 extern s16 backYScroll;
-
+extern Vect2D_s16 curChunkPos;
+extern Vect2D_s16 prevChunkPos;
 extern const fix16 gravityScale;
 
 struct {
@@ -46,3 +47,5 @@ extern AABB roomSize;
 extern AABB playerBounds;
 
 extern u16 VDPTilesFilled;
+
+//$globalVariables$

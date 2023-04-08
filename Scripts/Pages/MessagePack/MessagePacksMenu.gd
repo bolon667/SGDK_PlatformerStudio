@@ -12,6 +12,8 @@ onready var messageTextEdit = $CanvasLayer/VBoxContainer/TextEditContainer/HBoxC
 # var b = "text"
 var messagePack_amount: int = 0
 var message_arr_len:int = 0
+
+var level_ind: int = 0
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
@@ -24,7 +26,7 @@ func clear_messagePacks():
 
 func load_messagePacks():
 	clear_messagePacks()
-	var message_pack_arr: Array = singleton.get_messagePack_arr()
+	var message_pack_arr: Array = singleton.get_messagePack_arr(level_ind)
 	for message_pack in message_pack_arr:
 		var msg_pack_name: String = message_pack["name"]
 		var msg_pack_node = msgPackBtn_t.instance()
@@ -52,7 +54,7 @@ func clear_messages():
 
 func load_messages():
 	clear_messages()
-	var message_pack_arr: Array = singleton.get_messagePack_arr()
+	var message_pack_arr: Array = singleton.get_messagePack_arr(level_ind)
 	if(len(message_pack_arr) == 0):
 		return
 	messagePackNameEdit.text = message_pack_arr[singleton.cur_messagePack_ind]["name"]

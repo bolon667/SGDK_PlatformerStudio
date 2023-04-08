@@ -34,6 +34,7 @@ typedef struct {
 	u8* collArr;
 	Vect2D_s16 sizeinPx;
 	Vect2D_s16 sizeinTiles;
+	Vect2D_s16 sizeinChunks;
 	u8* music;
 	void (*beforeLevelFunc)(void);
 	void (*everyFrameFunc)(void);
@@ -93,6 +94,24 @@ typedef struct {
 
 //$entityMergedStruct$
 
+//$variableMergedStruct$
+
+typedef struct
+{
+	u16 size;
+	EntityMerged* entityArr;
+} EntityMergedChunk;
+
+
+typedef struct {
+	u16 additionalEntityMergedSlots;
+    u16 EntityBulletMerged_size;
+	EntityBulletMerged* EntityBulletMerged_arr;
+	//$EntityMergedArrStruct$
+	u16 Trigger_size;
+	Trigger* Trigger_arr;
+} EntityAll;
+
 typedef struct {
 	u16 additionalEntityMergedSlots;
     u16 EntityBulletMerged_size;
@@ -101,12 +120,13 @@ typedef struct {
 	EntityMerged* EntityMerged_arr;
 	u16 Trigger_size;
 	Trigger* Trigger_arr;
-} EntityAll;
+} EntityAllPlayer;
 
 typedef struct {
     Level* lvl;
     EntityAll* entityAll_arr;
 	MessagePack* messagePacks;
+	LocalVariableMerged* variable_arr;
 } LevelFull;
 
 AABB newAABB(s16 x1, s16 x2, s16 y1, s16 y2);

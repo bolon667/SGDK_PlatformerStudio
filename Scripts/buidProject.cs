@@ -94,7 +94,7 @@ public class buidProject : Node
 	{
 		GD.Print("typesH_CodeReplacer running...");
 		Node singleton = (Node)GetNode("/root/singleton");
-		
+		int entityLoadMode = int.Parse(singleton.Call("get_entity_load_opt_mode").ToString());
 
 		String typesH_path = engineRootPath + "/build/inc/types.h";
 		String typesCode = System.IO.File.ReadAllText(typesH_path);
@@ -106,7 +106,12 @@ public class buidProject : Node
 		mergedFieldDef_arr = (Godot.Collections.Array)singleton.Call("get_merged_fieldDef", "bulletEntities");
 		mergedStructCode = genMergedStructCode_bullet(mergedFieldDef_arr);
 		typesCode = typesCode.Replace("//$entityBulletMergedStruct$", mergedStructCode);
+		//Addimg merged struct for variables on level
+		Godot.Collections.Array mergedVars_arr = (Godot.Collections.Array)singleton.Call("get_merged_varInst_levels");
+		String variableStructCode = genMergedStructCode_variable(mergedVars_arr);
+		typesCode = typesCode.Replace("//$variableMergedStruct$", variableStructCode);
 
+	
 		int cellSize = (int)singleton.Call("get_cell_size");
 		GD.Print($"Got cell_size {cellSize}");
 		int shiftVal = 3;
@@ -121,14 +126,94 @@ public class buidProject : Node
 
 		typesCode = typesCode.Replace("//$definesCode$", definesCode);
 
-		
+		//Changing entityMerged_arr to match entity load optimization
+
+		String toReplace;
+		switch (entityLoadMode)
+		{
+			case 0: //No opt
+				toReplace = "u16 EntityMerged_size;\nEntityMerged* EntityMerged_arr;\n";
+				typesCode = typesCode.Replace("//$EntityMergedArrStruct$", toReplace);
+				break;
+			case 1: //Chunk opt
+				toReplace = "u16 EntityMergedChunk_size;\nEntityMergedChunk* EntityMergedChunk_arr;\n";
+				typesCode = typesCode.Replace("//$EntityMergedArrStruct$", toReplace);
+				break;
+		}
+
 		System.IO.File.WriteAllText(typesH_path, typesCode);
 		GD.Print("types.h code replaced");
 	}
 
+	private void globalH_CodeReplacer()
+	{
+		GD.Print("globalH_CodeReplacer running...");
+		Node singleton = (Node)GetNode("/root/singleton");
+
+
+		String globalH_path = engineRootPath + "/build/inc/global.h";
+		String globalCode = System.IO.File.ReadAllText(globalH_path);
+		//Adding merged struct for entity
+		Godot.Collections.Array variables_arr = (Godot.Collections.Array)singleton.Call("get_global_variables");
+		String variablesCode = genGlobalVariablesCode_h(variables_arr);
+
+		globalCode = globalCode.Replace("//$globalVariables$", variablesCode);
+
+
+		System.IO.File.WriteAllText(globalH_path, globalCode);
+		GD.Print("global.h code replaced");
+	}
+
+	private void globalC_CodeReplacer()
+	{
+		GD.Print("globalC_CodeReplacer running...");
+		Node singleton = (Node)GetNode("/root/singleton");
+
+
+		String globalC_path = engineRootPath + "/build/src/global.c";
+		String globalCode = System.IO.File.ReadAllText(globalC_path);
+		//Adding merged struct for entity
+		Godot.Collections.Array variables_arr = (Godot.Collections.Array)singleton.Call("get_global_variables");
+		String variablesCode = genGlobalVariablesCode_c(variables_arr);
+
+		globalCode = globalCode.Replace("//$globalVariables$", variablesCode);
+
+
+		System.IO.File.WriteAllText(globalC_path, globalCode);
+		GD.Print("global.c code replaced");
+	}
+
+	private String genGlobalVariablesCode_c(Godot.Collections.Array variables_arr)
+	{
+		String result = "";
+		foreach (Godot.Collections.Dictionary varInst in variables_arr)
+		{
+			String value = varInst["value"].ToString();
+			result += varInst["type"].ToString() + " " + varInst["name"].ToString();
+
+			if (value.Length > 0)
+			{
+				result += " = " + value;
+			}
+			result += ";\n";
+
+		}
+		return result;
+	}
+
+	private String genGlobalVariablesCode_h(Godot.Collections.Array variables_arr)
+	{
+		String result = "";
+		foreach(Godot.Collections.Dictionary varInst in variables_arr)
+		{
+			result += "extern " + varInst["type"].ToString() + " " + varInst["name"].ToString() + ";\n";
+
+		}
+		return result;
+	}
+
 	private String genDefaultEntityConstCode_bullet()
 	{
-		//Godot.Collections.Array mergedFieldDef_arr
 		String result = "";
 		Node singleton = (Node)GetNode("/root/singleton");
 		Dictionary mergedFieldDefs2 = (Dictionary)singleton.Call("get_merged_fieldDefs_v2", "bulletEntities");
@@ -140,6 +225,7 @@ public class buidProject : Node
 		
 		foreach (Dictionary entityDef in entityDefs)
 		{
+			Godot.Collections.Array triggerAABB = (Godot.Collections.Array)entityDef["triggerAABB"];
 			String entityName = (String)entityDef["identifier"];
 			//Add entity default const
 			result += $"const {entityType} const {entityName}_default = {{";
@@ -152,7 +238,7 @@ public class buidProject : Node
 			result += "{0,0}, "; //spd
 			result += "{0,0}, "; //size
 			result += "FALSE, "; //onScreen
-			result += "{0,0,8,8}, "; //aabb
+			result += "{" + triggerAABB[0] + ", " + triggerAABB[1] + ", " + triggerAABB[2] + ", " + triggerAABB[3] + "}, "; //aabb
 			result += "NULL, "; //spr
 			if (showTriggerRects)
 			{
@@ -225,6 +311,7 @@ public class buidProject : Node
 			result += $"const {entityType} const {entityName}_default = {{";
 			//Predefined values for const
 			result += $"{mergedIdsDict[entityName]}, "; //entityType
+			result += $"0, ";//instId
 			result += "FALSE, "; //alive
 			result += "{0,0}, "; //posInt
 			result += "{0,0}, "; //pos
@@ -274,13 +361,33 @@ public class buidProject : Node
 				result += $"{triggerValue2}, "; //val2
 				result += $"{triggerValue3}, "; //val3
 				result += "1, "; //triggerHp
-
-
+				result += "FALSE, "; //activated
+				result += "FALSE, "; //prevActivated
 				result += "};\n";
 			}
 
 
 		}
+		return result;
+	}
+
+	private String genMergedStructCode_variable(Godot.Collections.Array mergedArr)
+	{
+		Node singleton = (Node)GetNode("/root/singleton");
+
+		String result = "typedef struct {\n";
+
+		foreach (Godot.Collections.Dictionary field in mergedArr)
+		{
+			String fieldName = (String)field["name"];
+			String fieldType = (String)field["type"];
+			result += $"  {fieldType} {fieldName};\n";
+
+		}
+
+
+		result += "} LocalVariableMerged;\n";
+
 		return result;
 	}
 
@@ -412,7 +519,27 @@ public class buidProject : Node
 	private void applyMods()
 	{
 		fileReplceMod();
+		fileReplceMod_opt();
+	}
 
+	private void fileReplceMod_opt()
+	{
+		Node singleton = (Node)GetNode("/root/singleton");
+		int entityLoadMode = int.Parse(singleton.Call("get_entity_load_opt_mode").ToString());
+		String fromPath;
+		String toPath;
+		switch (entityLoadMode)
+		{
+			case 1:
+				fromPath = engineRootPath + "/code_template/chunkOpt1/src/";
+				toPath = engineRootPath + "/build/src/";
+				CopyFilesRecursively(fromPath, toPath);
+				fromPath = engineRootPath + "/code_template/chunkOpt1/inc/";
+				toPath = engineRootPath + "/build/inc/";
+				CopyFilesRecursively(fromPath, toPath);
+				loadChunkRuntimeC_CodeReplacer();
+				break;
+		}
 	}
 
 	private void fileReplceMod()
@@ -425,6 +552,8 @@ public class buidProject : Node
 		fromPath = engineRootPath + "/code_template/inc/";
 		toPath = engineRootPath + "/build/inc/";
 		CopyFilesRecursively(fromPath, toPath);
+
+
 	}
 
 	private void genResCode()
@@ -549,6 +678,9 @@ public class buidProject : Node
 		levelsC_CodeReplacer();
 		typesH_CodeReplacer();
 
+		globalH_CodeReplacer();
+		globalC_CodeReplacer();
+
 		enumsH_CodeReplacer();
 
 		entityHandlerC_CodeReplacer();
@@ -563,10 +695,15 @@ public class buidProject : Node
 	{
 		int curLevel;
 		Node singleton = (Node)GetNode("/root/singleton");
+		int entityLoadMode = int.Parse(singleton.Call("get_entity_load_opt_mode").ToString());
 		curLevel = (int)singleton.Call("get_run_level_ind");
 		String mainC_path = engineRootPath + "/build/src/main.c";
 		String mainCode = System.IO.File.ReadAllText(mainC_path);
 		String finalCode = mainCode.Replace("$curLevel$", curLevel.ToString());
+		if(entityLoadMode != 0)
+		{
+			finalCode = finalCode.Replace("//$chunkLoadFunc$", "loadChunkRuntime();");
+		}
 		System.IO.File.WriteAllText(mainC_path, finalCode);
 		GD.Print("main.c code replaced");
 	}
@@ -915,6 +1052,13 @@ public class buidProject : Node
 		levelSizeTiles.x = (int)levelSizePx.x / cellSize;
 		levelSizeTiles.y = (int)levelSizePx.y / cellSize;
 		String levelSizeTilesText = "{" + levelSizeTiles.x.ToString() + ", " + levelSizeTiles.y.ToString() + "}";
+
+		float chunkSizeX = float.Parse(singleton.Call("get_chunkSizeX").ToString());
+		float chunkSizeY = float.Parse(singleton.Call("get_chunkSizeY").ToString());
+		double levelSizeChunksX = Math.Ceiling(levelSizePx.x / chunkSizeX);
+		double levelSizeChunksY = Math.Ceiling(levelSizePx.y / chunkSizeY);
+		String levelSizeChunksText = "{" + levelSizeChunksX.ToString() + ", " + levelSizeChunksY.ToString() + "}";
+
 		String bgaPath = (String)levelDict["bgRelPath"];
 		String bgbPath = (String)levelDict["bgRelPath2"];
 
@@ -1077,7 +1221,7 @@ public class buidProject : Node
 
 
 		String levelCode = $"const Level const lvl_Level_{curLevel.ToString()} = {{{bgaMapResName}, {bgbMapResName}, {bgaTilesetResName}, {bgbTilesetResName}, {bgaPalResName}, {bgbPalResName}," +
-			$" {bgaImageName}, {bgbImageName}, {posArrText}, {posAmountText}, {collMapName}, {levelSizePxText}, {levelSizeTilesText}, {musicName}, {beforeLevelScriptName}, {everyFrameScriptName}," +
+			$" {bgaImageName}, {bgbImageName}, {posArrText}, {posAmountText}, {collMapName}, {levelSizePxText}, {levelSizeTilesText}, {levelSizeChunksText}, {musicName}, {beforeLevelScriptName}, {everyFrameScriptName}," +
 			$" {afterLevelScriptName}, {pal0Name}, {pal1Name}, {pal2Name}, {pal3Name},}};\n";
 		return levelCode;
 	}
@@ -1160,6 +1304,418 @@ public class buidProject : Node
 		return resultArray;
 	}
 
+	private String genLocalVariableMergedCode(int curLevel)
+	{
+		GD.Print("Gen LocalVariableMerged Code...");
+		String result = "";
+		result += $"const LocalVariableMerged const LocalVariable_arr_Level_{curLevel.ToString()}[] = ";
+		Node singleton = (Node)GetNode("/root/singleton");
+		Godot.Collections.Dictionary level = (Godot.Collections.Dictionary)singleton.Call("get_level", curLevel);
+		Godot.Collections.Array mergedTemplate = (Godot.Collections.Array)singleton.Call("get_merged_varInst_levels");
+		if(mergedTemplate == null)
+		{
+			mergedTemplate = new Godot.Collections.Array();
+
+		}
+		GD.Print(mergedTemplate);
+		
+		result += "{";
+		foreach (Godot.Collections.Dictionary varInstTemplate in mergedTemplate)
+		{
+			String value = "0";
+			//finding value of this fieldName, why? Because in struct order is nessesary
+			GD.Print(321);
+			foreach (Godot.Collections.Dictionary varInst in (Godot.Collections.Array)level["localVars"])
+			{
+				GD.Print(123);
+				//if names of varInst and varInstTemplate are equal
+				if ((String)varInst["name"] == (String)varInstTemplate["name"])
+				{
+					//Then value is found
+					String tempValue = varInst["value"].ToString();
+					if (tempValue.Length > 0)
+					{
+						value = tempValue.ToString();
+					}
+					
+					break;
+				}
+
+			}
+			//In most caces entity doesn't have every possible field, so, we are using default value
+			result += value + ", ";
+		}
+		result += "};\n";
+
+
+		return result;
+	}
+	private String genTriggerCode_chunkOpt1(int curLevel)
+	{
+		GD.Print("Gen TriggerCode_chunkOpt1 for level ", curLevel);
+
+		Node singleton = (Node)GetNode("/root/singleton");
+		//GD.Print(0);
+		String result = ""; ;
+		//Getting "entity_name: mergedId" pairs
+		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict");
+		Vector2 levelSize = (Vector2)singleton.Call("get_level_size", curLevel);
+
+		//GD.Print(1);
+
+		//Getting entityInstances in curLevel
+		Godot.Collections.Array entityInstances = (Godot.Collections.Array)singleton.Call("get_entityInstances_by_levelNum", curLevel);
+		//Adding gates
+		Godot.Collections.Array gateInstances = (Godot.Collections.Array)singleton.Call("get_gateInstances_by_levelNum", curLevel);
+		//Merging them
+		entityInstances = mergeGodotArrays(entityInstances, gateInstances);
+
+		result += $"const Trigger const Trigger_arr_Level_{curLevel.ToString()}[] = ";
+
+		int chunkSizeX = int.Parse(singleton.Call("get_chunkSizeX").ToString());
+		int chunkSizeY = int.Parse(singleton.Call("get_chunkSizeX").ToString());
+
+		int firstPosX = 0;
+		int firstPosY = 0;
+
+		//int curTriggerInd = 0;
+		int lastPosX = chunkSizeX;
+		int lastPosY = chunkSizeY;
+
+		//Opening Trigger_arr block
+		result += "{";
+
+		while (firstPosY <= levelSize.y)
+		{
+			while (firstPosX <= levelSize.x)
+			{
+
+				foreach (Godot.Collections.Dictionary entityInst in entityInstances)
+				{
+					//GD.Print(2);
+					//Getting useful data about entity
+					if (!entityInst.Contains("__identifier"))
+					{
+						continue;
+					}
+					Godot.Collections.Array pos = (Godot.Collections.Array)entityInst["px"];
+					int entityPosX = int.Parse(pos[0].ToString());
+					int entityPosY = int.Parse(pos[1].ToString());
+					//If entity outside chunk bounds
+					if (!((entityPosX >= firstPosX) && (entityPosX < lastPosX)) || !((entityPosY >= firstPosY) && (entityPosY < lastPosY)))
+					{
+						//Then, skipping this entity
+						continue;
+					}
+					if (!entityInst.Contains("addTrigger") || (bool)entityInst["addTrigger"] == false)
+					{
+						continue;
+					}
+					String entityName = (String)entityInst["__identifier"];
+
+					//GD.Print(entityName);
+					//GD.Print(3);
+
+					Godot.Collections.Array triggerAABB = new Godot.Collections.Array();
+
+					if (entityInst.Contains("triggerAABB"))
+					{
+						triggerAABB = (Godot.Collections.Array)entityInst["triggerAABB"];
+					}
+					else
+					{
+						triggerAABB.Add(0);
+						triggerAABB.Add(0);
+						triggerAABB.Add(0);
+						triggerAABB.Add(0);
+
+					}
+					//GD.Print(4);
+					String triggerType = "0";
+					if (entityInst.Contains("triggerTypeName"))
+					{
+						if (entityInst["triggerTypeName"].ToString().Length > 0)
+						{
+							triggerType = "TRIGGER_TYPE_" + entityInst["triggerTypeName"].ToString();
+						}
+					}
+					//GD.Print(4.5);
+					int triggerValue = 0;
+					int triggerValue2 = 0;
+					int triggerValue3 = 0;
+					if (entityInst.Contains("triggerValue"))
+					{
+						triggerValue = (int)int.Parse(entityInst["triggerValue"].ToString());
+					}
+
+					if (entityInst.Contains("triggerValue2"))
+					{
+						triggerValue2 = (int)int.Parse(entityInst["triggerValue2"].ToString());
+					}
+
+					if (entityInst.Contains("triggerValue3"))
+					{
+						triggerValue3 = (int)int.Parse(entityInst["triggerValue3"].ToString());
+					}
+					//GD.Print(5);
+
+					int[] spd = { 0, 0 };
+
+					//Opening Trigger block
+					result += "{";
+
+					//Applying to generated code
+
+					/*****---> Struct reminder <---*****
+			 
+						typedef struct {
+							bool alive;
+							Vect2D_s16 firstPos;
+							Vect2D_s16 lastPos;
+							s8 trigger_type;
+							s8 trigger_value;
+							s16 triggerHp;
+							bool activated;
+							bool prevActivated;
+						} Trigger;
+
+					**********************************/
+
+					result += "TRUE, "; //alive
+					result += "{" + $"{pos[0]}, {pos[1]}" + "}, "; //pos
+					result += "{" + $"{triggerAABB[0]}, {triggerAABB[1]}, {triggerAABB[2]}, {triggerAABB[3]}" + "}, "; //triggerRect
+					result += $"{triggerType}, "; //triggerType
+					result += $"{triggerValue}, "; //triggerValue
+					result += $"{triggerValue2}, "; //triggerValue2
+					result += $"{triggerValue3}, "; //triggerValue3
+					result += "1, "; //triggerHp
+					result += "FALSE, "; //activated
+					result += "FALSE, "; //prevActivated
+
+					//Closing Trigger block
+					result += "}, ";
+				}
+				lastPosX += chunkSizeX;
+				firstPosX += chunkSizeX;
+			}
+			firstPosX = 0;
+			lastPosX = chunkSizeX;
+			lastPosY += chunkSizeY;
+			firstPosY += chunkSizeY;
+		}
+
+		//Closing Trigger_arr block
+		result += "};\n";
+		return result;
+	}
+
+	private String genEntityMergedCode_chunkOpt1(int curLevel)
+	{
+		GD.Print("Gen EntityMerged Code: chunkOpt1...");
+		String result = "";
+		Node singleton = (Node)GetNode("/root/singleton");
+		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
+		Godot.Collections.Array mergedFieldDef_arr = (Godot.Collections.Array)singleton.Call("get_merged_fieldDef", "entities");
+		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict", "entities");
+		//Getting entityInstances in curLevel
+		Godot.Collections.Array entityInstances = (Godot.Collections.Array)singleton.Call("get_entityInstances_by_levelNum", curLevel);
+		//Adding gates
+		Godot.Collections.Array gateInstances = (Godot.Collections.Array)singleton.Call("get_gateInstances_by_levelNum", curLevel);
+		//Merging them
+		entityInstances = mergeGodotArrays(entityInstances, gateInstances);
+		//Get level size
+		Vector2 levelSize = (Vector2)singleton.Call("get_level_size", curLevel);
+		String chunksCode = "";
+		String chunksCodeAll = $"const EntityMergedChunk const EntityMergedChunk_arr_Level_{curLevel.ToString()}[] = {{";
+
+		int chunkSizeX = int.Parse(singleton.Call("get_chunkSizeX").ToString());
+		int chunkSizeY = int.Parse(singleton.Call("get_chunkSizeX").ToString());
+
+		int firstPosX = 0;
+		int firstPosY = 0;
+
+		System.Collections.Generic.Dictionary<int, int> entityIdEqualsTriggerInd_dict = new System.Collections.Generic.Dictionary<int, int>();
+
+		int lastTriggerInd = 0;
+		int curTriggerInd = 0;
+		int lastPosX = chunkSizeX;
+		int lastPosY = chunkSizeY;
+
+		GD.Print("levelSize");
+
+		GD.Print(levelSize.x);
+		GD.Print(levelSize.y);
+
+		while (firstPosY <= levelSize.y)
+		{
+			while (firstPosX <= levelSize.x)
+			{
+				String arrName = $"EntityMerged_arr_ChunkOpt1_Level_{curLevel.ToString()}_chunk_{firstPosX.ToString()}_{firstPosY.ToString()}";
+				chunksCode += $"const EntityMerged const {arrName}[] = {{";
+
+				int entityAmountInChunk = 0;
+				foreach (Godot.Collections.Dictionary entityInst in entityInstances)
+				{
+					//Getting useful data about entity
+					if (!entityInst.Contains("__identifier"))
+					{
+						continue;
+					}
+					Godot.Collections.Array pos = (Godot.Collections.Array)entityInst["px"];
+					int width = 0;
+					int height = 0;
+					width = (int)int.Parse(entityInst["width"].ToString());
+					//Studio crashes if you don't do proper conversion.
+					height = (int)int.Parse(entityInst["height"].ToString());
+
+					int entityFirstPosX = int.Parse(pos[0].ToString());
+					int entityFirstPosY = int.Parse(pos[1].ToString());
+
+					int entityLastPosX = entityFirstPosX + width;
+					int entityLastPosY = entityFirstPosY + height;
+
+					//Checking all 4 corners of entity, to make sure, that entity copied in all intercepted chunks.
+					bool leftUpPointCheck = !((entityFirstPosX >= firstPosX) && (entityFirstPosX < lastPosX)) || !((entityFirstPosY >= firstPosY) && (entityFirstPosY < lastPosY));
+					bool rightUpPointCheck = !((entityLastPosX >= firstPosX) && (entityLastPosX < lastPosX)) || !((entityFirstPosY >= firstPosY) && (entityFirstPosY < lastPosY));
+					bool leftDownPointCheck = !((entityFirstPosX >= firstPosX) && (entityFirstPosX < lastPosX)) || !((entityLastPosY >= firstPosY) && (entityLastPosY < lastPosY));
+					bool rightDownPointCheck = !((entityLastPosX >= firstPosX) && (entityLastPosX < lastPosX)) || !((entityLastPosY >= firstPosY) && (entityLastPosY < lastPosY));
+
+					//If entity outside chunk bounds
+					if (leftUpPointCheck && rightUpPointCheck && leftDownPointCheck && rightDownPointCheck)
+					{
+						//Then, skipping this entity
+						continue;
+					}
+					entityAmountInChunk++;
+					bool addTrigger = false;
+					String entityName = (String)entityInst["__identifier"];
+					int mergedId = (int)mergedIdsDict[entityName];
+
+					int instId = 0;
+					instId = (int)int.Parse(entityInst["instId"].ToString());
+
+					int[] spd = { 0, 0 };
+
+					//Opening entityMerged block
+					chunksCode += "{";
+
+					//Applying to generated code
+
+					/*****---> Struct reminder <---*****
+			 
+						typedef struct {
+						  u16 entityType;
+						  bool alive;
+						  Vect2D_s16 posInt;
+						  Vect2D_f32 pos;
+						  Vect2D_f16 spd;
+						  Vect2D_s16 size;
+						  bool onScreen;
+						  Trigger* trigger;
+						  u16 triggerInd;
+						  Sprite* spr;
+						} EntityMerged;
+
+					**********************************/
+
+					chunksCode += $"{mergedId.ToString()},"; //mergedId
+					chunksCode += $"{instId.ToString()},"; //instId
+					chunksCode += $" TRUE, "; //alive 
+					chunksCode += "{" + pos[0].ToString() + ", " + pos[1].ToString() + "}, "; //posInt
+					chunksCode += "{FIX32(" + pos[0].ToString() + "), FIX32(" + pos[1].ToString() + ")}, "; //pos
+					chunksCode += "{" + spd[0].ToString() + ", " + spd[1].ToString() + "}, "; //spd
+					chunksCode += "{" + width.ToString() + ", " + height.ToString() + "}, "; //size
+					chunksCode += "FALSE, "; //onScreen
+
+					if (!entityInst.Contains("addTrigger") || (bool)entityInst["addTrigger"] == false)
+					{
+						chunksCode += $"NULL,"; //trigger = NULL
+					}
+					else
+					{
+						if (entityIdEqualsTriggerInd_dict.ContainsKey(instId))
+						{
+							curTriggerInd = entityIdEqualsTriggerInd_dict[instId];
+						} else
+						{
+							curTriggerInd = lastTriggerInd;
+							entityIdEqualsTriggerInd_dict[instId] = curTriggerInd;
+							lastTriggerInd++;
+						}
+						//addTrigger = true;
+						chunksCode += $"&Trigger_arr_Level_{curLevel}[{curTriggerInd}],"; //trigger
+
+					}
+					chunksCode += $"{curTriggerInd},"; //triggerInd small this is for unoptimized entity load algorithm
+					chunksCode += "NULL,"; //spr
+
+					if (showTriggerRects)
+					{
+						chunksCode += "NULL, "; //debugSpr1
+						chunksCode += "NULL, "; //debugSpr2
+					}
+
+					//Checking every field
+					Godot.Collections.Array fieldInstances = (Godot.Collections.Array)entityInst["fieldInstances"];
+
+
+					foreach (Godot.Collections.Dictionary fieldDef in mergedFieldDef_arr)
+					{
+						//String inCodeType = (String)field["__inCodeType"];
+						if (!(bool)fieldDef["hasStruct"])
+						{
+							continue;
+						}
+
+						//finding value of this fieldName, why? Because in struct order is nessesary
+						var value = "";
+						foreach (Godot.Collections.Dictionary fieldInst in fieldInstances)
+						{
+							//if names of fieldDef and fieldInstance are equal
+							if ((String)fieldInst["__identifier"] == (String)fieldDef["identifier"])
+							{
+								//GD.Print(fieldInst["__identifier"]);
+								//Then value is found
+								value = fieldInst["__value"].ToString();
+								break;
+							}
+
+						}
+						//In most caces entity doesn't have every possible field, so, we are using default value
+
+						if (value.Length == 0)
+						{
+							value = fieldDef["defaultValue"].ToString();
+						}
+						chunksCode += value + ", ";
+
+
+					}
+					//if (addTrigger)
+					//{
+					//	curTriggerInd++;
+					//}
+
+					//Closing entityMerged block
+					chunksCode += "}, ";
+				}
+				chunksCodeAll += $"{{{entityAmountInChunk.ToString()}, &{arrName}}}, ";
+				chunksCode += "};\n";
+				lastPosX += chunkSizeX;
+				firstPosX += chunkSizeX;
+
+			}
+			firstPosX = 0;
+			lastPosX = chunkSizeX;
+			lastPosY += chunkSizeY;
+			firstPosY += chunkSizeY;
+		}
+		chunksCodeAll += "};\n";
+
+		result += chunksCode;
+		result += chunksCodeAll;
+		return result;
+	}
 	private String genEntityMergedCode(int curLevel)
 	{
 		GD.Print("Gen EntityMerged Code...");
@@ -1308,6 +1864,8 @@ public class buidProject : Node
 		return result;
 	}
 
+	
+
 	private String genTriggerCode(int curLevel)
 	{
 		GD.Print("Gen TriggerCode for level ", curLevel);
@@ -1409,6 +1967,8 @@ public class buidProject : Node
 					s8 trigger_type;
 					s8 trigger_value;
 					s16 triggerHp;
+					bool activated;
+					bool prevActivated;
 				} Trigger;
 
 			**********************************/
@@ -1421,16 +1981,12 @@ public class buidProject : Node
 			result += $"{triggerValue2}, "; //triggerValue2
 			result += $"{triggerValue3}, "; //triggerValue3
 			result += "1, "; //triggerHp
-			result += "TRUE, "; //activated
-			result += "TRUE, "; //prevActivated
-
+			result += "FALSE, "; //activated
+			result += "FALSE, "; //prevActivated
 
 			//Closing Trigger block
 			result += "}, ";
-			
-
 		}
-
 
 		//Closing Trigger_arr block
 		result += "};\n";
@@ -1440,8 +1996,8 @@ public class buidProject : Node
 	private String genEntityAllCode(int curLevel)
 	{
 		Node singleton = (Node)GetNode("/root/singleton");
+		int entityLoadMode = int.Parse(singleton.Call("get_entity_load_opt_mode").ToString());
 
-		
 
 		String result = "";
 		result += $"const EntityAll const EntityAll_arr_Level_{curLevel}[] = ";
@@ -1470,8 +2026,18 @@ public class buidProject : Node
 		result += bulletAmount.ToString() + ", ";
 		result += "NULL, ";
 		//Entity all
-		result += entityAmount.ToString() + ", ";
-		result += $"&EntityMerged_arr_Level_{curLevel.ToString()}, ";
+		switch (entityLoadMode)
+		{
+			case 0: // load entity: no optmization
+				result += entityAmount.ToString() + ", ";
+				result += $"&EntityMerged_arr_Level_{curLevel.ToString()}, ";
+				break;
+			case 1: // load entity: chunk optimization
+				result += entityAmount.ToString() + ", ";
+				result += $"&EntityMergedChunk_arr_Level_{curLevel.ToString()}, ";
+				break;
+		}
+		
 		//Trigger
 		result += triggerAmount.ToString() + ", ";
 		result += $"&Trigger_arr_Level_{curLevel.ToString()}, ";
@@ -1491,16 +2057,26 @@ public class buidProject : Node
 		Node singleton = (Node)GetNode("/root/singleton");
 		int amountOfLevel = (int)singleton.Call("get_level_count");
 
-
+		int entityLoadMode = int.Parse(singleton.Call("get_entity_load_opt_mode").ToString());
 		
 		for (int curLevel = 0; curLevel < amountOfLevel; curLevel++)
 		{
 			result += genPositionsCode(curLevel);
 			
-			result += genTriggerCode(curLevel);
+			switch (entityLoadMode)
+			{
+				case 0:
+					result += genTriggerCode(curLevel);
+					result += genEntityMergedCode(curLevel);
+					break;
+				case 1:
+					result += genTriggerCode_chunkOpt1(curLevel);
+					result += genEntityMergedCode_chunkOpt1(curLevel);
+					break;
+			}
 			
-			result += genEntityMergedCode(curLevel);
-			
+			result += genLocalVariableMergedCode(curLevel);
+
 			result += genEntityAllCode(curLevel);
 			
 			result += genMessagePacksCode(curLevel);
@@ -1512,7 +2088,7 @@ public class buidProject : Node
 		result += "const LevelFull const LevelFull_arr[] = {";
 		for (int curLevel = 0; curLevel < amountOfLevel; curLevel++)
 		{
-			result += "{" + $"&lvl_Level_{curLevel.ToString()}, &EntityAll_arr_Level_{curLevel.ToString()}, &MessagePack_Level_{curLevel.ToString()}" + "}, ";
+			result += "{" + $"&lvl_Level_{curLevel.ToString()}, &EntityAll_arr_Level_{curLevel.ToString()}, &MessagePack_Level_{curLevel.ToString()}, &LocalVariable_arr_Level_{curLevel.ToString()}" + "}, ";
 		}
 		result += "};\n";
 
@@ -1520,7 +2096,22 @@ public class buidProject : Node
 
 	}
 
-	//System.IO.File.WriteAllText(path, code);
+	private void loadChunkRuntimeC_CodeReplacer()
+	{
+		GD.Print("loadChunkRuntime.c code replacing...");
+		Node singleton = (Node)GetNode("/root/singleton");
+		String loadChunkRuntime_path = engineRootPath + "/build/src/loadChunkRuntime.c";
+		String loadChunkRuntimeCode = System.IO.File.ReadAllText(loadChunkRuntime_path);
+
+		String chunkSizeX = singleton.Call("get_chunkSizeX").ToString();
+		String chunkSizeY = singleton.Call("get_chunkSizeY").ToString();
+
+		loadChunkRuntimeCode = loadChunkRuntimeCode.Replace("$chunkSizeX$", chunkSizeX);
+		loadChunkRuntimeCode = loadChunkRuntimeCode.Replace("$chunkSizeY$", chunkSizeY);
+
+		System.IO.File.WriteAllText(loadChunkRuntime_path, loadChunkRuntimeCode);
+		GD.Print("loadChunkRuntime.c code replaced");
+	}
 	private void mapsC_CodeReplacer()
 	{
 		GD.Print("maps.c code replacing...");

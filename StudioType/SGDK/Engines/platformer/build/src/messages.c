@@ -11,7 +11,10 @@
 #include "../inc/global.h"
 
 
-
+void printMessageNoStop(char* str, bool vertSide, u16 windowTiles) {
+	VDP_setWindowVPos(vertSide, windowTiles);
+	VDP_drawTextBG(WINDOW, str, 0, 0);
+}
 
 
 void printMessageBase(char* str, Image* img_msg_sign, u8 msg_sign_pal) {

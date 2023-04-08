@@ -47,8 +47,8 @@ var level_move_mode: bool = false
 var entity_types = {
 	"__header__": 
 	{
-		"fileType": "SGDK Studio Project JSON",
-		"app": "SGDK Studio",
+		"fileType": "PS4SGDK Project JSON",
+		"app": "Platformer Studio For SGDK",
 		"doc": "???",
 		"appAuthor": "bolon667",
 		"appVersion": "1.3 alpha",
@@ -56,10 +56,14 @@ var entity_types = {
 	},
 	"jsonVersion": "1.0.0",
 	"engineRootPath": "./StudioType/SGDK/Engines/platformer",
-	"isOneScreen": false, #mb, i will delete that
+	"isOneScreen": false, #mb, i will delete this
 	"runFromCurrentLevel": false,
 	"defaultGridSize": 16,
 	"addEntityMergedSlots": 10,
+	"addEntityBulletMergedSlots": 10,
+	"entityLoadOptimization": 0,
+	"chunkSizeX": 80,
+	"chunkSizeY": 80,
 	"turnOnGates": false,
 	"defs": 
 	{
@@ -88,6 +92,10 @@ var entity_types = {
 				
 			],
 		"levelFields":
+			[
+				
+			],
+		"variables":
 			[
 				
 			],
@@ -330,6 +338,10 @@ const level_template = {
 		[
 			
 		],
+	"localVars":
+		[
+		
+		],
 }
 
 const level_layer_template = {
@@ -424,10 +436,10 @@ func change_load_image_mode_bga(mode: int, level_ind:int):
 func change_load_image_mode_bgb(mode: int, level_ind:int):
 	entity_types["levels"][level_ind]["bgbMode"] = mode
 
-func get_level_attr(attr: String):
-	if(!entity_types["levels"][cur_level_ind].has(attr)):
-		entity_types["levels"][cur_level_ind][attr] = ""
-	return entity_types["levels"][cur_level_ind][attr]
+func get_level_attr(attr: String, level_ind: int):
+	if(!entity_types["levels"][level_ind].has(attr)):
+		entity_types["levels"][level_ind][attr] = ""
+	return entity_types["levels"][level_ind][attr]
 		
 func get_load_modes(level_ind: int):
 	if(!entity_types["levels"][level_ind].has("bgaMode")):
@@ -507,6 +519,9 @@ func get_engine_root_path():
 func get_cell_size():
 	return cell_size
 	
+func get_entity_load_opt_mode():
+	return entity_types["entityLoadOptimization"]
+	
 func change_cell_size(new_size: int):
 	cell_size = new_size
 	entity_types["defaultGridSize"] = cell_size
@@ -570,14 +585,25 @@ func update_project():
 	#Add bulletEntites def if not exists
 	if(!entity_types["defs"].has("bulletEntities")):
 		entity_types["defs"]["bulletEntities"] = []
+	if !entity_types["defs"].has("variables"):
+		entity_types["defs"]["variables"] = []
 	#Add arr entityBulletInstances arr to all entities
 	for level in entity_types["levels"]:
 		var entityLayer = level["layerInstances"][0]
 		if !entityLayer.has("entityBulletInstances"):
 			entityLayer["entityBulletInstances"] = []
-	
+	if(!entity_types.has("chunkSizeX")):
+		entity_types["chunkSizeX"] = 80;
+	if(!entity_types.has("chunkSizeY")):
+		entity_types["chunkSizeY"] = 80;
 	#autoupdate triggers
 	add_trigger_enum()
+
+func get_chunkSizeX():
+	return entity_types["chunkSizeX"] 
+	
+func get_chunkSizeY():
+	return entity_types["chunkSizeY"] 
 
 func load_project(projectPath: String):
 	var dict = {}
@@ -836,10 +862,10 @@ func change_cur_entityInst(key: String, val):
 func get_amount_of_levels():
 	return len(entity_types["levels"])
 
-func get_messagePack_arr():
-	if(!entity_types["levels"][cur_level_ind].has("messagePacks")):
-		entity_types["levels"][cur_level_ind]["messagePacks"] = []
-	return entity_types["levels"][cur_level_ind]["messagePacks"]
+func get_messagePack_arr(level_ind:int):
+	if(!entity_types["levels"][level_ind].has("messagePacks")):
+		entity_types["levels"][level_ind]["messagePacks"] = []
+	return entity_types["levels"][level_ind]["messagePacks"]
 	
 
 func change_entityInstName_by_defId(entity_name: String, defId: int):
@@ -882,27 +908,31 @@ func get_unique_entity_fieldId():
 	return fieldId
 	
 
-func get_unique_gate_instId(level_ind: int):
-	var instId = 0
-	if(!entity_types["levels"][level_ind]["layerInstances"][0].has("gateInstances")):
-		entity_types["levels"][level_ind]["layerInstances"][0]["gateInstances"] = []
-	#find last instId
-	for gate_inst in entity_types["levels"][level_ind]["layerInstances"][0]["gateInstances"]:
-		if instId < int(gate_inst["instId"]):
-			instId = gate_inst["instId"]
-		continue
-	# +1 to make sure, that instId is unique
-	return instId+1
-
 func get_unique_entity_instId():
-	var instId: int = 0
-	#find last instId
+	var lastInstId: int = 0
+	#find last instId in entityInstances arr
 	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
-		if instId < int(entity_inst["instId"]):
-			instId = entity_inst["instId"]
-		continue
+		if lastInstId < int(entity_inst["instId"]):
+			lastInstId = entity_inst["instId"]
+	#find last instId in gateInstances arr
+	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["gateInstances"]:
+		if lastInstId < int(entity_inst["instId"]):
+			lastInstId = entity_inst["instId"]
 	# +1 to make sure, that instId is unique
-	return instId+1
+	return lastInstId+1
+	
+func get_unique_entity_instId_level_ind(level_ind):
+	var lastInstId: int = 0
+	#find last instId in entityInstances arr
+	for entity_inst in entity_types["levels"][level_ind]["layerInstances"][0]["entityInstances"]:
+		if lastInstId < int(entity_inst["instId"]):
+			lastInstId = entity_inst["instId"]
+	#find last instId in gateInstances arr
+	for entity_inst in entity_types["levels"][level_ind]["layerInstances"][0]["gateInstances"]:
+		if lastInstId < int(entity_inst["instId"]):
+			lastInstId = entity_inst["instId"]
+	# +1 to make sure, that instId is unique
+	return lastInstId+1
 
 func get_unique_entity_defId():
 	var defId = 0
@@ -1408,7 +1438,7 @@ func get_gateInstance_t_defId(defId: int, level_ind: int):
 	entity_inst["__spritePath"] = def["spritePath"]
 	
 	entity_inst["defId"] = def["defId"]
-	entity_inst["instId"] = get_unique_gate_instId(level_ind)
+	entity_inst["instId"] = get_unique_entity_instId_level_ind(level_ind)
 	var filed_inst_arr = []
 	#Get all fields from entityDef, and copy name,value to fields in entityInstance
 	#Entity definition - template for entity
@@ -1650,6 +1680,22 @@ func get_merged_fieldDef(entityCollectionDef: String):
 				pass
 	mergedFieldArr = mergedFieldDef_arr
 	return mergedFieldDef_arr
+
+func get_global_variables():
+	return entity_types["defs"]["variables"];
+
+func get_merged_varInst_levels() -> Array:
+	var merged_arr:Array = []
+	var merged_names:Array = []
+	for level in entity_types["levels"]:
+		if !level.has("localVars"):
+			level["localVars"] = []
+			continue
+		for varInst in level["localVars"]:
+			if !(varInst["name"] in merged_names):
+				merged_arr.append(varInst)
+				merged_names.append(varInst["name"])
+	return merged_arr
 
 
 func get_merged_fieldDefs_v2(entityCollectionDef: String):

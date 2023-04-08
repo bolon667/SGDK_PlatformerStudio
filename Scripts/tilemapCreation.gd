@@ -9,7 +9,7 @@ onready var TileMapEditorWindow_roomSize = $TileMapEditorWindow/World/roomSize
 onready var TileMapEditorWindow_bgA = $TileMapEditorWindow/World/roomSize/bgA
 onready var TileMapEditorWindow_bgB = $TileMapEditorWindow/World/roomSize/bgB
 
-
+var leftContainer
 var layer_id: int = 0
 
 
@@ -17,7 +17,8 @@ var level_count: int = 0
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
-	var node = get_tree().get_nodes_in_group("levelContainer")[0].get_node("TileMap")
+	leftContainer = get_tree().get_nodes_in_group("levelContainer")[0]
+	var node = leftContainer.get_node("TileMap")
 	var tile_ids = node.tile_set.get_tiles_ids()
 	for tile_id in tile_ids:
 		var texture = node.tile_set.tile_get_texture(tile_id)
@@ -100,9 +101,7 @@ func _on_buildProjectBtn_pressed():
 
 
 func _on_Button_pressed():
-	#for field in singleton.get_merged_fieldDef():
-	#	print(field["identifier"])
-	#print(singleton.get_merged_fieldDefs_v2())
+	print(singleton.get_merged_varInst_levels())
 	pass # Replace with function body.
 
 

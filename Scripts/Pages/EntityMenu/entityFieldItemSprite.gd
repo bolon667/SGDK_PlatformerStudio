@@ -48,12 +48,16 @@ func _on_FileDialog_file_selected(path):
 	$HBoxContainer/VBoxContainer/TextEdit.text = spr_name
 	change_spr_by_path(path)
 	
-	
 	#Change defaultValue to sprite reference
 	singleton.change_fieldDef(entityCollection, "sprDef", spr_name)
 	
+	var spr_height = $HBoxContainer/VBoxContainer/Control/Sprite.texture.get_height()
+	var spr_width = $HBoxContainer/VBoxContainer/Control/Sprite.texture.get_width()
+	
 	#Change spritePath if entity
 	singleton.entity_types["defs"][entityCollection][singleton.cur_entity_type_ind]["spritePath"] = path
+	singleton.entity_types["defs"][entityCollection][singleton.cur_entity_type_ind]["height"] = spr_height
+	singleton.entity_types["defs"][entityCollection][singleton.cur_entity_type_ind]["width"] = spr_width
 	pass # Replace with function body.
 
 

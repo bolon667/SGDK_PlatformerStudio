@@ -10,8 +10,9 @@ extern const LevelFull const LevelFull_arr[];
 extern u16 levelNum;
 
 extern Level* curLvlData;
-extern EntityAll* curEntityAll;
+extern EntityAllPlayer* curEntityAll;
 extern MessagePack* curMessagePacks;
+extern LocalVariableMerged* curLocalVariables;
 
 extern u16 palette_full[];
 

@@ -16,5 +16,10 @@ AABB playerBounds;
 s16 backXScroll = 0;
 s16 backYScroll = 0;
 
+Vect2D_s16 curChunkPos = {0,0};
+Vect2D_s16 prevChunkPos = {0,0};
+
 //Index of the last tile that has been placed, useful to avoid overlapping
 u16 VDPTilesFilled = TILE_USER_INDEX;
+
+//$globalVariables$

@@ -16,8 +16,9 @@
 
 u16 levelNum = 0;
 Level* curLvlData;
-EntityAll* curEntityAll;
+EntityAllPlayer* curEntityAll;
 MessagePack* curMessagePacks;
+LocalVariableMerged* curLocalVariables;
 
 u16 palette_full[64];
 

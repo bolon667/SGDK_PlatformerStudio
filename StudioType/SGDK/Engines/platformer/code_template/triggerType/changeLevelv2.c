@@ -11,20 +11,20 @@ PAL_fadeOutAll(3,FALSE);
 	switch(trigger->val2) // position mode
 	{
 		case 0: //Left
-			newStartPos.x = LevelFull_arr[levelNum].lvl->sizeinPx.x-playerBody.aabb.max.x;
+			newStartPos.x = LevelFull_arr[levelNum].lvl->sizeinPx.x-playerBody.aabb.max.x-trigger->rect.max.x;
 			newStartPos.y = playerBody.globalPosition.y-trigger->val3;
 			break;
 		case 1: //Right
-			newStartPos.x = 0;
+			newStartPos.x = trigger->rect.max.x;
 			newStartPos.y = playerBody.globalPosition.y-trigger->val3;
 			break;
 		case 2: //Up
 			newStartPos.x = playerBody.globalPosition.x-trigger->val3;
-			newStartPos.y = LevelFull_arr[levelNum].lvl->sizeinPx.y-playerBody.aabb.max.y;
+			newStartPos.y = LevelFull_arr[levelNum].lvl->sizeinPx.y-playerBody.aabb.max.y-trigger->rect.max.y;
 			break;
 		case 3: //Down
 			newStartPos.x = playerBody.globalPosition.x-trigger->val3;
-			newStartPos.y = 0;
+			newStartPos.y = trigger->rect.max.y;
 			break;
 	}
 					

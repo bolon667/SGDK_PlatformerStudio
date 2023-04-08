@@ -28,7 +28,14 @@ theme = ExtResource( 3 )
 margin_right = 1024.0
 margin_bottom = 50.0
 
+[node name="curLevelLabel" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
+margin_top = 15.0
+margin_right = 111.0
+margin_bottom = 35.0
+text = "Level Test123"
+
 [node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
+margin_left = 115.0
 margin_top = 15.0
 margin_right = 970.0
 margin_bottom = 35.0
