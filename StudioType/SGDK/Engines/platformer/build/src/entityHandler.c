@@ -201,7 +201,8 @@ void showEntityMerged(EntityMerged* entity){
 	showEntityFuncArr[entity->entityType](entity);
 }
 
-void showEntityAll(){
+
+void showEntityAllPlayer(){
 	if(playerBody.animModeChangable){
 		playerBody.animMode = 0;
 	}
@@ -217,3 +218,13 @@ void showEntityAll(){
 	}
 }
 
+void showEntityAllScene(){
+	for(u16 i=0; i<curEntityAll->EntityBulletMerged_size; i++){
+		showEntityBulletMerged(&curEntityAll->EntityBulletMerged_arr[i]);
+	}
+	for(u16 i=0; i<curEntityAll->EntityMerged_size; i++){
+		showEntityMerged(&curEntityAll->EntityMerged_arr[i]);
+	}
+}
+
+void(* showEntityAll_arr[])(void) = {showEntityAllPlayer, showEntityAllScene};

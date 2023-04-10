@@ -51,7 +51,7 @@ var entity_types = {
 		"app": "Platformer Studio For SGDK",
 		"doc": "???",
 		"appAuthor": "bolon667",
-		"appVersion": "1.4 alpha",
+		"appVersion": "1.5 beta",
 		"url": "https://github.com/bolon667/SGDK_PlatformerStudio",
 	},
 	"jsonVersion": "1.0.0",
@@ -325,6 +325,7 @@ const level_template = {
 	"pal1SpriteName": "",
 	"pal2SpriteName": "",
 	"pal3SpriteName": "",
+	"levelType": 0, #default level is level (0), not a scene (1)
 	"startPos": [0,0],
 	"fieldInstances":
 		[
@@ -589,6 +590,12 @@ func update_project():
 		entity_types["defs"]["variables"] = []
 	#Add arr entityBulletInstances arr to all entities
 	for level in entity_types["levels"]:
+		if(!level.has("levelMode")):
+			level["levelMode"] = "0"
+		if(!level.has("controlScript")):
+			level["controlScript"] = "0"
+		if(!level.has("updateCameraScript")):
+			level["updateCameraScript"] = "updateCamera"
 		var entityLayer = level["layerInstances"][0]
 		if !entityLayer.has("entityBulletInstances"):
 			entityLayer["entityBulletInstances"] = []
@@ -1186,6 +1193,7 @@ func delete_level(level_ind: int):
 		return
 	entity_types["levels"].remove(level_ind)
 	level_count = get_level_count()
+	cur_level_ind = 0
 	
 
 func change_fieldDef(entityCollectionDef: String, field_property_name: String, field_property_value: String):

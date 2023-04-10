@@ -1,9 +1,13 @@
+#pragma once
 #include "../inc/levels.h"
 
 #include "../inc/maps.h"
 #include "../inc/camera.h"
 #include "../inc/global.h"
 #include "../inc/player.h"
+#include "../inc/updatePlayer.h"
+#include "../inc/enums.h"
+#include "../inc/levels.h"
 
 #include "../res/resources.h"
 #include "../res/gfx.h"

@@ -2,8 +2,10 @@
 
 #include "../inc/levels.h"
 #include "../inc/camera.h"
+#include "../inc/enums.h"
 #include "../inc/player.h"
 #include "../inc/entityHandler.h"
+#include "../inc/customScripts.h"
 
 void inGameJoyEvent(u16 joy, u16 changed, u16 state);
 
@@ -31,14 +33,13 @@ int main(bool resetType) {
 	while (TRUE) {
 		//First we update all the things that have to be updated each frame
 		
+		// if(curLvlData->levelMode == 0){
+		// 	updatePlayer();
+		// }
+		customScriptArr[curLvlData->controlScript]();
+		customScriptArr[curLvlData->updateCameraScript]();
 		
-		updatePlayer();
-		updateCamera();
-		
-
-		showEntityAll();
-		
-
+		showEntityAll_arr[curLvlData->levelMode]();		
 		//Update the player animations
 		updateAnimations();
 

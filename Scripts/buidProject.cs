@@ -69,6 +69,7 @@ public class buidProject : Node
 		String enumsHCode = System.IO.File.ReadAllText(enumsHPath);
 		String enumCodePaste = "";
 		enumCodePaste += genTriggerEnumCode();
+		enumCodePaste += genCustomScriptsEnumCode();
 
 		enumsHCode = enumsHCode.Replace("//$Enums$", enumCodePaste);
 		System.IO.File.WriteAllText(enumsHPath, enumsHCode);
@@ -86,7 +87,26 @@ public class buidProject : Node
 			String fileName = System.IO.Path.GetFileNameWithoutExtension(newPath);
 			enumCode += "  TRIGGER_TYPE_" + fileName + ",\n";
 		}
-		enumCode += "} triggetType;\n";
+		enumCode += "} triggetType;\n\n";
+		return enumCode;
+	}
+
+	private String genCustomScriptsEnumCode()
+	{
+		String enumCode = "typedef enum {\n";
+		string scriptsFolderPath = engineRootPath + "/code_template/customScripts";
+		String[] paths = System.IO.Directory.GetFiles(scriptsFolderPath);
+		Array<String> fileNames = new Array<String>();
+		enumCode += "  CUSTOM_SCRIPT_updatePlayer,\n";
+		enumCode += "  CUSTOM_SCRIPT_updateCamera,\n";
+		//Adding scripts code
+		foreach (String path in paths)
+		{
+			String fileNameNoExt = System.IO.Path.GetFileName(path);
+			fileNameNoExt = fileNameNoExt.Substring(0, fileNameNoExt.Find("."));
+			enumCode += "  CUSTOM_SCRIPT_" + fileNameNoExt + ",\n";
+		}
+		enumCode += "} customScriptEnum;\n\n";
 		return enumCode;
 	}
 
@@ -713,6 +733,7 @@ public class buidProject : Node
 		String customScriptsC_path = engineRootPath + "/build/src/customScripts.c";
 		String customScriptsCode = System.IO.File.ReadAllText(customScriptsC_path);
 		String finalCode = customScriptsCode.Replace("//$customScripts$", genCustomScriptsCodeC());
+
 		System.IO.File.WriteAllText(customScriptsC_path, finalCode);
 		GD.Print("customScripts.c code replaced");
 	}
@@ -747,6 +768,8 @@ public class buidProject : Node
 		result += "void emptyScript(){};\n";
 		//Creating arr of funcs, to be able to use them, when collision with trigger occurs
 		result += "void (* customScriptArr[])(void) = {";
+		result += "updatePlayer, ";
+		result += "updateCamera, ";
 		foreach (String funcName in fileNames)
 		{
 			result += funcName + ", ";
@@ -1103,7 +1126,43 @@ public class buidProject : Node
 		String pal2Name = "NULL";
 		String pal3Name = "NULL";
 
+		String levelMode = "0"; //0 = default level; 1 = scene
+		String controlScript = "CUSTOM_SCRIPT_updatePlayer";
+		String updateCameraScript = "CUSTOM_SCRIPT_updateCamera";
+
+
+
+
+		if (levelDict.Contains("levelMode"))
+		{
+			String temp = levelDict["levelMode"].ToString();
+			if (temp.Length > 0)
+			{
+				levelMode = temp;
+			}
+		}
+
+		if(int.Parse(levelMode) > 0)
+		{
+			if (levelDict.Contains("controlScript"))
+			{
+				String temp = levelDict["controlScript"].ToString();
+				if (temp.Length > 0)
+				{
+					controlScript = "CUSTOM_SCRIPT_" + temp;
+				}
+			}
+			if (levelDict.Contains("updateCameraScript"))
+			{
+				String temp = levelDict["updateCameraScript"].ToString();
+				if (temp.Length > 0)
+				{
+					updateCameraScript = "CUSTOM_SCRIPT_" + temp;
+				}
+			}
+		}
 		
+
 		if (levelDict.Contains("pal0SpriteName"))
 		{
 			String temp = (String)levelDict["pal0SpriteName"];
@@ -1222,7 +1281,7 @@ public class buidProject : Node
 
 		String levelCode = $"const Level const lvl_Level_{curLevel.ToString()} = {{{bgaMapResName}, {bgbMapResName}, {bgaTilesetResName}, {bgbTilesetResName}, {bgaPalResName}, {bgbPalResName}," +
 			$" {bgaImageName}, {bgbImageName}, {posArrText}, {posAmountText}, {collMapName}, {levelSizePxText}, {levelSizeTilesText}, {levelSizeChunksText}, {musicName}, {beforeLevelScriptName}, {everyFrameScriptName}," +
-			$" {afterLevelScriptName}, {pal0Name}, {pal1Name}, {pal2Name}, {pal3Name},}};\n";
+			$" {afterLevelScriptName}, {pal0Name}, {pal1Name}, {pal2Name}, {pal3Name}, {levelMode}, {controlScript}, {updateCameraScript}}};\n";
 		return levelCode;
 	}
 
@@ -1350,7 +1409,7 @@ public class buidProject : Node
 
 		return result;
 	}
-	private String genTriggerCode_chunkOpt1(int curLevel)
+	private String genTriggerCode_chunkOpt1(int curLevel, ref System.Collections.Generic.Dictionary<int, int> entityIdEqualsTriggerInd_dict)
 	{
 		GD.Print("Gen TriggerCode_chunkOpt1 for level ", curLevel);
 
@@ -1359,7 +1418,6 @@ public class buidProject : Node
 		String result = ""; ;
 		//Getting "entity_name: mergedId" pairs
 		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict");
-		Vector2 levelSize = (Vector2)singleton.Call("get_level_size", curLevel);
 
 		//GD.Print(1);
 
@@ -1369,139 +1427,129 @@ public class buidProject : Node
 		Godot.Collections.Array gateInstances = (Godot.Collections.Array)singleton.Call("get_gateInstances_by_levelNum", curLevel);
 		//Merging them
 		entityInstances = mergeGodotArrays(entityInstances, gateInstances);
+		
 
 		result += $"const Trigger const Trigger_arr_Level_{curLevel.ToString()}[] = ";
-
-		int chunkSizeX = int.Parse(singleton.Call("get_chunkSizeX").ToString());
-		int chunkSizeY = int.Parse(singleton.Call("get_chunkSizeX").ToString());
-
-		int firstPosX = 0;
-		int firstPosY = 0;
-
-		//int curTriggerInd = 0;
-		int lastPosX = chunkSizeX;
-		int lastPosY = chunkSizeY;
 
 		//Opening Trigger_arr block
 		result += "{";
 
-		while (firstPosY <= levelSize.y)
+
+		System.Collections.Generic.Dictionary<int, String> triggerLinesDict = new System.Collections.Generic.Dictionary<int, string>();
+
+		int triggerAmount = 0;
+		foreach (Godot.Collections.Dictionary entityInst in entityInstances)
 		{
-			while (firstPosX <= levelSize.x)
+			String oneTriggerLine = "";
+			//GD.Print(2);
+			//Getting useful data about entity
+			if (!entityInst.Contains("__identifier"))
 			{
-
-				foreach (Godot.Collections.Dictionary entityInst in entityInstances)
-				{
-					//GD.Print(2);
-					//Getting useful data about entity
-					if (!entityInst.Contains("__identifier"))
-					{
-						continue;
-					}
-					Godot.Collections.Array pos = (Godot.Collections.Array)entityInst["px"];
-					int entityPosX = int.Parse(pos[0].ToString());
-					int entityPosY = int.Parse(pos[1].ToString());
-					//If entity outside chunk bounds
-					if (!((entityPosX >= firstPosX) && (entityPosX < lastPosX)) || !((entityPosY >= firstPosY) && (entityPosY < lastPosY)))
-					{
-						//Then, skipping this entity
-						continue;
-					}
-					if (!entityInst.Contains("addTrigger") || (bool)entityInst["addTrigger"] == false)
-					{
-						continue;
-					}
-					String entityName = (String)entityInst["__identifier"];
-
-					//GD.Print(entityName);
-					//GD.Print(3);
-
-					Godot.Collections.Array triggerAABB = new Godot.Collections.Array();
-
-					if (entityInst.Contains("triggerAABB"))
-					{
-						triggerAABB = (Godot.Collections.Array)entityInst["triggerAABB"];
-					}
-					else
-					{
-						triggerAABB.Add(0);
-						triggerAABB.Add(0);
-						triggerAABB.Add(0);
-						triggerAABB.Add(0);
-
-					}
-					//GD.Print(4);
-					String triggerType = "0";
-					if (entityInst.Contains("triggerTypeName"))
-					{
-						if (entityInst["triggerTypeName"].ToString().Length > 0)
-						{
-							triggerType = "TRIGGER_TYPE_" + entityInst["triggerTypeName"].ToString();
-						}
-					}
-					//GD.Print(4.5);
-					int triggerValue = 0;
-					int triggerValue2 = 0;
-					int triggerValue3 = 0;
-					if (entityInst.Contains("triggerValue"))
-					{
-						triggerValue = (int)int.Parse(entityInst["triggerValue"].ToString());
-					}
-
-					if (entityInst.Contains("triggerValue2"))
-					{
-						triggerValue2 = (int)int.Parse(entityInst["triggerValue2"].ToString());
-					}
-
-					if (entityInst.Contains("triggerValue3"))
-					{
-						triggerValue3 = (int)int.Parse(entityInst["triggerValue3"].ToString());
-					}
-					//GD.Print(5);
-
-					int[] spd = { 0, 0 };
-
-					//Opening Trigger block
-					result += "{";
-
-					//Applying to generated code
-
-					/*****---> Struct reminder <---*****
-			 
-						typedef struct {
-							bool alive;
-							Vect2D_s16 firstPos;
-							Vect2D_s16 lastPos;
-							s8 trigger_type;
-							s8 trigger_value;
-							s16 triggerHp;
-							bool activated;
-							bool prevActivated;
-						} Trigger;
-
-					**********************************/
-
-					result += "TRUE, "; //alive
-					result += "{" + $"{pos[0]}, {pos[1]}" + "}, "; //pos
-					result += "{" + $"{triggerAABB[0]}, {triggerAABB[1]}, {triggerAABB[2]}, {triggerAABB[3]}" + "}, "; //triggerRect
-					result += $"{triggerType}, "; //triggerType
-					result += $"{triggerValue}, "; //triggerValue
-					result += $"{triggerValue2}, "; //triggerValue2
-					result += $"{triggerValue3}, "; //triggerValue3
-					result += "1, "; //triggerHp
-					result += "FALSE, "; //activated
-					result += "FALSE, "; //prevActivated
-
-					//Closing Trigger block
-					result += "}, ";
-				}
-				lastPosX += chunkSizeX;
-				firstPosX += chunkSizeX;
+				continue;
 			}
-			firstPosX = 0;
-			lastPosX = chunkSizeX;
-			lastPosY += chunkSizeY;
-			firstPosY += chunkSizeY;
+			int instId = 0;
+			instId = (int)int.Parse(entityInst["instId"].ToString());
+			
+			if (!entityInst.Contains("addTrigger") || (bool)entityInst["addTrigger"] == false)
+			{
+				continue;
+			}
+			triggerAmount++;
+			String entityName = (String)entityInst["__identifier"];
+
+			//GD.Print(entityName);
+			//GD.Print(3);
+
+			Godot.Collections.Array pos = (Godot.Collections.Array)entityInst["px"];
+
+			Godot.Collections.Array triggerAABB = new Godot.Collections.Array();
+
+			if (entityInst.Contains("triggerAABB"))
+			{
+				triggerAABB = (Godot.Collections.Array)entityInst["triggerAABB"];
+			}
+			else
+			{
+				triggerAABB.Add(0);
+				triggerAABB.Add(0);
+				triggerAABB.Add(0);
+				triggerAABB.Add(0);
+
+			}
+			//GD.Print(4);
+			String triggerType = "0";
+			if (entityInst.Contains("triggerTypeName"))
+			{
+				if (entityInst["triggerTypeName"].ToString().Length > 0)
+				{
+					triggerType = "TRIGGER_TYPE_" + entityInst["triggerTypeName"].ToString();
+				}
+			}
+			//GD.Print(4.5);
+			int triggerValue = 0;
+			int triggerValue2 = 0;
+			int triggerValue3 = 0;
+			if (entityInst.Contains("triggerValue"))
+			{
+				triggerValue = (int)int.Parse(entityInst["triggerValue"].ToString());
+			}
+
+			if (entityInst.Contains("triggerValue2"))
+			{
+				triggerValue2 = (int)int.Parse(entityInst["triggerValue2"].ToString());
+			}
+
+			if (entityInst.Contains("triggerValue3"))
+			{
+				triggerValue3 = (int)int.Parse(entityInst["triggerValue3"].ToString());
+			}
+			//GD.Print(5);
+
+			int[] spd = { 0, 0 };
+
+			//Opening Trigger block
+			oneTriggerLine += "{";
+
+			//Applying to generated code
+
+			/*****---> Struct reminder <---*****
+			 
+				typedef struct {
+					bool alive;
+					Vect2D_s16 firstPos;
+					Vect2D_s16 lastPos;
+					s8 trigger_type;
+					s8 trigger_value;
+					s16 triggerHp;
+					bool activated;
+					bool prevActivated;
+				} Trigger;
+
+			**********************************/
+
+			oneTriggerLine += "TRUE, "; //alive
+			oneTriggerLine += "{" + $"{pos[0]}, {pos[1]}" + "}, "; //pos
+			oneTriggerLine += "{" + $"{triggerAABB[0]}, {triggerAABB[1]}, {triggerAABB[2]}, {triggerAABB[3]}" + "}, "; //triggerRect
+			oneTriggerLine += $"{triggerType}, "; //triggerType
+			oneTriggerLine += $"{triggerValue}, "; //triggerValue
+			oneTriggerLine += $"{triggerValue2}, "; //triggerValue2
+			oneTriggerLine += $"{triggerValue3}, "; //triggerValue3
+			oneTriggerLine += "1, "; //triggerHp
+			oneTriggerLine += "FALSE, "; //activated
+			oneTriggerLine += "FALSE, "; //prevActivated
+
+			//Closing Trigger block
+			oneTriggerLine += "}, ";
+
+			if (entityIdEqualsTriggerInd_dict.ContainsKey(instId))
+			{
+				triggerLinesDict[entityIdEqualsTriggerInd_dict[instId]] = oneTriggerLine;
+			}
+		}
+
+		for(int i=0; i< triggerAmount; i++)
+		{
+			result += triggerLinesDict[i];
 		}
 
 		//Closing Trigger_arr block
@@ -1509,7 +1557,7 @@ public class buidProject : Node
 		return result;
 	}
 
-	private String genEntityMergedCode_chunkOpt1(int curLevel)
+	private String genEntityMergedCode_chunkOpt1(int curLevel, ref System.Collections.Generic.Dictionary<int, int> entityIdEqualsTriggerInd_dict)
 	{
 		GD.Print("Gen EntityMerged Code: chunkOpt1...");
 		String result = "";
@@ -1534,7 +1582,7 @@ public class buidProject : Node
 		int firstPosX = 0;
 		int firstPosY = 0;
 
-		System.Collections.Generic.Dictionary<int, int> entityIdEqualsTriggerInd_dict = new System.Collections.Generic.Dictionary<int, int>();
+		
 
 		int lastTriggerInd = 0;
 		int curTriggerInd = 0;
@@ -1546,12 +1594,15 @@ public class buidProject : Node
 		GD.Print(levelSize.x);
 		GD.Print(levelSize.y);
 
-		while (firstPosY <= levelSize.y)
+		while (firstPosY <= levelSize.y+1)
 		{
-			while (firstPosX <= levelSize.x)
+			while (firstPosX <= levelSize.x+1)
 			{
+				
 				String arrName = $"EntityMerged_arr_ChunkOpt1_Level_{curLevel.ToString()}_chunk_{firstPosX.ToString()}_{firstPosY.ToString()}";
-				chunksCode += $"const EntityMerged const {arrName}[] = {{";
+				//EntityMerged_arr open
+				String tempChunkCode = $"const EntityMerged const {arrName}[] = {{";
+				//chunksCode += $"const EntityMerged const {arrName}[] = {{";
 
 				int entityAmountInChunk = 0;
 				foreach (Godot.Collections.Dictionary entityInst in entityInstances)
@@ -1575,10 +1626,10 @@ public class buidProject : Node
 					int entityLastPosY = entityFirstPosY + height;
 
 					//Checking all 4 corners of entity, to make sure, that entity copied in all intercepted chunks.
-					bool leftUpPointCheck = !((entityFirstPosX >= firstPosX) && (entityFirstPosX < lastPosX)) || !((entityFirstPosY >= firstPosY) && (entityFirstPosY < lastPosY));
-					bool rightUpPointCheck = !((entityLastPosX >= firstPosX) && (entityLastPosX < lastPosX)) || !((entityFirstPosY >= firstPosY) && (entityFirstPosY < lastPosY));
-					bool leftDownPointCheck = !((entityFirstPosX >= firstPosX) && (entityFirstPosX < lastPosX)) || !((entityLastPosY >= firstPosY) && (entityLastPosY < lastPosY));
-					bool rightDownPointCheck = !((entityLastPosX >= firstPosX) && (entityLastPosX < lastPosX)) || !((entityLastPosY >= firstPosY) && (entityLastPosY < lastPosY));
+					bool leftUpPointCheck = !((entityFirstPosX >= firstPosX) && (entityFirstPosX <= lastPosX)) || !((entityFirstPosY >= firstPosY) && (entityFirstPosY <= lastPosY));
+					bool rightUpPointCheck = !((entityLastPosX >= firstPosX) && (entityLastPosX <= lastPosX)) || !((entityFirstPosY >= firstPosY) && (entityFirstPosY <= lastPosY));
+					bool leftDownPointCheck = !((entityFirstPosX >= firstPosX) && (entityFirstPosX <= lastPosX)) || !((entityLastPosY >= firstPosY) && (entityLastPosY <= lastPosY));
+					bool rightDownPointCheck = !((entityLastPosX >= firstPosX) && (entityLastPosX <= lastPosX)) || !((entityLastPosY >= firstPosY) && (entityLastPosY <= lastPosY));
 
 					//If entity outside chunk bounds
 					if (leftUpPointCheck && rightUpPointCheck && leftDownPointCheck && rightDownPointCheck)
@@ -1597,7 +1648,7 @@ public class buidProject : Node
 					int[] spd = { 0, 0 };
 
 					//Opening entityMerged block
-					chunksCode += "{";
+					tempChunkCode += "{";
 
 					//Applying to generated code
 
@@ -1618,18 +1669,18 @@ public class buidProject : Node
 
 					**********************************/
 
-					chunksCode += $"{mergedId.ToString()},"; //mergedId
-					chunksCode += $"{instId.ToString()},"; //instId
-					chunksCode += $" TRUE, "; //alive 
-					chunksCode += "{" + pos[0].ToString() + ", " + pos[1].ToString() + "}, "; //posInt
-					chunksCode += "{FIX32(" + pos[0].ToString() + "), FIX32(" + pos[1].ToString() + ")}, "; //pos
-					chunksCode += "{" + spd[0].ToString() + ", " + spd[1].ToString() + "}, "; //spd
-					chunksCode += "{" + width.ToString() + ", " + height.ToString() + "}, "; //size
-					chunksCode += "FALSE, "; //onScreen
+					tempChunkCode += $"{mergedId.ToString()},"; //mergedId
+					tempChunkCode += $"{instId.ToString()},"; //instId
+					tempChunkCode += $" TRUE, "; //alive 
+					tempChunkCode += "{" + pos[0].ToString() + ", " + pos[1].ToString() + "}, "; //posInt
+					tempChunkCode += "{FIX32(" + pos[0].ToString() + "), FIX32(" + pos[1].ToString() + ")}, "; //pos
+					tempChunkCode += "{" + spd[0].ToString() + ", " + spd[1].ToString() + "}, "; //spd
+					tempChunkCode += "{" + width.ToString() + ", " + height.ToString() + "}, "; //size
+					tempChunkCode += "FALSE, "; //onScreen
 
 					if (!entityInst.Contains("addTrigger") || (bool)entityInst["addTrigger"] == false)
 					{
-						chunksCode += $"NULL,"; //trigger = NULL
+						tempChunkCode += $"NULL,"; //trigger = NULL
 					}
 					else
 					{
@@ -1643,16 +1694,16 @@ public class buidProject : Node
 							lastTriggerInd++;
 						}
 						//addTrigger = true;
-						chunksCode += $"&Trigger_arr_Level_{curLevel}[{curTriggerInd}],"; //trigger
+						tempChunkCode += $"&Trigger_arr_Level_{curLevel}[{curTriggerInd}],"; //trigger
 
 					}
-					chunksCode += $"{curTriggerInd},"; //triggerInd small this is for unoptimized entity load algorithm
-					chunksCode += "NULL,"; //spr
+					tempChunkCode += $"{curTriggerInd},"; //triggerInd small this is for unoptimized entity load algorithm
+					tempChunkCode += "NULL,"; //spr
 
 					if (showTriggerRects)
 					{
-						chunksCode += "NULL, "; //debugSpr1
-						chunksCode += "NULL, "; //debugSpr2
+						tempChunkCode += "NULL, "; //debugSpr1
+						tempChunkCode += "NULL, "; //debugSpr2
 					}
 
 					//Checking every field
@@ -1687,7 +1738,7 @@ public class buidProject : Node
 						{
 							value = fieldDef["defaultValue"].ToString();
 						}
-						chunksCode += value + ", ";
+						tempChunkCode += value + ", ";
 
 
 					}
@@ -1697,13 +1748,31 @@ public class buidProject : Node
 					//}
 
 					//Closing entityMerged block
-					chunksCode += "}, ";
+					tempChunkCode += "}, ";
 				}
-				chunksCodeAll += $"{{{entityAmountInChunk.ToString()}, &{arrName}}}, ";
-				chunksCode += "};\n";
+				if(entityAmountInChunk == 0)
+				{
+					arrName = "NULL";
+				} else
+				{
+					arrName = "&" + arrName;
+
+				}
+				chunksCodeAll += $"{{{entityAmountInChunk.ToString()}, {arrName}}}, ";
+				tempChunkCode += "};\n";
 				lastPosX += chunkSizeX;
 				firstPosX += chunkSizeX;
 
+				if (entityAmountInChunk == 0)
+				{
+					//If chunk is empty, then, no need to waste rom storage.
+					tempChunkCode = "";
+				} else
+				{
+					//If chunk have at least 1 entity, then, saving chunks code
+					chunksCode += tempChunkCode;
+
+				}
 			}
 			firstPosX = 0;
 			lastPosX = chunkSizeX;
@@ -2070,8 +2139,12 @@ public class buidProject : Node
 					result += genEntityMergedCode(curLevel);
 					break;
 				case 1:
-					result += genTriggerCode_chunkOpt1(curLevel);
-					result += genEntityMergedCode_chunkOpt1(curLevel);
+					System.Collections.Generic.Dictionary<int, int> entityIdEqualsTriggerInd_dict = new System.Collections.Generic.Dictionary<int, int>();
+					String temp = "";
+					temp += genEntityMergedCode_chunkOpt1(curLevel, ref entityIdEqualsTriggerInd_dict);
+
+					result += genTriggerCode_chunkOpt1(curLevel, ref entityIdEqualsTriggerInd_dict);
+					result += temp;
 					break;
 			}
 			

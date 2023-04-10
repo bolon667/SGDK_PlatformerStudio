@@ -43,6 +43,9 @@ typedef struct {
 	Palette* pal1;
 	Palette* pal2;
 	Palette* pal3;
+	u16 levelMode;
+	u16 controlScript;
+	u16 updateCameraScript;
 } Level;
 
 

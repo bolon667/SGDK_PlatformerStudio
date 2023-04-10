@@ -24,6 +24,7 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 	VDP_setPlaneSize(64,32,TRUE);
 	VDP_setScrollingMode(HSCROLL_PLANE, VSCROLL_PLANE);
 	SPR_reset();
+	SYS_doVBlankProcess();
 
 	//Deallocate prev entityData to avoid memory leak
 	deallocLevel();
@@ -39,8 +40,14 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 	if(curLvlData->beforeLevelFunc != NULL){
 		(*curLvlData->beforeLevelFunc)();
 	}
+	if(curLvlData->levelMode == 0){
+		playerInit((Vect2D_s16)startPos);
+	} else {
+		playerBody.globalPosition.x = 0;
+		playerBody.globalPosition.y = 0;
 
-	playerInit((Vect2D_s16)startPos);
+	}
+	
 	updateCamera();
 	
 	
@@ -50,7 +57,7 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 			curLvlData->pal1 = curLvlData->foregroundPallete;
 		}
 		memcpy(&palette_full[16],  curLvlData->pal1->data, 16 * 2);
-		VDP_loadTileSet(curLvlData->foregroundTileset, VDPTilesFilled, DMA);
+		VDP_loadTileSet(curLvlData->foregroundTileset, VDPTilesFilled, DMA_QUEUE);
 		bga = MAP_create(curLvlData->foregroundMap, BG_A, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, VDPTilesFilled));
 		VDPTilesFilled += curLvlData->foregroundTileset->numTile;
 	} else {
@@ -62,7 +69,7 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 			curLvlData->pal0 = curLvlData->backgroundPallete;
 		}
 		memcpy(&palette_full[0],  curLvlData->pal0->data, 16 * 2);
-		VDP_loadTileSet(curLvlData->backgroundTileset, VDPTilesFilled, DMA);
+		VDP_loadTileSet(curLvlData->backgroundTileset, VDPTilesFilled, DMA_QUEUE);
 		bgb = MAP_create(curLvlData->backgroundMap, BG_B, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, VDPTilesFilled));
 		VDPTilesFilled += curLvlData->backgroundTileset->numTile;
 	} else {
@@ -74,15 +81,16 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 			curLvlData->pal1 = curLvlData->foregroundImage->palette;
 		}
 		memcpy(&palette_full[16],  curLvlData->pal1->data, 16 * 2);
-		VDP_drawImageEx(BG_A, curLvlData->foregroundImage, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, VDPTilesFilled), 0, 0, FALSE, TRUE);
+		VDP_drawImageEx(BG_A, curLvlData->foregroundImage, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, VDPTilesFilled), 0, 0, FALSE, FALSE);
 		VDPTilesFilled += curLvlData->foregroundImage->tileset->numTile;
 	}
+	
 	if(curLvlData->backgroundImage != NULL){
 		if(curLvlData->pal0 == NULL){
 			curLvlData->pal0 = curLvlData->backgroundImage->palette;
 		}
 		memcpy(&palette_full[0],  curLvlData->pal0->data, 16 * 2);
-		VDP_drawImageEx(BG_B, curLvlData->backgroundImage, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, VDPTilesFilled), 0, 0, FALSE, TRUE);
+		VDP_drawImageEx(BG_B, curLvlData->backgroundImage, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, VDPTilesFilled), 0, 0, FALSE, FALSE);
 		VDPTilesFilled += curLvlData->backgroundImage->tileset->numTile;
 	}
 

@@ -39,6 +39,7 @@ func load_chunk_size():
 func load_entity_optimization():
 	if(singleton.entity_types.has("entityLoadOptimization")):
 		entityOptBtn.select(singleton.entity_types["entityLoadOptimization"])
+		$CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HBoxContainer4.visible = singleton.entity_types["entityLoadOptimization"]
 
 func load_run_from_cur_level():
 	if(singleton.entity_types.has("runFromCurrentLevel")):
@@ -85,7 +86,10 @@ func _on_addBulletSlotsSlider_value_changed(value):
 
 func _on_entityOptBtn_item_selected(index):
 	singleton.entity_types["entityLoadOptimization"] = index
-
+	var chunkVisible: bool = false
+	if (index > 0):
+		chunkVisible = true
+	$CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HBoxContainer4.visible = chunkVisible
 
 func _on_chunkSizeX_text_changed(new_text):
 	singleton.entity_types["chunkSizeX"] = int(new_text)

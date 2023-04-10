@@ -11,6 +11,7 @@ public class ChooseFileProperty : HBoxContainer
 
 	[Export] private String levelAttrName = "";
 	[Export] private String fileDialogLocalPath = "/code_template/customScripts/";
+	[Export] private String defaultVal = "NULL";
 	public override void _Ready()
 	{
 		singleton = (Node)GetNode("/root/singleton");
@@ -43,7 +44,7 @@ public class ChooseFileProperty : HBoxContainer
 	private void _on_removeBtn_button_down()
 	{
 		singleton.Call("change_level_attr", levelAttrName, "");
-		infoLabel.Text = "NULL";
+		infoLabel.Text = defaultVal;
 	}
 	
 	private void _on_applyAllLevelsBtn_button_down()

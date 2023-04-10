@@ -9,5 +9,6 @@ void deleteEntityMergedTriggerByInstId(u16 instId);
 void showEntityAll();
 void showEntityMerged(EntityMerged *entity);
 
+void(* showEntityAll_arr[])(void);
 
 

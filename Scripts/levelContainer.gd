@@ -59,6 +59,7 @@ func draw_frame(rect: Rect2, color, line_thickness):
 
 func delete_self():
 	#singleton.entity_types["turnOnGates"] = false
+	
 	disable_side_areas()
 	yield(get_tree(), "idle_frame")
 	#get_tree.
