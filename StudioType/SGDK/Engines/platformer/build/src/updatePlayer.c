@@ -42,8 +42,8 @@ void updatePlayer() {
 				playerBody.velocity.fixX -= playerBody.deceleration;
 			else if (playerBody.velocity.x < 0)
 				playerBody.velocity.fixX += playerBody.deceleration;
-			else
-				playerBody.velocity.fixX = 0;
+			// else
+			// 	playerBody.velocity.fixX = 0;
 		}
 		playerBody.velocity.x = clamp(fix16ToInt(playerBody.velocity.fixX), -playerBody.speed, playerBody.speed);
 	}
@@ -76,12 +76,6 @@ void updatePlayer() {
 	SPR_setPosition(playerBody.sprite, playerBody.position.x, playerBody.position.y);
 	//$showTriggerRects$
 	
-
-	//Reset when falling off the screen
-	if (playerBody.falling) {
-		dyingSteps++;
-		if(dyingSteps > dieDelay){
-			SYS_hardReset();
-		}
-	}
+	updateAnimations();
+	playerInputChanged();
 }

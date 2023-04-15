@@ -26,17 +26,26 @@ struct pBody {
 	bool onGround;
 	bool onStair;
 	bool onSemiSolid;
+	bool semiSolidHasCollision;
 	bool jumping;
 	bool falling;
 	bool climbingStair;
 	bool attack;
 
 	bool damaged;
+	bool godMode;
+	bool isVisible;
 
 	s16 animMode;
+	s16 state;
 	bool animModeChangable;
 
+	u16 attackType;
+
+	bool dead;
 	s16 hp;
+
+	u16 vdpIndexPos;
 	
 	Vect2D_s16 position;
 	Vect2D_s16 globalPosition;
@@ -48,7 +57,7 @@ struct pBody {
 		fix16 fixY;
 	}velocity;
 
-	
+	s16 timer;
 
 	s16 curAmountOfJumps;
 	s16 maxAmountOfJumps;

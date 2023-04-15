@@ -1,4 +1,4 @@
-$entityType$* addNew_$entityName$(Vect2D_s16 posInt){
+$entityType$* addNew_$entityName$(Vect2D_s16 posInt, Vect2D_f16 spd){
     Trigger* foundTrigger = NULL;
     KDebug_Alert("new Trigger");
     for(u16 i=0; i<curEntityAll->Trigger_size; i++){
@@ -13,7 +13,7 @@ $entityType$* addNew_$entityName$(Vect2D_s16 posInt){
     }
     if(foundTrigger == NULL) {
         KDebug_Alert("Fail for Trigger and for $entityName$...");
-        return;
+        return NULL;
     }
 
     for(u16 i=0; i<curEntityAll->$entityType$_size; i++){
@@ -30,7 +30,7 @@ $entityType$* addNew_$entityName$(Vect2D_s16 posInt){
             //Adding trigger to entity
             curEntityAll->$entityType$_arr[i].trigger = foundTrigger;
             KDebug_Alert("Success for $entityName$!");
-            return NULL;
+            return &curEntityAll->$entityType$_arr[i];
         }
     }
     KDebug_Alert("Fail for $entityName$...");

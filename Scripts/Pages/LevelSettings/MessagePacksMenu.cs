@@ -10,6 +10,7 @@ public class MessagePacksMenu : Control
 	public override void _Ready()
 	{
 		try {
+		
 		singleton = (Node)GetNode("/root/singleton");
 		settingsContainer = (VBoxContainer)GetNode("CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer");
 		curLevelLabel = (Label)GetNode("CanvasLayer/VBoxContainer/HBoxContainer2/curLevelLabel");
@@ -31,9 +32,10 @@ public class MessagePacksMenu : Control
 				Godot.Collections.Array propertyContainer_arr = (Godot.Collections.Array)groupContainer.GetChildren();
 				foreach (Node propertyContainer in propertyContainer_arr)
 				{
-					String levelAttrName = (String)propertyContainer.Get("levelAttrName");
-					String attrVal = (String)singleton.Call("get_level_attr", levelAttrName, level_ind);
+					String levelAttrName = propertyContainer.Get("levelAttrName").ToString();
+					String attrVal = singleton.Call("get_level_attr", levelAttrName, level_ind).ToString();
 					Label infoLabel = (Label)propertyContainer.GetNode("VBoxContainer/infoLabel");
+					
 					if (attrVal.Length == 0)
 					{
 						infoLabel.Text = "NULL";
@@ -42,10 +44,12 @@ public class MessagePacksMenu : Control
 					{
 						infoLabel.Text = attrVal;
 					}
+
+					propertyContainer.Call("loadContent");
 				}
 			} else
 			{
-				String levelAttrName = (String)child.Get("levelAttrName");
+				String levelAttrName = child.Get("levelAttrName").ToString();
 				String attrVal = singleton.Call("get_level_attr", levelAttrName, level_ind).ToString();
 				if (child.HasNode("VBoxContainer/infoLabel"))
 				{
@@ -58,6 +62,7 @@ public class MessagePacksMenu : Control
 					{
 						infoLabel.Text = attrVal;
 					}
+					child.Call("loadContent");
 				} else if (child.HasNode("VBoxContainer/HBoxContainer/OptionButton"))
 				{
 					OptionButton optionButton = (OptionButton)child.GetNode("VBoxContainer/HBoxContainer/OptionButton");
@@ -70,7 +75,7 @@ public class MessagePacksMenu : Control
 
 	}
 	private void _on_ExitBtn_pressed()
-	{
+	{	
 		QueueFree();
 	}
 }

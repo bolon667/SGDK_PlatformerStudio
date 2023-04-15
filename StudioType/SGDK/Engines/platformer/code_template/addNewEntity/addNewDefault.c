@@ -12,7 +12,7 @@ $entityType$* addNew_$entityName$(Vect2D_s16 posInt, Vect2D_f16 spd){
             //Changing making entity ALIVE
             curEntityAll->$entityType$_arr[i].alive = TRUE;
             KDebug_Alert("Success for $entityName$!");
-            return NULL;
+            return &curEntityAll->$entityType$_arr[i];
         }
     }
     KDebug_Alert("Fail for $entityName$...");

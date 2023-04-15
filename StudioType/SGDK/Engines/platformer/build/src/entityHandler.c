@@ -6,6 +6,7 @@
 #include "../inc/enums.h"
 
 #include "../res/resources.h"
+#include "../res/images.h"
 #include "../res/gfx.h"
 #include "../res/sprites.h"
 #include "../inc/camera.h"
@@ -71,6 +72,8 @@ EntityMerged* addNew_EntityMerged(EntityMerged* entity){
     
 
 void entityCheckForBullet(EntityMerged* entity){
+	//WARNING
+	//If you wanna make an enemy which not desappearing after death, then, make sure that enemy does not call this function, otherwise you will get a MEMORY LEAK!!!
 	entity->damaged = FALSE;
 	AABB entityTriggerBounds = newAABB(
 		entity->trigger->pos.x + entity->trigger->rect.min.x,
@@ -155,6 +158,21 @@ EntityMerged* getEntityMergedByInstId(u16 instId){
 	}
 	return NULL;
 }
+
+// EntityMerged* getRandomEntityMergedByDefId(u16 instId){
+// 	//DefId = EntityType
+// 	//May be will add that in the future
+// 	for(u16 i = 0; i < curEntityAll->EntityMerged_size; i++){
+// 		EntityMerged* curEntityMerged = &curEntityAll->EntityMerged_arr[i];
+// 		if(!curEntityMerged->alive){
+// 			continue;
+// 		}
+// 		if(curEntityMerged->instId == instId){
+// 			return curEntityMerged;
+// 		}
+// 	}
+// 	return NULL;
+// }
 
 
 //$triggerTypeFuncs$

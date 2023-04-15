@@ -68,30 +68,48 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="levelMode" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 5 )]
-margin_bottom = 40.0
+margin_bottom = 64.0
 levelAttrName = "levelMode"
 
-[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode" index="0"]
-margin_bottom = 40.0
-
-[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer/HBoxContainer" index="0"]
-margin_top = 10.0
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode" index="0"]
 margin_right = 109.0
-margin_bottom = 30.0
+margin_bottom = 42.0
+text = "Level Mode: "
 
-[node name="OptionButton" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer/HBoxContainer" index="1"]
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode" index="1"]
 margin_left = 113.0
-margin_right = 806.0
+margin_bottom = 64.0
+
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer" index="0"]
+margin_right = 911.0
+margin_bottom = 20.0
+
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer" index="1"]
+margin_top = 24.0
+margin_right = 911.0
+margin_bottom = 64.0
+
+[node name="OptionButton" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 574.0
 text = "Level"
 items = [ "Level", null, false, 0, null, "Scene", null, false, 1, null ]
 selected = 0
 
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 578.0
+margin_right = 693.0
+
 [node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 810.0
+margin_left = 697.0
+margin_right = 867.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 871.0
+margin_right = 911.0
 
 [node name="ControlScript" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
-margin_top = 44.0
-margin_bottom = 108.0
+margin_top = 68.0
+margin_bottom = 132.0
 levelAttrName = "controlScript"
 defaultVal = "updatePlayer"
 
@@ -114,14 +132,18 @@ margin_right = 893.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 675.0
+margin_right = 556.0
 text = "Choose replacement for updatePlayer func"
 
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer/HBoxContainer" index="1"]
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 560.0
+margin_right = 675.0
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer/HBoxContainer" index="2"]
 margin_left = 679.0
 margin_right = 849.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer/HBoxContainer" index="2"]
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer/HBoxContainer" index="3"]
 margin_left = 853.0
 margin_right = 893.0
 
@@ -131,8 +153,8 @@ margin_right = 1012.0
 filters = PoolStringArray( "*.c" )
 
 [node name="UpdateCameraScript" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
-margin_top = 112.0
-margin_bottom = 176.0
+margin_top = 136.0
+margin_bottom = 200.0
 levelAttrName = "updateCameraScript"
 defaultVal = "updateCamera"
 
@@ -155,14 +177,18 @@ margin_right = 891.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 673.0
+margin_right = 554.0
 text = "Choose replacement for updateCamera func"
 
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer/HBoxContainer" index="1"]
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 558.0
+margin_right = 673.0
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer/HBoxContainer" index="2"]
 margin_left = 677.0
 margin_right = 847.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer/HBoxContainer" index="2"]
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer/HBoxContainer" index="3"]
 margin_left = 851.0
 margin_right = 891.0
 
@@ -172,8 +198,8 @@ margin_right = 1012.0
 filters = PoolStringArray( "*.c" )
 
 [node name="chooseMusic" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
-margin_top = 180.0
-margin_bottom = 244.0
+margin_top = 204.0
+margin_bottom = 268.0
 levelAttrName = "musicName"
 fileDialogLocalPath = "/build/res/music/"
 
@@ -196,14 +222,18 @@ margin_right = 893.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 675.0
+margin_right = 556.0
 text = "Choose vgm"
 
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="1"]
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 560.0
+margin_right = 675.0
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="2"]
 margin_left = 679.0
 margin_right = 849.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="2"]
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="3"]
 margin_left = 853.0
 margin_right = 893.0
 
@@ -213,55 +243,56 @@ margin_right = 1012.0
 filters = PoolStringArray( "*.vgm" )
 
 [node name="DropDownContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 4 )]
-margin_top = 248.0
-margin_bottom = 278.0
+margin_top = 272.0
+margin_bottom = 302.0
 groupName = "Scripts"
 
 [node name="GroupContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer" index="1"]
-margin_top = 30.0
-margin_right = 1014.0
-margin_bottom = 230.0
+margin_top = 34.0
+margin_bottom = 234.0
 
 [node name="beforeLevelScript" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer" index="0" instance=ExtResource( 2 )]
-margin_right = 1014.0
 margin_bottom = 64.0
 levelAttrName = "beforeLevelScript"
 
 [node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/beforeLevelScript" index="0"]
-margin_right = 170.0
+margin_right = 214.0
 margin_bottom = 42.0
+text = "Before load level script: "
 
 [node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/beforeLevelScript" index="1"]
-margin_left = 174.0
-margin_right = 1014.0
+margin_left = 218.0
 margin_bottom = 64.0
 
 [node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/beforeLevelScript/VBoxContainer" index="0"]
-margin_right = 840.0
+margin_right = 806.0
 margin_bottom = 20.0
 
 [node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/beforeLevelScript/VBoxContainer" index="1"]
 margin_top = 24.0
-margin_right = 840.0
+margin_right = 806.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 622.0
+margin_right = 469.0
 
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="1"]
-margin_left = 626.0
-margin_right = 796.0
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 473.0
+margin_right = 588.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 800.0
-margin_right = 840.0
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 592.0
+margin_right = 762.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/beforeLevelScript/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 766.0
+margin_right = 806.0
 
 [node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/beforeLevelScript" index="2"]
 filters = PoolStringArray( "*.c" )
 
 [node name="everyFrameScript" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer" index="1" instance=ExtResource( 2 )]
 margin_top = 68.0
-margin_right = 1014.0
 margin_bottom = 132.0
 levelAttrName = "everyFrameScript"
 
@@ -272,28 +303,31 @@ text = "Every frame script: "
 
 [node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/everyFrameScript" index="1"]
 margin_left = 172.0
-margin_right = 1014.0
 margin_bottom = 64.0
 
 [node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/everyFrameScript/VBoxContainer" index="0"]
-margin_right = 842.0
+margin_right = 852.0
 margin_bottom = 20.0
 
 [node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/everyFrameScript/VBoxContainer" index="1"]
 margin_top = 24.0
-margin_right = 842.0
+margin_right = 852.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 624.0
+margin_right = 515.0
 
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="1"]
-margin_left = 628.0
-margin_right = 798.0
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 519.0
+margin_right = 634.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 802.0
-margin_right = 842.0
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 638.0
+margin_right = 808.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/everyFrameScript/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 812.0
+margin_right = 852.0
 
 [node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/everyFrameScript" index="2"]
 margin_left = 612.0
@@ -302,39 +336,41 @@ filters = PoolStringArray( "*.c" )
 
 [node name="afterLevelScript" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer" index="2" instance=ExtResource( 2 )]
 margin_top = 136.0
-margin_right = 1014.0
 margin_bottom = 200.0
 levelAttrName = "afterLevelScript"
 
 [node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/afterLevelScript" index="0"]
-margin_right = 157.0
+margin_right = 201.0
 margin_bottom = 42.0
-text = "After level script: "
+text = "After load level script: "
 
 [node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/afterLevelScript" index="1"]
-margin_left = 161.0
-margin_right = 1014.0
+margin_left = 205.0
 margin_bottom = 64.0
 
 [node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/afterLevelScript/VBoxContainer" index="0"]
-margin_right = 853.0
+margin_right = 819.0
 margin_bottom = 20.0
 
 [node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/afterLevelScript/VBoxContainer" index="1"]
 margin_top = 24.0
-margin_right = 853.0
+margin_right = 819.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 635.0
+margin_right = 482.0
 
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="1"]
-margin_left = 639.0
-margin_right = 809.0
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 486.0
+margin_right = 601.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 813.0
-margin_right = 853.0
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 605.0
+margin_right = 775.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/afterLevelScript/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 779.0
+margin_right = 819.0
 
 [node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/afterLevelScript" index="2"]
 margin_left = 612.0
@@ -342,16 +378,103 @@ margin_right = 1012.0
 filters = PoolStringArray( "*.c" )
 
 [node name="DropDownContainer2" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 4 )]
-margin_top = 282.0
-margin_bottom = 312.0
+margin_top = 306.0
+margin_bottom = 336.0
 groupName = "Palette"
 
 [node name="GroupContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2" index="1"]
-margin_top = 30.0
-margin_bottom = 30.0
+margin_top = 34.0
+margin_right = 1014.0
+margin_bottom = 438.0
 
-[node name="pal0" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer" index="0" instance=ExtResource( 2 )]
+[node name="ForePal_ind" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer" index="0" instance=ExtResource( 5 )]
+margin_right = 1014.0
 margin_bottom = 64.0
+levelAttrName = "forePalIndex"
+
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/ForePal_ind" index="0"]
+margin_right = 172.0
+margin_bottom = 42.0
+
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/ForePal_ind" index="1"]
+margin_left = 176.0
+margin_right = 1014.0
+margin_bottom = 64.0
+
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/ForePal_ind/VBoxContainer" index="0"]
+margin_right = 838.0
+margin_bottom = 20.0
+
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/ForePal_ind/VBoxContainer" index="1"]
+margin_top = 24.0
+margin_right = 838.0
+margin_bottom = 64.0
+
+[node name="OptionButton" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/ForePal_ind/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 501.0
+text = "PAL0"
+items = [ "PAL0", null, false, 0, null, "PAL1", null, false, 1, null, "PAL2", null, false, 2, null, "PAL3", null, false, 3, null ]
+selected = 0
+
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/ForePal_ind/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 505.0
+margin_right = 620.0
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/ForePal_ind/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 624.0
+margin_right = 794.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/ForePal_ind/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 798.0
+margin_right = 838.0
+
+[node name="BackPal_ind" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer" index="1" instance=ExtResource( 5 )]
+margin_top = 68.0
+margin_right = 1014.0
+margin_bottom = 132.0
+levelAttrName = "backPalIndex"
+
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/BackPal_ind" index="0"]
+margin_right = 177.0
+margin_bottom = 42.0
+text = "Background pal ind: "
+
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/BackPal_ind" index="1"]
+margin_left = 181.0
+margin_right = 1014.0
+margin_bottom = 64.0
+
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/BackPal_ind/VBoxContainer" index="0"]
+margin_right = 833.0
+margin_bottom = 20.0
+
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/BackPal_ind/VBoxContainer" index="1"]
+margin_top = 24.0
+margin_right = 833.0
+margin_bottom = 64.0
+
+[node name="OptionButton" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/BackPal_ind/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 496.0
+text = "PAL0"
+items = [ "PAL0", null, false, 0, null, "PAL1", null, false, 1, null, "PAL2", null, false, 2, null, "PAL3", null, false, 3, null ]
+selected = 0
+
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/BackPal_ind/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 500.0
+margin_right = 615.0
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/BackPal_ind/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 619.0
+margin_right = 789.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/BackPal_ind/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 793.0
+margin_right = 833.0
+
+[node name="pal0" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer" index="2" instance=ExtResource( 2 )]
+margin_top = 136.0
+margin_right = 1014.0
+margin_bottom = 200.0
 levelAttrName = "pal0SpriteName"
 fileDialogLocalPath = "/build/res/palette/"
 
@@ -362,37 +485,43 @@ text = "Change PAL0:"
 
 [node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal0" index="1"]
 margin_left = 114.0
+margin_right = 1014.0
 margin_bottom = 64.0
 
 [node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal0/VBoxContainer" index="0"]
-margin_right = 910.0
+margin_right = 900.0
 margin_bottom = 20.0
 
 [node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal0/VBoxContainer" index="1"]
 margin_top = 24.0
-margin_right = 910.0
+margin_right = 900.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal0/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 692.0
+margin_right = 563.0
 text = "Choose png"
 
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal0/VBoxContainer/HBoxContainer" index="1"]
-margin_left = 696.0
-margin_right = 866.0
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal0/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 567.0
+margin_right = 682.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal0/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 870.0
-margin_right = 910.0
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal0/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 686.0
+margin_right = 856.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal0/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 860.0
+margin_right = 900.0
 
 [node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal0" index="2"]
 margin_left = 612.0
 margin_right = 1012.0
 filters = PoolStringArray( "*.png", "*.pal", "*.bmp" )
 
-[node name="pal1" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer" index="1" instance=ExtResource( 2 )]
-margin_top = 68.0
-margin_bottom = 132.0
+[node name="pal1" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer" index="3" instance=ExtResource( 2 )]
+margin_top = 204.0
+margin_right = 1014.0
+margin_bottom = 268.0
 levelAttrName = "pal1SpriteName"
 fileDialogLocalPath = "/build/res/palette/"
 
@@ -403,37 +532,43 @@ text = "Change PAL1:"
 
 [node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal1" index="1"]
 margin_left = 110.0
+margin_right = 1014.0
 margin_bottom = 64.0
 
 [node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal1/VBoxContainer" index="0"]
-margin_right = 914.0
+margin_right = 904.0
 margin_bottom = 20.0
 
 [node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal1/VBoxContainer" index="1"]
 margin_top = 24.0
-margin_right = 914.0
+margin_right = 904.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal1/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 696.0
+margin_right = 567.0
 text = "Choose png"
 
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal1/VBoxContainer/HBoxContainer" index="1"]
-margin_left = 700.0
-margin_right = 870.0
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal1/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 571.0
+margin_right = 686.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal1/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 874.0
-margin_right = 914.0
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal1/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 690.0
+margin_right = 860.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal1/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 864.0
+margin_right = 904.0
 
 [node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal1" index="2"]
 margin_left = 612.0
 margin_right = 1012.0
 filters = PoolStringArray( "*.png", "*.bmp", "*.pal" )
 
-[node name="pal2" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer" index="2" instance=ExtResource( 2 )]
-margin_top = 136.0
-margin_bottom = 200.0
+[node name="pal2" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer" index="4" instance=ExtResource( 2 )]
+margin_top = 272.0
+margin_right = 1014.0
+margin_bottom = 336.0
 levelAttrName = "pal2SpriteName"
 fileDialogLocalPath = "/build/res/palette/"
 
@@ -444,37 +579,43 @@ text = "Change PAL2:"
 
 [node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal2" index="1"]
 margin_left = 114.0
+margin_right = 1014.0
 margin_bottom = 64.0
 
 [node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal2/VBoxContainer" index="0"]
-margin_right = 910.0
+margin_right = 900.0
 margin_bottom = 20.0
 
 [node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal2/VBoxContainer" index="1"]
 margin_top = 24.0
-margin_right = 910.0
+margin_right = 900.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal2/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 692.0
+margin_right = 563.0
 text = "Choose png"
 
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal2/VBoxContainer/HBoxContainer" index="1"]
-margin_left = 696.0
-margin_right = 866.0
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal2/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 567.0
+margin_right = 682.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal2/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 870.0
-margin_right = 910.0
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal2/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 686.0
+margin_right = 856.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal2/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 860.0
+margin_right = 900.0
 
 [node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal2" index="2"]
 margin_left = 612.0
 margin_right = 1012.0
 filters = PoolStringArray( "*.png", "*.bmp", "*.pal" )
 
-[node name="pal3" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer" index="3" instance=ExtResource( 2 )]
-margin_top = 204.0
-margin_bottom = 268.0
+[node name="pal3" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer" index="5" instance=ExtResource( 2 )]
+margin_top = 340.0
+margin_right = 1014.0
+margin_bottom = 404.0
 levelAttrName = "pal3SpriteName"
 fileDialogLocalPath = "/build/res/palette/"
 
@@ -485,28 +626,33 @@ text = "Change PAL3:"
 
 [node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal3" index="1"]
 margin_left = 113.0
+margin_right = 1014.0
 margin_bottom = 64.0
 
 [node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal3/VBoxContainer" index="0"]
-margin_right = 911.0
+margin_right = 901.0
 margin_bottom = 20.0
 
 [node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal3/VBoxContainer" index="1"]
 margin_top = 24.0
-margin_right = 911.0
+margin_right = 901.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal3/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 693.0
+margin_right = 564.0
 text = "Choose png"
 
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal3/VBoxContainer/HBoxContainer" index="1"]
-margin_left = 697.0
-margin_right = 867.0
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal3/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 568.0
+margin_right = 683.0
 
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal3/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 871.0
-margin_right = 911.0
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal3/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 687.0
+margin_right = 857.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal3/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 861.0
+margin_right = 901.0
 
 [node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal3" index="2"]
 margin_left = 612.0
@@ -524,6 +670,8 @@ filters = PoolStringArray( "*.png", "*.bmp", "*.pal" )
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/everyFrameScript"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/afterLevelScript"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/ForePal_ind"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/BackPal_ind"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal0"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal1"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/pal2"]

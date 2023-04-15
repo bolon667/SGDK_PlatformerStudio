@@ -112,6 +112,7 @@ func _on_MessagePacksBtn_button_down():
 	var node = msg_packs_menu_t.instance()
 	node.level_ind = level_container.cur_level_ind
 	leftContainer.add_child(node)
+	singleton.in_modal_window = false
 	queue_free()
 
 
@@ -119,6 +120,7 @@ func _on_LevelSettingsBtn_button_down():
 	var node = level_settings_menu_t.instance()
 	node.level_ind = level_container.cur_level_ind
 	leftContainer.add_child(node)
+	singleton.in_modal_window = false
 	queue_free()
 
 
@@ -126,4 +128,5 @@ func _on_LocalVariablesBtn2_button_down():
 	var node = local_vars_menu_t.instance()
 	node.level_ind = level_container.cur_level_ind
 	leftContainer.add_child(node)
+	singleton.in_modal_window = false
 	queue_free()

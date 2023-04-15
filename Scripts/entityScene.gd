@@ -17,6 +17,7 @@ onready var settings_head_t = preload("res://Scenes/Fields/settings_head.tscn")
 
 var entityInst_id = -1
 var level_ind = -1
+var def_id = -1
 var triggerAABB: Array = [0,0,0,0]
 #var entity_definition: Dictionary = {
 #	\"__identifier\":\"testIdentifierName\",
@@ -90,7 +91,7 @@ func show_fields_of_entity():
 	if(!entity_definition):
 		return
 	settings_head_node.get_node("Label").text = entity_definition["__identifier"]
-	settings_head_node.get_node("InfoLabel").text = "level_Id = " + str(level_ind) + "; entityInst_Id = " + str(entityInst_id) + ";"
+	settings_head_node.get_node("InfoLabel").text = "level_Id = " + str(level_ind) + ";\nentityInst_Id = " + str(entityInst_id) + ";\ndef_Id = " + str(def_id) + ";"
 	
 	VBoxContainerRight.add_child(settings_head_node)
 	for field_inst in entity_definition["fieldInstances"]:
@@ -99,8 +100,8 @@ func show_fields_of_entity():
 			settings_field_node = settings_field_trigger_type_t.instance()
 			settings_field_node.level_ind = level_ind
 			settings_field_node.entityInst_id = entityInst_id
+			settings_field_node.triggerType_name = entity_definition["triggerTypeName"]
 			settings_field_node.get_node("Label").text = str(field_inst["__identifier"])
-			settings_field_node.get_node("VBoxContainer/LineEdit").text = str(field_inst["__value"])
 		elif field_inst["__type"] == "Sprite":
 			settings_field_node = settings_field_sprite_t.instance()
 			settings_field_node.level_ind = level_ind

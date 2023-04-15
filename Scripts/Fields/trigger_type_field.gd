@@ -61,7 +61,7 @@ func _on_LineEdit_text_changed(new_text):
 
 func _on_OptionButton_item_selected(index):
 	print("change optionsButton index")
-	$VBoxContainer/LineEdit.text = str(index)
+	#$VBoxContainer/LineEdit.text = str(index)
 	var triggerTypeName = $VBoxContainer/OptionButton.get_item_text(index)
 	#singleton.change_entityInst_by_instId(singleton.cur_entity_inst_ind, "triggerType", index)
 	#singleton.change_entityInst_by_instId(singleton.cur_entity_inst_ind, "triggerType", index)

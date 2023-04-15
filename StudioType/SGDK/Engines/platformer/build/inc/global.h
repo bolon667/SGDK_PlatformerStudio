@@ -35,9 +35,8 @@ extern Vect2D_s16 prevChunkPos;
 extern const fix16 gravityScale;
 
 struct {
-	u16 joy;
-	u16 changed;
 	u16 state;
+	u16 prevState;
 }input;
 
 extern Map* bga;

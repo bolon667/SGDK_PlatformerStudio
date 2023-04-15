@@ -1126,12 +1126,30 @@ public class buidProject : Node
 		String pal2Name = "NULL";
 		String pal3Name = "NULL";
 
-		String levelMode = "0"; //0 = default level; 1 = scene
+		String levelMode = "0"; //0 = level; 1 = scene
 		String controlScript = "CUSTOM_SCRIPT_updatePlayer";
 		String updateCameraScript = "CUSTOM_SCRIPT_updateCamera";
 
+		String forePalIndex = "0";
+		String backPalIndex = "0";
 
+		if (levelDict.Contains("forePalIndex"))
+		{
+			String temp = levelDict["forePalIndex"].ToString();
+			if (temp.Length > 0)
+			{
+				forePalIndex = temp;
+			}
+		}
 
+		if (levelDict.Contains("backPalIndex"))
+		{
+			String temp = levelDict["backPalIndex"].ToString();
+			if (temp.Length > 0)
+			{
+				backPalIndex = temp;
+			}
+		}
 
 		if (levelDict.Contains("levelMode"))
 		{
@@ -1168,7 +1186,11 @@ public class buidProject : Node
 			String temp = (String)levelDict["pal0SpriteName"];
 			if (temp.Length > 0)
 			{
-				pal0Name = $"&pal_{temp}";
+				if(temp != "NULL")
+				{
+					pal0Name = $"&pal_{temp}";
+				}
+				
 			}
 		}
 
@@ -1177,7 +1199,10 @@ public class buidProject : Node
 			String temp = (String)levelDict["pal1SpriteName"];
 			if (temp.Length > 0)
 			{
-				pal1Name = $"&pal_{temp}";
+				if (temp != "NULL")
+				{
+					pal1Name = $"&pal_{temp}";
+				}
 			}
 		}
 
@@ -1186,7 +1211,10 @@ public class buidProject : Node
 			String temp = (String)levelDict["pal2SpriteName"];
 			if (temp.Length > 0)
 			{
-				pal2Name = $"&pal_{temp}";
+				if (temp != "NULL")
+				{
+					pal2Name = $"&pal_{temp}";
+				}
 			}
 		}
 
@@ -1195,7 +1223,10 @@ public class buidProject : Node
 			String temp = (String)levelDict["pal3SpriteName"];
 			if (temp.Length > 0)
 			{
-				pal3Name = $"&pal_{temp}";
+				if (temp != "NULL")
+				{
+					pal3Name = $"&pal_{temp}";
+				}
 			}
 		}
 
@@ -1229,10 +1260,7 @@ public class buidProject : Node
 		if (levelDict.Contains("musicName"))
 		{
 			String temp = (String)levelDict["musicName"];
-			if (temp.Length > 0)
-			{
-				musicName = "&mus_" + temp;
-			}
+			if (!(temp == "NULL" || temp.Length == 0)) musicName = "&mus_" + temp;
 		}
 
 		if (bgaPath.Length > 0)
@@ -1281,7 +1309,7 @@ public class buidProject : Node
 
 		String levelCode = $"const Level const lvl_Level_{curLevel.ToString()} = {{{bgaMapResName}, {bgbMapResName}, {bgaTilesetResName}, {bgbTilesetResName}, {bgaPalResName}, {bgbPalResName}," +
 			$" {bgaImageName}, {bgbImageName}, {posArrText}, {posAmountText}, {collMapName}, {levelSizePxText}, {levelSizeTilesText}, {levelSizeChunksText}, {musicName}, {beforeLevelScriptName}, {everyFrameScriptName}," +
-			$" {afterLevelScriptName}, {pal0Name}, {pal1Name}, {pal2Name}, {pal3Name}, {levelMode}, {controlScript}, {updateCameraScript}}};\n";
+			$" {afterLevelScriptName}, {pal0Name}, {pal1Name}, {pal2Name}, {pal3Name}, {levelMode}, {controlScript}, {updateCameraScript}, {forePalIndex}, {backPalIndex}}};\n";
 		return levelCode;
 	}
 

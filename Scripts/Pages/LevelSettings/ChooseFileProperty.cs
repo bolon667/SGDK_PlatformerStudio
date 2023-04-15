@@ -7,11 +7,18 @@ public class ChooseFileProperty : HBoxContainer
 	private FileDialog fileDialog;
 	private Label infoLabel;
 	private String workingDir;
+	
+	public int levelInd;
 
 
 	[Export] private String levelAttrName = "";
 	[Export] private String fileDialogLocalPath = "/code_template/customScripts/";
 	[Export] private String defaultVal = "NULL";
+	
+	public void loadContent(){
+		//nothing
+	}
+	
 	public override void _Ready()
 	{
 		singleton = (Node)GetNode("/root/singleton");
@@ -20,6 +27,8 @@ public class ChooseFileProperty : HBoxContainer
 		workingDir = System.IO.Directory.GetCurrentDirectory();
 		String projectFolderPath = (String)singleton.Call("get_project_folder_path");
 		fileDialog.CurrentPath = projectFolderPath + fileDialogLocalPath;
+		
+		levelInd = int.Parse(singleton.Get("cur_level_ind").ToString());
 	}
 
 	//  // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -33,7 +42,7 @@ public class ChooseFileProperty : HBoxContainer
 		String fileNameNoExt = fileName.Substring(0,fileName.Find("."));
 		GD.Print(fileNameNoExt);
 		infoLabel.Text = fileNameNoExt;
-		singleton.Call("change_level_attr", levelAttrName, fileNameNoExt);
+		singleton.Call("change_level_attr", levelAttrName, fileNameNoExt, levelInd);
 	}
 	
 	private void _on_Button_button_down()
@@ -43,7 +52,7 @@ public class ChooseFileProperty : HBoxContainer
 	
 	private void _on_removeBtn_button_down()
 	{
-		singleton.Call("change_level_attr", levelAttrName, "");
+		singleton.Call("change_level_attr", levelAttrName, "", levelInd);
 		infoLabel.Text = defaultVal;
 	}
 	
@@ -51,7 +60,16 @@ public class ChooseFileProperty : HBoxContainer
 	{
 		singleton.Call("change_all_level_attr", levelAttrName, infoLabel.Text);
 	}
+	
+	private void _on_makeDefaultBtn_button_down()
+	{
+		singleton.Call("change_default_level_attr", levelAttrName, infoLabel.Text);
+		
+	}
 }
+
+
+
 
 
 

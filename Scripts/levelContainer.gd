@@ -246,6 +246,7 @@ func load_entities_on_scene():
 		var entity_pos = entity_inst["px"]
 		entity_node.position = Vector2(entity_pos[0], entity_pos[1])
 		entity_node.entityInst_id = entity_inst["instId"]
+		entity_node.def_id = entity_inst["defId"]
 		entity_node.level_ind = cur_level_ind
 		
 		if(!entity_inst.has("triggerAABB")):

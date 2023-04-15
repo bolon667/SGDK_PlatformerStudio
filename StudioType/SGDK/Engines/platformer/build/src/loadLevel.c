@@ -47,61 +47,72 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 		playerBody.globalPosition.y = 0;
 
 	}
+
+	customScriptArr[curLvlData->updateCameraScript]();
 	
-	updateCamera();
-	
-	
+	Palette* tempBgaPal;
+	Palette* tempBgbPal;
 	
 	if(curLvlData->foregroundTileset != NULL){
-		if(curLvlData->pal1 == NULL){
-			curLvlData->pal1 = curLvlData->foregroundPallete;
-		}
-		memcpy(&palette_full[16],  curLvlData->pal1->data, 16 * 2);
-		VDP_loadTileSet(curLvlData->foregroundTileset, VDPTilesFilled, DMA_QUEUE);
-		bga = MAP_create(curLvlData->foregroundMap, BG_A, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, VDPTilesFilled));
+		tempBgaPal = curLvlData->foregroundPallete;
+		//memcpy(&palette_full[16],  curLvlData->pal1->data, 16 * 2);
+		VDP_loadTileSet(curLvlData->foregroundTileset, VDPTilesFilled, CPU);
+		bga = MAP_create(curLvlData->foregroundMap, BG_A, TILE_ATTR_FULL(curLvlData->bgaPalIndex, FALSE, FALSE, FALSE, VDPTilesFilled));
 		VDPTilesFilled += curLvlData->foregroundTileset->numTile;
 	} else {
 		bga = NULL;
 	}
 	
 	if(curLvlData->backgroundTileset != NULL){
-		if(curLvlData->pal0 == NULL){
-			curLvlData->pal0 = curLvlData->backgroundPallete;
-		}
-		memcpy(&palette_full[0],  curLvlData->pal0->data, 16 * 2);
-		VDP_loadTileSet(curLvlData->backgroundTileset, VDPTilesFilled, DMA_QUEUE);
-		bgb = MAP_create(curLvlData->backgroundMap, BG_B, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, VDPTilesFilled));
+		tempBgbPal = curLvlData->backgroundPallete;
+		//memcpy(&palette_full[0],  curLvlData->pal0->data, 16 * 2);
+		VDP_loadTileSet(curLvlData->backgroundTileset, VDPTilesFilled, CPU);
+		bgb = MAP_create(curLvlData->backgroundMap, BG_B, TILE_ATTR_FULL(curLvlData->bgbPalIndex, FALSE, FALSE, FALSE, VDPTilesFilled));
 		VDPTilesFilled += curLvlData->backgroundTileset->numTile;
 	} else {
 		bgb = NULL;
 	}
 
 	if(curLvlData->foregroundImage != NULL){
-		if(curLvlData->pal1 == NULL){
-			curLvlData->pal1 = curLvlData->foregroundImage->palette;
-		}
-		memcpy(&palette_full[16],  curLvlData->pal1->data, 16 * 2);
-		VDP_drawImageEx(BG_A, curLvlData->foregroundImage, TILE_ATTR_FULL(PAL1, FALSE, FALSE, FALSE, VDPTilesFilled), 0, 0, FALSE, FALSE);
+		tempBgaPal = curLvlData->foregroundImage->palette;
+		//memcpy(&palette_full[16],  curLvlData->pal1->data, 16 * 2);
+		VDP_drawImageEx(BG_A, curLvlData->foregroundImage, TILE_ATTR_FULL(curLvlData->bgaPalIndex, FALSE, FALSE, FALSE, VDPTilesFilled), 0, 0, FALSE, FALSE);
 		VDPTilesFilled += curLvlData->foregroundImage->tileset->numTile;
 	}
 	
 	if(curLvlData->backgroundImage != NULL){
-		if(curLvlData->pal0 == NULL){
-			curLvlData->pal0 = curLvlData->backgroundImage->palette;
-		}
-		memcpy(&palette_full[0],  curLvlData->pal0->data, 16 * 2);
-		VDP_drawImageEx(BG_B, curLvlData->backgroundImage, TILE_ATTR_FULL(PAL0, FALSE, FALSE, FALSE, VDPTilesFilled), 0, 0, FALSE, FALSE);
+		tempBgbPal = curLvlData->backgroundImage->palette;
+		//memcpy(&palette_full[0],  curLvlData->pal0->data, 16 * 2);
+		VDP_drawImageEx(BG_B, curLvlData->backgroundImage, TILE_ATTR_FULL(curLvlData->bgbPalIndex, FALSE, FALSE, FALSE, VDPTilesFilled), 0, 0, FALSE, FALSE);
 		VDPTilesFilled += curLvlData->backgroundImage->tileset->numTile;
 	}
 
-	if(curLvlData->pal2 == NULL){
-		curLvlData->pal2 = spr_player.palette;
+	//Apply bga pal to whatewer pal_index you choose
+	memcpy(&palette_full[curLvlData->bgaPalIndex*16], tempBgaPal->data, 16 * 2);
+	//Apply bgb pal to whatewer pal_index you choose
+	memcpy(&palette_full[curLvlData->bgbPalIndex*16], tempBgbPal->data, 16 * 2);
+
+	//But, if you want to customize pal, then rewriting that.
+	if(curLvlData->pal0 != NULL){
+		memcpy(&palette_full[0], curLvlData->pal0->data, 16 * 2);
 	}
-	memcpy(&palette_full[PAL2*16], curLvlData->pal2->data, 16 * 2);
-	if(curLvlData->pal3 == NULL){
-		curLvlData->pal3 = spr_coin.palette;
+	if(curLvlData->pal1 != NULL){
+		memcpy(&palette_full[16], curLvlData->pal1->data, 16 * 2);
 	}
-	memcpy(&palette_full[PAL3*16], curLvlData->pal3->data, 16 * 2);
+	if(curLvlData->pal2 != NULL){
+		memcpy(&palette_full[32], curLvlData->pal2->data, 16 * 2);
+	}
+	if(curLvlData->pal3 != NULL){
+		memcpy(&palette_full[48], curLvlData->pal3->data, 16 * 2);
+	}
+
+	// memcpy(&palette_full[PAL2*16], curLvlData->pal2->data, 16 * 2);
+	
+	// if(curLvlData->pal3 == NULL){
+	// 	curLvlData->pal3 = spr_coin.palette;
+	// }
+	
+	// memcpy(&palette_full[PAL3*16], curLvlData->pal3->data, 16 * 2);
 
 	//addNewBullet((Bullet){TRUE, {2,2}, {0,0}, {FIX16(0.5),0}, {32,32}, {0,0,32,32}, FALSE, 1, NULL, &spr_noSpr});
 	
@@ -109,7 +120,10 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 	//memcpy(&palette_full[48],  plr.sprite->definition->palette->data, 16 * 2);
 
 	//Update the number of tiles filled in order to avoid overlaping them when loading more
-	VDPTilesFilled += level_tileset.numTile;
+
+	//                      |||
+	//wtf is THAT?!?!?      VVV
+	// VDPTilesFilled += level_tileset.numTile;
 
 	PAL_fadeIn(0, 63, palette_full, 5, TRUE);
 
@@ -121,7 +135,7 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 	if(curLvlData->afterLevelFunc != NULL){
 		(*curLvlData->afterLevelFunc)();
 	}
-
+	
 
 	KLog_U1("FreeMem: ", MEM_getFree());
 }

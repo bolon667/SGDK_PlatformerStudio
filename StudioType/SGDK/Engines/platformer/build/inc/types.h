@@ -46,6 +46,8 @@ typedef struct {
 	u16 levelMode;
 	u16 controlScript;
 	u16 updateCameraScript;
+	u8 bgaPalIndex;
+	u8 bgbPalIndex;
 } Level;
 
 

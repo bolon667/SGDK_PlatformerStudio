@@ -49,9 +49,9 @@ var entity_types = {
 	{
 		"fileType": "PS4SGDK Project JSON",
 		"app": "Platformer Studio For SGDK",
-		"doc": "???",
+		"doc": "https://github.com/bolon667/SGDK_PlatformerStudio/wiki/Welcome-to-studio",
 		"appAuthor": "bolon667",
-		"appVersion": "1.5 beta",
+		"appVersion": "1.6 beta",
 		"url": "https://github.com/bolon667/SGDK_PlatformerStudio",
 	},
 	"jsonVersion": "1.0.0",
@@ -99,6 +99,20 @@ var entity_types = {
 			[
 				
 			],
+		"levelDefaultData":
+			{
+				"musicName": "NULL",
+				"backPalIndex": "0",
+				"forePalIndex": "1",
+				"levelMode": "0",
+				"beforeLevelScript": "",
+				"everyFrameScript": "",
+				"afterLevelScript": "",
+				"pal0SpriteName": "",
+				"pal1SpriteName": "",
+				"pal2SpriteName": "player_pal",
+				"pal3SpriteName": "",
+			},
 	},
 	"levels": 
 		[
@@ -317,7 +331,7 @@ const level_template = {
 	"bgRelPath2": "",
 	"bgaMode": 0,
 	"bgbMode": 0,
-	"musicName": "",
+	"musicName": "NULL",
 	"beforeLevelScript": "",
 	"everyFrameScript": "",
 	"afterLevelScript": "",
@@ -325,7 +339,7 @@ const level_template = {
 	"pal1SpriteName": "",
 	"pal2SpriteName": "",
 	"pal3SpriteName": "",
-	"levelType": 0, #default level is level (0), not a scene (1)
+	"levelMode": "0", #default level is level (0), not a scene (1)
 	"startPos": [0,0],
 	"fieldInstances":
 		[
@@ -425,6 +439,21 @@ const field_inst_template = {
 	"__hasStruct": true,
 }
 
+func updateLevelDefaultData():
+	entity_types["defs"]["levelDefaultData"] = {
+		"levelMode": "",
+		"musicName": "",
+		"backPalIndex": "",
+		"forePalIndex": "",
+		"beforeLevelScript": "",
+		"everyFrameScript": "",
+		"afterLevelScript": "",
+		"pal0SpriteName": "",
+		"pal1SpriteName": "",
+		"pal2SpriteName": "",
+		"pal3SpriteName": "",
+	}
+
 func change_load_image_mode_bga_all_levels():
 	for level_ind in range(len(entity_types["levels"])):
 		entity_types["levels"][level_ind]["bgaMode"] = entity_types["levels"][cur_level_ind]["bgaMode"]
@@ -452,9 +481,12 @@ func get_load_modes(level_ind: int):
 func change_all_level_attr(attr: String, val):
 	for level_ind in range(len(entity_types["levels"])):
 		entity_types["levels"][level_ind][attr] = val
+		
+func change_default_level_attr(attr: String, val):
+	entity_types["defs"]["levelDefaultData"][attr] = val
 
-func change_level_attr(attr: String, val):
-	entity_types["levels"][cur_level_ind][attr] = val
+func change_level_attr(attr: String, val, level_ind: int):
+	entity_types["levels"][level_ind][attr] = val
 
 func get_trigger_enum():
 	for cur_enum in entity_types["defs"]["enums"]:
@@ -588,10 +620,17 @@ func update_project():
 		entity_types["defs"]["bulletEntities"] = []
 	if !entity_types["defs"].has("variables"):
 		entity_types["defs"]["variables"] = []
+	if !entity_types["defs"].has("levelDefaultData"):
+		updateLevelDefaultData()
+	
+	if !entity_types.has("entityLoadOptimization"):
+		entity_types["entityLoadOptimization"] = 0
 	#Add arr entityBulletInstances arr to all entities
 	for level in entity_types["levels"]:
 		if(!level.has("levelMode")):
 			level["levelMode"] = "0"
+		if(!level.has("musicName")):
+			level["musicName"] = ""
 		if(!level.has("controlScript")):
 			level["controlScript"] = "0"
 		if(!level.has("updateCameraScript")):
@@ -849,6 +888,7 @@ func fix_level_inst_ids(level_ind):
 func change_entityInstTriggerAABB(aabb: Array, level_ind: int, entityInst_id: int):
 	var entity_layer_ind: int = -1
 	var temp_entity_layer_ind: int = 0
+	#find entity_layer_ind
 	for layer_inst in entity_types["levels"][level_ind]["layerInstances"]:
 		if(layer_inst["__type"] == "Entity"):
 			entity_layer_ind = temp_entity_layer_ind
@@ -856,7 +896,13 @@ func change_entityInstTriggerAABB(aabb: Array, level_ind: int, entityInst_id: in
 		temp_entity_layer_ind += 1
 	if entity_layer_ind == -1:
 		return
-	entity_types["levels"][level_ind]["layerInstances"][entity_layer_ind]["entityInstances"][entityInst_id]["triggerAABB"] = aabb
+	#find ind for entity_inst_id
+	var entity_ind: int = 0
+	for entityInst in entity_types["levels"][level_ind]["layerInstances"][entity_layer_ind]["entityInstances"]:
+		if entityInst["instId"] == entityInst_id:
+			break
+		entity_ind += 1
+	entity_types["levels"][level_ind]["layerInstances"][entity_layer_ind]["entityInstances"][entity_ind]["triggerAABB"] = aabb
 
 func change_cur_entityInst(key: String, val):
 	var entity_layer_ind: int = 0
@@ -1169,6 +1215,23 @@ func add_level(level_world_pos: Vector2):
 			
 	level_data["worldX"] = level_world_pos.x
 	level_data["worldY"] = level_world_pos.y
+	
+	
+	level_data["backPalIndex"] = entity_types["defs"]["levelDefaultData"]["backPalIndex"]
+	level_data["forePalIndex"] = entity_types["defs"]["levelDefaultData"]["forePalIndex"]
+	
+	level_data["afterLevelScript"] = entity_types["defs"]["levelDefaultData"]["afterLevelScript"]
+	level_data["everyFrameScript"] = entity_types["defs"]["levelDefaultData"]["everyFrameScript"]
+	level_data["beforeLevelScript"] = entity_types["defs"]["levelDefaultData"]["beforeLevelScript"]
+	
+	level_data["levelMode"] = entity_types["defs"]["levelDefaultData"]["levelMode"]
+	level_data["musicName"] = entity_types["defs"]["levelDefaultData"]["musicName"]
+	level_data["pal0SpriteName"] = entity_types["defs"]["levelDefaultData"]["pal0SpriteName"]
+	level_data["pal1SpriteName"] = entity_types["defs"]["levelDefaultData"]["pal1SpriteName"]
+	level_data["pal2SpriteName"] = entity_types["defs"]["levelDefaultData"]["pal2SpriteName"]
+	level_data["pal3SpriteName"] = entity_types["defs"]["levelDefaultData"]["pal3SpriteName"]
+	
+	
 	
 	
 	entity_types["levels"].append(level_data)
