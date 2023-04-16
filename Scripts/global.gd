@@ -51,7 +51,7 @@ var entity_types = {
 		"app": "Platformer Studio For SGDK",
 		"doc": "https://github.com/bolon667/SGDK_PlatformerStudio/wiki/Welcome-to-studio",
 		"appAuthor": "bolon667",
-		"appVersion": "1.6 beta",
+		"appVersion": "1.7 beta",
 		"url": "https://github.com/bolon667/SGDK_PlatformerStudio",
 	},
 	"jsonVersion": "1.0.0",

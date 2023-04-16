@@ -10,6 +10,7 @@ public class ChooseOptionProperty : HBoxContainer
 
 	[Export] private String levelAttrName = "";
 	[Export] private String defaultVal = "NULL";
+	[Export] private bool isIndexCodeValue = true;
 	
 	public void loadContent(){
 		GD.Print("I;m here");
@@ -35,8 +36,14 @@ public class ChooseOptionProperty : HBoxContainer
 
 	private void _on_OptionButton_item_selected(int index)
 	{
+		String putValue = "";
+		if(isIndexCodeValue){
+			putValue = index.ToString();
+		} else {
+			putValue = optionButton.GetItemText(index);
+		}
 		singleton.Call("change_level_attr", levelAttrName, index.ToString(), levelInd);
-		infoLabel.Text = index.ToString();
+		infoLabel.Text = putValue;
 	}
 	private void _on_applyAllLevelsBtn_button_down()
 	{

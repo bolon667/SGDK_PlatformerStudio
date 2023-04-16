@@ -36,6 +36,7 @@ typedef struct {
 	Vect2D_s16 sizeinTiles;
 	Vect2D_s16 sizeinChunks;
 	u8* music;
+	u32 musicSizeof;
 	void (*beforeLevelFunc)(void);
 	void (*everyFrameFunc)(void);
 	void (*afterLevelFunc)(void);
@@ -43,11 +44,15 @@ typedef struct {
 	Palette* pal1;
 	Palette* pal2;
 	Palette* pal3;
-	u16 levelMode;
+	u8 levelMode;
 	u16 controlScript;
 	u16 updateCameraScript;
 	u8 bgaPalIndex;
 	u8 bgbPalIndex;
+	u8 musicMode;
+	u8 pcmChannel;
+	u8 musicLoop;
+	u8 freshMusicStart;
 } Level;
 
 

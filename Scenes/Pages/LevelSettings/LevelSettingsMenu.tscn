@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Scripts/Pages/LevelSettings/MessagePacksMenu.cs" type="Script" id=1]
 [ext_resource path="res://Scenes/Pages/LevelSettings/ChooseFileProperty.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Styles/style1.tres" type="Theme" id=3]
 [ext_resource path="res://Scenes/Others/DropDownContainer.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Scenes/Pages/LevelSettings/ChooseOptionProperty.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Scenes/Pages/LevelSettings/ChooseBoolProperty.tscn" type="PackedScene" id=6]
 
 [node name="MessagePacksMenu" type="Control" groups=["messageMenu"]]
 anchor_right = 1.0
@@ -61,13 +62,14 @@ size_flags_vertical = 3
 scroll_horizontal_enabled = false
 
 [node name="SettingsContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer"]
-margin_right = 1024.0
-margin_bottom = 546.0
+margin_right = 1014.0
+margin_bottom = 642.0
 rect_min_size = Vector2( 200, 200 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="levelMode" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 5 )]
+margin_right = 1014.0
 margin_bottom = 64.0
 levelAttrName = "levelMode"
 
@@ -78,37 +80,39 @@ text = "Level Mode: "
 
 [node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode" index="1"]
 margin_left = 113.0
+margin_right = 1014.0
 margin_bottom = 64.0
 
 [node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer" index="0"]
-margin_right = 911.0
+margin_right = 901.0
 margin_bottom = 20.0
 
 [node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer" index="1"]
 margin_top = 24.0
-margin_right = 911.0
+margin_right = 901.0
 margin_bottom = 64.0
 
 [node name="OptionButton" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 574.0
+margin_right = 564.0
 text = "Level"
 items = [ "Level", null, false, 0, null, "Scene", null, false, 1, null ]
 selected = 0
 
 [node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer/HBoxContainer" index="1"]
-margin_left = 578.0
-margin_right = 693.0
+margin_left = 568.0
+margin_right = 683.0
 
 [node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 697.0
-margin_right = 867.0
+margin_left = 687.0
+margin_right = 857.0
 
 [node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer/HBoxContainer" index="3"]
-margin_left = 871.0
-margin_right = 911.0
+margin_left = 861.0
+margin_right = 901.0
 
 [node name="ControlScript" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
 margin_top = 68.0
+margin_right = 1014.0
 margin_bottom = 132.0
 levelAttrName = "controlScript"
 defaultVal = "updatePlayer"
@@ -120,32 +124,33 @@ text = "Control Script: "
 
 [node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript" index="1"]
 margin_left = 131.0
+margin_right = 1014.0
 margin_bottom = 64.0
 
 [node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer" index="0"]
-margin_right = 893.0
+margin_right = 883.0
 margin_bottom = 20.0
 
 [node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer" index="1"]
 margin_top = 24.0
-margin_right = 893.0
+margin_right = 883.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 556.0
+margin_right = 546.0
 text = "Choose replacement for updatePlayer func"
 
 [node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer/HBoxContainer" index="1"]
-margin_left = 560.0
-margin_right = 675.0
+margin_left = 550.0
+margin_right = 665.0
 
 [node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 679.0
-margin_right = 849.0
+margin_left = 669.0
+margin_right = 839.0
 
 [node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer/HBoxContainer" index="3"]
-margin_left = 853.0
-margin_right = 893.0
+margin_left = 843.0
+margin_right = 883.0
 
 [node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript" index="2"]
 margin_left = 612.0
@@ -154,6 +159,7 @@ filters = PoolStringArray( "*.c" )
 
 [node name="UpdateCameraScript" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
 margin_top = 136.0
+margin_right = 1014.0
 margin_bottom = 200.0
 levelAttrName = "updateCameraScript"
 defaultVal = "updateCamera"
@@ -165,87 +171,47 @@ text = "Camera Script: "
 
 [node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript" index="1"]
 margin_left = 133.0
+margin_right = 1014.0
 margin_bottom = 64.0
 
 [node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer" index="0"]
-margin_right = 891.0
+margin_right = 881.0
 margin_bottom = 20.0
 
 [node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer" index="1"]
 margin_top = 24.0
-margin_right = 891.0
+margin_right = 881.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 554.0
+margin_right = 544.0
 text = "Choose replacement for updateCamera func"
 
 [node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer/HBoxContainer" index="1"]
-margin_left = 558.0
-margin_right = 673.0
+margin_left = 548.0
+margin_right = 663.0
 
 [node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 677.0
-margin_right = 847.0
+margin_left = 667.0
+margin_right = 837.0
 
 [node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer/HBoxContainer" index="3"]
-margin_left = 851.0
-margin_right = 891.0
+margin_left = 841.0
+margin_right = 881.0
 
 [node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript" index="2"]
 margin_left = 612.0
 margin_right = 1012.0
 filters = PoolStringArray( "*.c" )
 
-[node name="chooseMusic" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
-margin_top = 204.0
-margin_bottom = 268.0
-levelAttrName = "musicName"
-fileDialogLocalPath = "/build/res/music/"
-
-[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic" index="0"]
-margin_right = 127.0
-margin_bottom = 42.0
-text = "Change music: "
-
-[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic" index="1"]
-margin_left = 131.0
-margin_bottom = 64.0
-
-[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer" index="0"]
-margin_right = 893.0
-margin_bottom = 20.0
-
-[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer" index="1"]
-margin_top = 24.0
-margin_right = 893.0
-margin_bottom = 64.0
-
-[node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 556.0
-text = "Choose vgm"
-
-[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="1"]
-margin_left = 560.0
-margin_right = 675.0
-
-[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 679.0
-margin_right = 849.0
-
-[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic/VBoxContainer/HBoxContainer" index="3"]
-margin_left = 853.0
-margin_right = 893.0
-
-[node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic" index="2"]
-margin_left = 612.0
-margin_right = 1012.0
-filters = PoolStringArray( "*.vgm" )
-
 [node name="DropDownContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 4 )]
-margin_top = 272.0
-margin_bottom = 302.0
+margin_top = 204.0
+margin_right = 1014.0
+margin_bottom = 234.0
 groupName = "Scripts"
+
+[node name="pressGroupBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer" index="0"]
+margin_right = 1014.0
 
 [node name="GroupContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer" index="1"]
 margin_top = 34.0
@@ -377,10 +343,232 @@ margin_left = 612.0
 margin_right = 1012.0
 filters = PoolStringArray( "*.c" )
 
-[node name="DropDownContainer2" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 4 )]
-margin_top = 306.0
+[node name="DropDownContainer3" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 4 )]
+margin_top = 238.0
+margin_right = 1014.0
+margin_bottom = 608.0
+groupName = "Music"
+
+[node name="pressGroupBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3" index="0"]
+margin_right = 1014.0
+
+[node name="GroupContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3" index="1"]
+visible = true
+margin_top = 34.0
+margin_right = 1014.0
+margin_bottom = 370.0
+
+[node name="musicMode" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer" index="0" instance=ExtResource( 5 )]
+margin_right = 1014.0
+margin_bottom = 64.0
+levelAttrName = "musicMode"
+
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/musicMode" index="0"]
+margin_right = 110.0
+margin_bottom = 42.0
+text = "Music Mode: "
+
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/musicMode" index="1"]
+margin_left = 114.0
+margin_right = 1014.0
+margin_bottom = 64.0
+
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/musicMode/VBoxContainer" index="0"]
+margin_right = 900.0
+margin_bottom = 20.0
+
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/musicMode/VBoxContainer" index="1"]
+margin_top = 24.0
+margin_right = 900.0
+margin_bottom = 64.0
+
+[node name="OptionButton" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/musicMode/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 563.0
+text = "VGM (recommended)"
+items = [ "VGM (recommended)", null, false, 0, null, "WAV (4PCM) 4 channels 8 bits 16 Khz rate, Volume change", null, false, 2, null, "WAV (2ADPCM) 2 channels 4 bits 22050 Hz rate", null, false, 3, null, "WAV (PCM) 1 channel 8 bits 8-32 Khz rate", null, false, 4, null ]
+selected = 0
+
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/musicMode/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 567.0
+margin_right = 682.0
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/musicMode/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 686.0
+margin_right = 856.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/musicMode/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 860.0
+margin_right = 900.0
+
+[node name="pcmChannel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer" index="1" instance=ExtResource( 5 )]
+margin_top = 68.0
+margin_right = 1014.0
+margin_bottom = 132.0
+levelAttrName = "pcmChannel"
+isIndexCodeValue = false
+
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/pcmChannel" index="0"]
+margin_right = 117.0
+margin_bottom = 42.0
+text = "PCM Channel: "
+
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/pcmChannel" index="1"]
+margin_left = 121.0
+margin_right = 1014.0
+margin_bottom = 64.0
+
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/pcmChannel/VBoxContainer" index="0"]
+margin_bottom = 20.0
+
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/pcmChannel/VBoxContainer" index="1"]
+margin_top = 24.0
+margin_bottom = 64.0
+
+[node name="OptionButton" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/pcmChannel/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 556.0
+text = "SOUND_PCM_CH_AUTO"
+items = [ "SOUND_PCM_CH_AUTO", null, false, 0, null, "SOUND_PCM_CH1", null, false, 1, null, "SOUND_PCM_CH2", null, false, 2, null, "SOUND_PCM_CH3", null, false, 3, null, "SOUND_PCM_CH4", null, false, 4, null ]
+selected = 0
+
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/pcmChannel/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 560.0
+margin_right = 675.0
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/pcmChannel/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 679.0
+
+[node name="chooseMusic" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer" index="2" instance=ExtResource( 2 )]
+margin_top = 136.0
+margin_right = 1014.0
+margin_bottom = 200.0
+levelAttrName = "musicName"
+fileDialogLocalPath = "/build/res/music/"
+
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/chooseMusic" index="0"]
+margin_right = 127.0
+margin_bottom = 42.0
+text = "Change music: "
+
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/chooseMusic" index="1"]
+margin_left = 131.0
+margin_right = 1014.0
+margin_bottom = 64.0
+
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/chooseMusic/VBoxContainer" index="0"]
+margin_right = 883.0
+margin_bottom = 20.0
+
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/chooseMusic/VBoxContainer" index="1"]
+margin_top = 24.0
+margin_right = 883.0
+margin_bottom = 64.0
+
+[node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/chooseMusic/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 546.0
+text = "Choose vgm or wav"
+
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/chooseMusic/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 550.0
+margin_right = 665.0
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/chooseMusic/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 669.0
+margin_right = 839.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/chooseMusic/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 843.0
+margin_right = 883.0
+
+[node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/chooseMusic" index="2"]
+margin_left = 612.0
+margin_right = 1012.0
+filters = PoolStringArray( "*.vgm", "*.wav" )
+show_hidden_files = true
+
+[node name="MusicLoop" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer" index="3" instance=ExtResource( 6 )]
+margin_top = 204.0
+margin_right = 1014.0
+margin_bottom = 268.0
+levelAttrName = "musicLoop"
+
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/MusicLoop" index="0"]
+margin_bottom = 42.0
+
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/MusicLoop" index="1"]
+margin_right = 1014.0
+margin_bottom = 64.0
+
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/MusicLoop/VBoxContainer" index="0"]
+margin_right = 1010.0
+margin_bottom = 20.0
+
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/MusicLoop/VBoxContainer" index="1"]
+margin_top = 24.0
+margin_right = 1010.0
+margin_bottom = 64.0
+
+[node name="CheckButton" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/MusicLoop/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 673.0
+
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/MusicLoop/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 677.0
+margin_right = 792.0
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/MusicLoop/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 796.0
+margin_right = 966.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/MusicLoop/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 970.0
+margin_right = 1010.0
+
+[node name="FreshMusic" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer" index="4" instance=ExtResource( 6 )]
+margin_top = 272.0
+margin_right = 1014.0
 margin_bottom = 336.0
+levelAttrName = "freshMusicStart"
+defaultVal = "1"
+
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/FreshMusic" index="0"]
+margin_bottom = 42.0
+
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/FreshMusic" index="1"]
+margin_right = 1014.0
+margin_bottom = 64.0
+
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/FreshMusic/VBoxContainer" index="0"]
+margin_right = 1010.0
+margin_bottom = 20.0
+
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/FreshMusic/VBoxContainer" index="1"]
+margin_top = 24.0
+margin_right = 1010.0
+margin_bottom = 64.0
+
+[node name="CheckButton" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/FreshMusic/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 673.0
+text = "Fresh music start"
+
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/FreshMusic/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 677.0
+margin_right = 792.0
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/FreshMusic/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 796.0
+margin_right = 966.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/FreshMusic/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 970.0
+margin_right = 1010.0
+
+[node name="DropDownContainer2" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 4 )]
+margin_top = 612.0
+margin_right = 1014.0
+margin_bottom = 642.0
 groupName = "Palette"
+
+[node name="pressGroupBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2" index="0"]
+margin_right = 1014.0
 
 [node name="GroupContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2" index="1"]
 margin_top = 34.0
@@ -664,11 +852,16 @@ filters = PoolStringArray( "*.png", "*.bmp", "*.pal" )
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript"]
-[editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/chooseMusic"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/beforeLevelScript"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/everyFrameScript"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer/GroupContainer/afterLevelScript"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/musicMode"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/pcmChannel"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/chooseMusic"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/MusicLoop"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3/GroupContainer/FreshMusic"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/ForePal_ind"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2/GroupContainer/BackPal_ind"]

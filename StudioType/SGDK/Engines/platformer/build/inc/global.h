@@ -34,6 +34,8 @@ extern Vect2D_s16 curChunkPos;
 extern Vect2D_s16 prevChunkPos;
 extern const fix16 gravityScale;
 
+extern u8* curMusic;
+
 struct {
 	u16 state;
 	u16 prevState;

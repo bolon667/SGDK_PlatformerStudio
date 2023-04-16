@@ -19,7 +19,9 @@ void updatePlayer() {
 		playerBody.curAmountOfJumps--;
 		playerBody.jumping = TRUE;
 			//Play the SFX with the index 64 (jump sfx) with the highest priority
-		XGM_startPlayPCM(64, 15, SOUND_PCM_CH1);
+		
+		//Commented because, if you not using default XGM driver, you will get a ear damage. It's really DANGEROUS you can get partially deaf in real life.
+		// XGM_startPlayPCM(64, 15, SOUND_PCM_CH1);
 		playerBody.velocity.fixY = FIX16(-playerBody.jumpSpeed);
 		}
 	}

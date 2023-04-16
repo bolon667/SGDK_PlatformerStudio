@@ -129,9 +129,35 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 
 	updateRoomSize(curLvlData);
 
-	if(curLvlData->music != NULL){
-		XGM_startPlay(curLvlData->music);
+	//Music mode reminder
+	// 0 - XGM driver (default), can play VGM music and Wav 14 Khz sample.
+	// 1 - WAV 4PCM Driver, 4 channels driver 16 Khz, good driver if you want to play WAV background music.
+	// 2 - WAV 2ADPCM 2 channels driver 22050 Hz.
+	// 3 - PCM, 1 channel driver, best quality 8-32 KHz, but it's just stupid, 32 KHz music takes too much ROM. And you only have 4 MB (unless you using a crunch, i mean, bank switch).
+
+	//If music is exists
+	if(curLvlData->music != NULL) {
+		//If music is not playing
+		if((curMusic != curLvlData->music) || curLvlData->freshMusicStart){
+			switch(curLvlData->musicMode){
+				case 0: //XGM
+					XGM_startPlay(curLvlData->music);
+					break;
+				case 1: //4PCM
+					SND_startPlay_4PCM_ENV(curLvlData->music, curLvlData->musicSizeof, curLvlData->pcmChannel, curLvlData->musicLoop);
+					break;
+				case 2: //2ADPCM
+					SND_startPlay_2ADPCM(curLvlData->music, curLvlData->musicSizeof, curLvlData->pcmChannel, curLvlData->musicLoop);
+					break;
+				case 3: //PCM
+					SND_startPlay_PCM(curLvlData->music, curLvlData->musicSizeof, SOUND_RATE_32000, SOUND_PAN_CENTER, curLvlData->musicLoop);
+					break;
+			}
+		}
+		curMusic = curLvlData->music;
 	}
+	
+
 	if(curLvlData->afterLevelFunc != NULL){
 		(*curLvlData->afterLevelFunc)();
 	}

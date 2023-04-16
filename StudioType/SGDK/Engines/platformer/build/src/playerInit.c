@@ -50,7 +50,9 @@ void playerInit(Vect2D_s16 levelStartPos) {
 			playerBody.globalPosition.y + playerBody.aabb.max.y
 		);
 
+	//Commented because, if you not using default XGM driver, you will get a ear damage. It's really DANGEROUS you can get partially deaf in real life.
+	
 	//Setup the jump SFX with an index between 64 and 255
-	XGM_setPCM(64, sfx_jump, sizeof(sfx_jump));
+	// XGM_setPCM(64, sfx_jump, sizeof(sfx_jump));
 	
 }

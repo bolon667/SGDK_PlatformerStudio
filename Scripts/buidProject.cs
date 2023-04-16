@@ -42,7 +42,7 @@ public class buidProject : Node
 		fullEngineResPath = fullEngineRootPath + "/build/res";
 		fullEmulatorPath = workingDir + "/Emulators/BlastEm/blastem.exe";
 
-		fullTemplatePath = workingDir + "/StudioType/SGDK/Engines/platformer/build";
+		fullTemplatePath = workingDir + "/StudioType/SGDK/Engines/platformer";
 	}
 
 	private static void CopyFilesRecursively(string sourcePath, string targetPath)
@@ -62,10 +62,15 @@ public class buidProject : Node
 
 	private void enumsH_CodeReplacer()
 	{
-		GD.Print("Replacing enums.c code");
+		GD.Print("Replacing enums.h code");
 		Node singleton = (Node)GetNode("/root/singleton");
 
 		String enumsHPath = fullEngineRootPath + "/build/inc/enums.h";
+		if(!System.IO.File.Exists(enumsHPath))
+		{
+			String fromPath = fullTemplatePath + "/build/inc/enums.h";
+			System.IO.File.Copy(fromPath, enumsHPath, false);
+		}
 		String enumsHCode = System.IO.File.ReadAllText(enumsHPath);
 		String enumCodePaste = "";
 		enumCodePaste += genTriggerEnumCode();
@@ -503,7 +508,7 @@ public class buidProject : Node
 	private void makeNewProjectFromTemplate()
 	{
 		//String fromFolder = engineRootPath + "/project_template";
-		String fromFolder = fullTemplatePath;
+		String fromFolder = fullTemplatePath + "/build";
 		
 		String toFolder = engineRootPath + "/build";
 		String outFolder = toFolder + "/out";
@@ -967,6 +972,13 @@ public class buidProject : Node
 				result += insertData + "\n";
 			} else
 			{
+				if (!System.IO.File.Exists(defaultEntityCodePath))
+				{
+					String fromPath = fullTemplatePath + "/code_template/showEntity/showDefault.c";
+					GD.Print(fromPath);
+					GD.Print("test122222");
+					System.IO.File.Copy(fromPath, defaultEntityCodePath, false);
+				}
 				String insertData = System.IO.File.ReadAllText(defaultEntityCodePath);
 				insertData = insertData.Replace("$entityName$", entityName);
 				insertData = insertData.Replace("$entityType$", "EntityMerged");
@@ -1018,6 +1030,11 @@ public class buidProject : Node
 			}
 			else
 			{
+				if (!System.IO.File.Exists(defaultEntityCodePath))
+				{
+					String fromPath = fullTemplatePath + "/code_template/showEntityBullet/showDefault.c";
+					System.IO.File.Copy(fromPath, defaultEntityCodePath, false);
+				}
 				String insertData = System.IO.File.ReadAllText(defaultEntityCodePath);
 				insertData = insertData.Replace("$entityName$", entityName);
 				insertData = insertData.Replace("$entityType$", "EntityBulletMerged");
@@ -1085,9 +1102,6 @@ public class buidProject : Node
 		String bgaPath = (String)levelDict["bgRelPath"];
 		String bgbPath = (String)levelDict["bgRelPath2"];
 
-		
-
-
 		int bgaMode = 0;
 		int bgbMode = 0;
 		if (levelDict.Contains("bgaMode"))
@@ -1118,6 +1132,7 @@ public class buidProject : Node
 		String bgbPalResName = "NULL";
 		String bgbImageName = "NULL";
 		String musicName = "NULL";
+		String musicSizeof = "0";
 		String beforeLevelScriptName = "NULL";
 		String everyFrameScriptName = "emptyScript";
 		String afterLevelScriptName = "NULL";
@@ -1132,6 +1147,48 @@ public class buidProject : Node
 
 		String forePalIndex = "0";
 		String backPalIndex = "0";
+
+		String musicMode = "0";
+		String pcmChannel = "0";
+		String musicLoop = "0";
+		String freshMusicStart = "1";
+
+
+		if (levelDict.Contains("freshMusicStart"))
+		{
+			String temp = levelDict["freshMusicStart"].ToString();
+			if (temp.Length > 0)
+			{
+				freshMusicStart = temp;
+			}
+		}
+
+		if (levelDict.Contains("musicLoop"))
+		{
+			String temp = levelDict["musicLoop"].ToString();
+			if (temp.Length > 0)
+			{
+				musicLoop = temp;
+			}
+		}
+
+		if (levelDict.Contains("pcmChannel"))
+		{
+			String temp = levelDict["pcmChannel"].ToString();
+			if (temp.Length > 0)
+			{
+				pcmChannel = temp;
+			}
+		}
+
+		if (levelDict.Contains("musicMode"))
+		{
+			String temp = levelDict["musicMode"].ToString();
+			if (temp.Length > 0)
+			{
+				musicMode = temp;
+			}
+		}
 
 		if (levelDict.Contains("forePalIndex"))
 		{
@@ -1260,7 +1317,15 @@ public class buidProject : Node
 		if (levelDict.Contains("musicName"))
 		{
 			String temp = (String)levelDict["musicName"];
-			if (!(temp == "NULL" || temp.Length == 0)) musicName = "&mus_" + temp;
+			if (!(temp == "NULL" || temp.Length == 0))
+			{
+				if (temp.Find("-") != -1)
+				{
+					temp = temp.Substring(0, temp.Find("-"));
+				}
+				musicName = "&mus_" + temp;
+				musicSizeof = "sizeof(" + "mus_" + temp + ")";
+			}
 		}
 
 		if (bgaPath.Length > 0)
@@ -1305,11 +1370,10 @@ public class buidProject : Node
 
 		}
 
-
-
 		String levelCode = $"const Level const lvl_Level_{curLevel.ToString()} = {{{bgaMapResName}, {bgbMapResName}, {bgaTilesetResName}, {bgbTilesetResName}, {bgaPalResName}, {bgbPalResName}," +
-			$" {bgaImageName}, {bgbImageName}, {posArrText}, {posAmountText}, {collMapName}, {levelSizePxText}, {levelSizeTilesText}, {levelSizeChunksText}, {musicName}, {beforeLevelScriptName}, {everyFrameScriptName}," +
-			$" {afterLevelScriptName}, {pal0Name}, {pal1Name}, {pal2Name}, {pal3Name}, {levelMode}, {controlScript}, {updateCameraScript}, {forePalIndex}, {backPalIndex}}};\n";
+			$" {bgaImageName}, {bgbImageName}, {posArrText}, {posAmountText}, {collMapName}, {levelSizePxText}, {levelSizeTilesText}, {levelSizeChunksText}, {musicName}, {musicSizeof}, {beforeLevelScriptName}, {everyFrameScriptName}," +
+			$" {afterLevelScriptName}, {pal0Name}, {pal1Name}, {pal2Name}, {pal3Name}, {levelMode}, {controlScript}, {updateCameraScript}, {forePalIndex}, {backPalIndex}, {musicMode}, {pcmChannel}, {musicLoop}," +
+			$" {freshMusicStart}}};\n";
 		return levelCode;
 	}
 

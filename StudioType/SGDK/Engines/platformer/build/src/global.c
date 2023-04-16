@@ -13,6 +13,8 @@ AABB roomSize;
 //Player collider bounds position
 AABB playerBounds;
 
+u8* curMusic;
+
 s16 backXScroll = 0;
 s16 backYScroll = 0;
 
