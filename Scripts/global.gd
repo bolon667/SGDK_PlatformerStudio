@@ -51,7 +51,7 @@ var entity_types = {
 		"app": "Platformer Studio For SGDK",
 		"doc": "https://github.com/bolon667/SGDK_PlatformerStudio/wiki/Welcome-to-studio",
 		"appAuthor": "bolon667",
-		"appVersion": "1.7 beta",
+		"appVersion": "1.8 beta",
 		"url": "https://github.com/bolon667/SGDK_PlatformerStudio",
 	},
 	"jsonVersion": "1.0.0",
@@ -183,7 +183,7 @@ const field_def_triggerValue = {
 	"inCodeType": "u8",
 	"fieldId": -1,
 	"canBeNull": true,
-	"defaultValue": "0",
+	"defaultValue": "-1",
 	"canBeDeleted": false,
 	"hasStruct": false,
 }
@@ -194,7 +194,7 @@ const field_def_triggerValue2 = {
 	"inCodeType": "u8",
 	"fieldId": -1,
 	"canBeNull": true,
-	"defaultValue": "0",
+	"defaultValue": "-1",
 	"canBeDeleted": false,
 	"hasStruct": false,
 }
@@ -205,7 +205,7 @@ const field_def_triggerValue3 = {
 	"inCodeType": "u8",
 	"fieldId": -1,
 	"canBeNull": true,
-	"defaultValue": "0",
+	"defaultValue": "-1",
 	"canBeDeleted": false,
 	"hasStruct": false,
 }
@@ -267,9 +267,9 @@ const bulletsEntity_def_template = {
 	"triggerAABB": [0,0,8,8],
 	"triggerType": 1,
 	"triggerTypeName": "",
-	"triggerValue": 1,
-	"triggerValue2": 1,
-	"triggerValue3": 1,
+	"triggerValue": -1,
+	"triggerValue2": -1,
+	"triggerValue3": -1,
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
 	#entity name or field name in entity menu.
 	"color": "#0048FF",
@@ -291,9 +291,9 @@ const entity_def_template = {
 	"triggerAABB": [0,0,8,8],
 	"triggerType": 1,
 	"triggerTypeName": "",
-	"triggerValue": 1,
-	"triggerValue2": 1,
-	"triggerValue3": 1,
+	"triggerValue": -1,
+	"triggerValue2": -1,
+	"triggerValue3": -1,
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
 	#entity name or field name in entity menu.
 	"color": "#0048FF",
@@ -385,9 +385,9 @@ const bulletEntity_inst_template = {
 	"px": [0,0],
 	"addTrigger": false,
 	"triggerType": 1,
-	"triggerValue": 1,
-	"triggerValue2": 1,
-	"triggerValue3": 1,
+	"triggerValue": -1,
+	"triggerValue2": -1,
+	"triggerValue3": -1,
 	"triggerAABB": [0,0,8,8],
 	"instId": -1, #id of entity instance, to quicly find in databse
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
@@ -411,9 +411,9 @@ const entity_inst_template = {
 	"px": [0,0],
 	"addTrigger": false,
 	"triggerType": 1,
-	"triggerValue": 1,
-	"triggerValue2": 1,
-	"triggerValue3": 1,
+	"triggerValue": -1,
+	"triggerValue2": -1,
+	"triggerValue3": -1,
 	"triggerAABB": [0,0,8,8],
 	"instId": -1, #id of entity instance, to quicly find in databse
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed

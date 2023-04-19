@@ -40,7 +40,7 @@ int main(bool resetType) {
 		customScriptArr[curLvlData->controlScript]();
 		customScriptArr[curLvlData->updateCameraScript]();
 		
-		showEntityAll_arr[curLvlData->levelMode]();		
+		showEntityAll();		
 
 		//Then we update sprites and after that we tell the Mega Drive that we have finished processing all the frame data
 		SPR_update();

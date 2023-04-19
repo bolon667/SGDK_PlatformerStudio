@@ -60,11 +60,19 @@ void updatePlayer() {
 	}
 
 	//Once all the input-related have been calculated, we apply the velocities to the global positions
-	playerBody.globalPosition.x += playerBody.velocity.x;
-	playerBody.globalPosition.y += fix16ToInt(playerBody.velocity.fixY);
+	playerBody.globalPosition.x += playerBody.velocity.x + fix16ToInt(playerBody.velocity.bufferFixX);
+	playerBody.globalPosition.y += fix16ToInt(playerBody.velocity.fixY + playerBody.velocity.bufferFixY);
+
+	playerBody.velocity.bufferFixX = playerBody.velocity.bufferFixX - FIX16(fix16ToInt(playerBody.velocity.bufferFixX));
+	playerBody.velocity.bufferFixY = playerBody.velocity.bufferFixY - FIX16(fix16ToInt(playerBody.velocity.bufferFixY));
 
 	//Now we can check for collisions and correct those positions
 	checkCollisions();
+
+	//Checking trigger collision with player
+	for(u16 i=0; i<curEntityAll->Trigger_size; i++){
+		checkTriggerForPlayer(&curEntityAll->Trigger_arr[i]);
+	}
 
 	//Now that the collisions have been checked, we know if the player is on a stair or not
 	if (!collidingAgainstStair && playerBody.climbingStair) {

@@ -37,7 +37,9 @@ struct pBody {
 	bool isVisible;
 
 	s16 animMode;
+	s16 val1;
 	s16 state;
+	bool isCombo;
 	bool animModeChangable;
 
 	u16 attackType;
@@ -55,6 +57,8 @@ struct pBody {
 		fix16 fixX;
 		s16 x;
 		fix16 fixY;
+		fix16 bufferFixX;
+		fix16 bufferFixY;
 	}velocity;
 
 	s16 timer;

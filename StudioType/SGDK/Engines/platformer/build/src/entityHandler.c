@@ -159,6 +159,32 @@ EntityMerged* getEntityMergedByInstId(u16 instId){
 	return NULL;
 }
 
+u16 getEntityMergedIndInArrByInstId(u16 instId){
+	for(u16 i = 0; i < curEntityAll->EntityMerged_size; i++){
+		EntityMerged* curEntityMerged = &curEntityAll->EntityMerged_arr[i];
+		if(!curEntityMerged->alive){
+			continue;
+		}
+		if(curEntityMerged->instId == instId){
+			return i;
+		}
+	}
+	return NULL;
+}
+
+u16 getTriggerParrentIndInArr(Trigger* trigger){
+	for(u16 i = 0; i < curEntityAll->EntityMerged_size; i++){
+		EntityMerged* curEntityMerged = &curEntityAll->EntityMerged_arr[i];
+		if(!curEntityMerged->alive){
+			continue;
+		}
+		if(curEntityMerged->trigger == trigger){
+			return i;
+		}
+	}
+	return NULL;
+}
+
 // EntityMerged* getRandomEntityMergedByDefId(u16 instId){
 // 	//DefId = EntityType
 // 	//May be will add that in the future
@@ -220,23 +246,7 @@ void showEntityMerged(EntityMerged* entity){
 }
 
 
-void showEntityAllPlayer(){
-	if(playerBody.animModeChangable){
-		playerBody.animMode = 0;
-	}
-	
-	for(u16 i=0; i<curEntityAll->EntityBulletMerged_size; i++){
-		showEntityBulletMerged(&curEntityAll->EntityBulletMerged_arr[i]);
-	}
-	for(u16 i=0; i<curEntityAll->Trigger_size; i++){
-		checkTriggerForPlayer(&curEntityAll->Trigger_arr[i]);
-	}
-	for(u16 i=0; i<curEntityAll->EntityMerged_size; i++){
-		showEntityMerged(&curEntityAll->EntityMerged_arr[i]);
-	}
-}
-
-void showEntityAllScene(){
+void showEntityAll(){
 	for(u16 i=0; i<curEntityAll->EntityBulletMerged_size; i++){
 		showEntityBulletMerged(&curEntityAll->EntityBulletMerged_arr[i]);
 	}
@@ -244,5 +254,3 @@ void showEntityAllScene(){
 		showEntityMerged(&curEntityAll->EntityMerged_arr[i]);
 	}
 }
-
-void(* showEntityAll_arr[])(void) = {showEntityAllPlayer, showEntityAllScene};
