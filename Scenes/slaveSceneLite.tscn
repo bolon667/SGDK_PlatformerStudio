@@ -1,0 +1,14 @@
+[gd_scene format=2]
+
+[node name="slave" type="Node2D"]
+
+[node name="Sprite" type="Sprite" parent="."]
+centered = false
+region_enabled = true
+region_rect = Rect2( 0, 0, 64, 64 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+mouse_filter = 2
+color = Color( 1, 0.960784, 0, 0.419608 )

@@ -38,8 +38,8 @@ func _on_FileDialog_file_selected(path: String):
 	$HBoxContainer/VBoxContainer/TextEdit.text = spr_name
 	
 	#update value in database
-	singleton.change_cur_fieldInst($HBoxContainer/Label.text, spr_name)
-	singleton.change_sprite_by_instId(path)
+	singleton.change_fieldInst_instId(entityInst_id, level_ind, $HBoxContainer/Label.text, spr_name)
+	singleton.change_sprite_by_instId(path, level_ind, entityInst_id)
 	
 	#change entity obj sprite
 	get_tree().call_group("levelContainer", "change_cur_entity_pic", path, level_ind, entityInst_id)
@@ -49,4 +49,4 @@ func _on_FileDialog_file_selected(path: String):
 
 
 func _on_TextEdit_text_changed():
-	singleton.change_cur_fieldInst($HBoxContainer/Label.text, $HBoxContainer/VBoxContainer/TextEdit.text)
+	singleton.change_fieldInst_instId(entityInst_id, level_ind, $HBoxContainer/Label.text, $HBoxContainer/VBoxContainer/TextEdit.text)

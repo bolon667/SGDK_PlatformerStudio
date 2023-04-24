@@ -7,22 +7,24 @@
 [node name="Control" type="Control" groups=["entityMenu"]]
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 2
 theme = ExtResource( 2 )
 script = ExtResource( 3 )
 entityCollection = "entities"
 entityDefaultName = "Entity"
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
-layer = 2
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
 modulate = Color( 0.203922, 0.196078, 0.192157, 1 )
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource( 2 )
@@ -51,6 +53,7 @@ text = "  X  "
 margin_top = 54.0
 margin_right = 1024.0
 margin_bottom = 600.0
+mouse_filter = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -93,6 +96,7 @@ rect_min_size = Vector2( 200, 500 )
 margin_left = 214.0
 margin_right = 1024.0
 margin_bottom = 546.0
+mouse_filter = 2
 size_flags_horizontal = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer"]
@@ -117,11 +121,17 @@ text = "Entity Name: "
 
 [node name="EntityNameEdit" type="TextEdit" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3"]
 margin_left = 115.0
-margin_right = 810.0
+margin_right = 620.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 300, 40 )
 size_flags_horizontal = 3
 text = "dsfsdfsdf"
+
+[node name="complexEntityEditorBtn" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3"]
+margin_left = 624.0
+margin_right = 810.0
+margin_bottom = 40.0
+text = "Complex entity editor"
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 visible = false
@@ -197,11 +207,13 @@ readonly = true
 margin_top = 88.0
 margin_right = 810.0
 margin_bottom = 546.0
+mouse_filter = 2
 size_flags_vertical = 3
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
 margin_right = 250.0
 margin_bottom = 458.0
+mouse_filter = 2
 
 [node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer"]
 margin_right = 250.0
@@ -248,6 +260,7 @@ size_flags_vertical = 3
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer2/ExitBtn" to="." method="_on_ExitBtn_button_down"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/VBoxContainer/AddNewEntityBtn" to="." method="_on_AddNewEntityBtn_button_down"]
 [connection signal="text_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3/EntityNameEdit" to="." method="_on_EntityNameEdit_text_changed"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3/complexEntityEditorBtn" to="." method="_on_complexEntityEditorBtn_button_down"]
 [connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer4/entityMergedActive" to="." method="_on_entityMergedActive_toggled"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer5/addTriggerActivate" to="." method="_on_addTriggerActivate_button_down"]
 [connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer6/canAddNewEntityBtn" to="." method="_on_canAddNewEntityBtn_toggled"]

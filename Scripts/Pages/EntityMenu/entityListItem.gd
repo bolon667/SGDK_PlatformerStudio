@@ -4,7 +4,7 @@ extends Control
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
-
+var defId: int = -1
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -35,6 +35,7 @@ func _on_ConfirmationDialogDelete_confirmed():
 
 func _on_TextBtn_button_down():
 	singleton.cur_entity_type_ind = get_index()
+	singleton.cur_entity_defId = defId
 	singleton.cur_entity_field_ind = 0
 	singleton.cur_entity_type = $HBoxContainer/TextBtn.text
 	get_tree().call_group("entityMenu", "clear_field_properties")

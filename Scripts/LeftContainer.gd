@@ -38,10 +38,12 @@ func load_layer_values(btn: Button):
 		"Entity":
 			singleton.cur_editor_mode = singleton.EditorMode.ENTITY
 			print("Entity mode")
-			var entity_names = singleton.get_entity_names("entities")
-			for entity_name in entity_names:
+			var entity_names = singleton.get_def_entityCollection_names("entities")
+			for entity_dict in entity_names:
 				var entity_layer_value_btn_node = entity_layer_value_btn_t.instance()
-				entity_layer_value_btn_node.text = entity_name
+				entity_layer_value_btn_node.text = entity_dict["name"]
+				entity_layer_value_btn_node.defId = entity_dict["defId"]
+				
 				layer_value_list.add_child(entity_layer_value_btn_node)
 		"Position": #Same as Entity but not so heavy, because, it stores only x,y, coords
 			get_tree().call_group("tilemapEditorWindow", "remove_fields_of_entity")

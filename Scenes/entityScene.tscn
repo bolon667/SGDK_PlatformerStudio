@@ -24,5 +24,7 @@ mouse_filter = 2
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource( 3 )
 
+[node name="slavesContainer" type="Node2D" parent="."]
+
 [connection signal="mouse_entered" from="." to="." method="_on_Area2D_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_Area2D_mouse_exited"]

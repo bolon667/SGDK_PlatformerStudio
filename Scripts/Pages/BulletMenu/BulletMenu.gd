@@ -144,9 +144,10 @@ func load_list_of_entity():
 		print("readonly")
 		entity_name_edit.readonly = true
 	
-	for entity_name in entity_names:
+	for entity_dict in entity_names:
 		var entity_item = entity_item_t.instance()
-		entity_item.get_node("HBoxContainer/TextBtn").text = entity_name
+		entity_item.get_node("HBoxContainer/TextBtn").text = entity_dict["name"]
+		
 		entity_list_container.add_child(entity_item)
 		
 

@@ -48,7 +48,7 @@ onready var entity_obj_t = preload("res://Scenes/entityScene.tscn")
 onready var position_obj_t = preload("res://Scenes/positionScene.tscn")
 onready var gate_obj_t = preload("res://Scenes/gateScene.tscn")
 onready var level_buttons_t = preload("res://Scenes/modalWindows/levelContainerContextButtons.tscn")
-
+onready var slaveSceneLite_t = preload("res://Scenes/slaveSceneLite.tscn")
 
 func draw_frame(rect: Rect2, color, line_thickness):
 	var half_line_thickness = int(line_thickness/2)
@@ -249,6 +249,8 @@ func load_entities_on_scene():
 		entity_node.def_id = entity_inst["defId"]
 		entity_node.level_ind = cur_level_ind
 		
+		var entity_def = singleton.get_entityDef_by_defId(entity_node.def_id)
+		
 		if(!entity_inst.has("triggerAABB")):
 			continue
 		entity_node.triggerAABB = entity_inst["triggerAABB"].duplicate(true)
@@ -287,9 +289,33 @@ func load_entities_on_scene():
 		entity_node.get_node("CollisionShape2D").shape.extents = draggableShape
 		entity_node.sprite_size = sprite_rect.size
 		entity_obj_list.add_child(entity_node)
+
+		entity_node.change_sprite_rect(sprite_rect)
 		
-		
-		entity_node.change_sprite_rect(sprite_rect)	
+		#Adding slaves(subordinates) if exists
+		if len(entity_def["subordinates"]) > 0:
+			var slavesContainer = entity_node.get_node("slavesContainer")
+			for entityInst in entity_def["subordinates"]:
+				var slave_node = slaveSceneLite_t.instance()
+				slave_node.position = Vector2(int(entityInst["px"][0]), int(entityInst["px"][1]))
+				var pic_path = entityInst["__spritePath"]
+				var temp_spr = slave_node.get_node("Sprite")
+				if(pic_path):
+					temp_spr.texture = load(pic_path)
+				var temp_sprite_size = singleton.get_sprite_size_from_path(pic_path)
+				var colorRect = slave_node.get_node("ColorRect")
+				if temp_sprite_size:
+					var sprite_size = temp_sprite_size
+					colorRect.rect_position = Vector2(0,0)
+					colorRect.rect_size = Vector2(temp_sprite_size.x, temp_sprite_size.y)
+					temp_spr.region_rect = Rect2(0,0,temp_sprite_size.x, temp_sprite_size.y)
+				else:
+					var sprite_size = slave_node.get_node("Sprite").texture.get_size()
+					colorRect.rect_position = Vector2(0,0)
+					colorRect.rect_size = Vector2(sprite_size.x, sprite_size.y)
+					temp_spr.region_rect = Rect2(0,0,sprite_size.x, sprite_size.y)
+				#sprite.set_region_rect(Rect2(-100,-100,200, 200))
+				slavesContainer.add_child(slave_node)
 
 func _ready():
 	load_level()
@@ -686,16 +712,17 @@ func entity_list_handler():
 				entity_obj_node.position = Vector2(mouse_pos.x, mouse_pos.y)
 			#Got uid for entityInst
 			var entity_inst = singleton.add_cur_entityInstance()
+			var entity_def = singleton.get_entityDef_by_defId(singleton.cur_entity_defId)
 			#Put entityInst in database
 			entity_obj_node.entityInst_id = entity_inst["instId"]
 			entity_obj_node.level_ind = cur_level_ind
+			entity_obj_node.def_id = entity_inst["defId"]
 			
 			var savePos = [entity_obj_node.position.x, entity_obj_node.position.y]
 			
 			entity_obj_list.add_child(entity_obj_node)
-			
+			#(defId: int, instId: int, posPx: Array):
 			singleton.save_entityInst_pos(entity_obj_node.entityInst_id, savePos)
-			
 			#If sprite path, not null, than changing sprite of new entity obj
 			if len(entity_inst["__spritePath"]) > 0:
 				var pic_path = entity_inst["__spritePath"]
@@ -714,7 +741,30 @@ func entity_list_handler():
 					entity_obj_node.sprite_size = entity_obj_node.get_node("Sprite").texture.get_size()
 					entity_obj_node.change_sprite_rect(Rect2(0,0,entity_obj_node.sprite_size.x, entity_obj_node.sprite_size.y))
 					entity_obj_node.get_node("CollisionShape2D").shape.extents = entity_obj_node.sprite_size/2
-			#Pretty long block
+			#Adding slaves(subordinates) if exists
+			if len(entity_def["subordinates"]) > 0:
+				var slavesContainer = entity_obj_node.get_node("slavesContainer")
+				for entityInst in entity_def["subordinates"]:
+					var slave_node = slaveSceneLite_t.instance()
+					slave_node.position = Vector2(int(entityInst["px"][0]), int(entityInst["px"][1]))
+					var pic_path = entityInst["__spritePath"]
+					var temp_spr = slave_node.get_node("Sprite")
+					if(pic_path):
+						temp_spr.texture = load(pic_path)
+					var temp_sprite_size = singleton.get_sprite_size_from_path(pic_path)
+					var colorRect = slave_node.get_node("ColorRect")
+					if temp_sprite_size:
+						var sprite_size = temp_sprite_size
+						colorRect.rect_position = Vector2(0,0)
+						colorRect.rect_size = Vector2(temp_sprite_size.x, temp_sprite_size.y)
+						temp_spr.region_rect = Rect2(0,0,temp_sprite_size.x, temp_sprite_size.y)
+					else:
+						var sprite_size = slave_node.get_node("Sprite").texture.get_size()
+						colorRect.rect_position = Vector2(0,0)
+						colorRect.rect_size = Vector2(sprite_size.x, sprite_size.y)
+						temp_spr.region_rect = Rect2(0,0,sprite_size.x, sprite_size.y)
+						
+					slavesContainer.add_child(slave_node)
 		
 	if(Input.is_action_pressed("mouse2")):
 		get_tree().call_group("tilemapEditorWindow", "remove_fields_of_entity")

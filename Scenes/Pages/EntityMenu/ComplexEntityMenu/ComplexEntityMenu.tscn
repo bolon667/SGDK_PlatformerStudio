@@ -1,0 +1,163 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://1RESURCES/killer_box.png" type="Texture" id=1]
+[ext_resource path="res://Styles/style1.tres" type="Theme" id=2]
+[ext_resource path="res://Scripts/Pages/EntityMenu/ComplexEntityMenu/ComplexEntityMenu.gd" type="Script" id=3]
+[ext_resource path="res://Icons/startPos.png" type="Texture" id=4]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 417, 255 )
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = ExtResource( 2 )
+script = ExtResource( 3 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
+modulate = Color( 0.203922, 0.196078, 0.192157, 1 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme = ExtResource( 2 )
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
+margin_right = 1024.0
+margin_bottom = 50.0
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
+margin_top = 15.0
+margin_right = 970.0
+margin_bottom = 35.0
+size_flags_horizontal = 3
+text = "Complex Entity Menu:  "
+align = 2
+valign = 1
+
+[node name="ExitBtn" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
+margin_left = 974.0
+margin_right = 1024.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 50, 50 )
+text = "  X  "
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
+margin_top = 54.0
+margin_right = 1024.0
+margin_bottom = 600.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxChooseEntity" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+margin_right = 200.0
+margin_bottom = 546.0
+rect_min_size = Vector2( 200, 0 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity"]
+margin_right = 200.0
+margin_bottom = 20.0
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/VBoxContainer"]
+margin_right = 200.0
+margin_bottom = 20.0
+text = "Choose entity"
+align = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity"]
+margin_top = 24.0
+margin_right = 200.0
+margin_bottom = 546.0
+size_flags_vertical = 3
+scroll_horizontal_enabled = false
+
+[node name="EntityListContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer"]
+margin_right = 200.0
+margin_bottom = 500.0
+rect_min_size = Vector2( 200, 500 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+margin_left = 204.0
+margin_right = 1024.0
+margin_bottom = 546.0
+mouse_filter = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_right = 820.0
+margin_bottom = 546.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+margin_right = 820.0
+margin_bottom = 546.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_right = 820.0
+margin_bottom = 40.0
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3"]
+margin_top = 10.0
+margin_right = 111.0
+margin_bottom = 30.0
+text = "Entity Name: "
+
+[node name="EntityNameEdit" type="TextEdit" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3"]
+margin_left = 115.0
+margin_right = 820.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 300, 40 )
+size_flags_horizontal = 3
+text = "NULL"
+readonly = true
+
+[node name="MainArea" type="Control" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 44.0
+margin_right = 820.0
+margin_bottom = 546.0
+mouse_filter = 2
+size_flags_vertical = 3
+
+[node name="CenterArea" type="Control" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/MainArea"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -20.0
+margin_top = -20.0
+margin_right = 20.0
+margin_bottom = 20.0
+
+[node name="rootPoint" type="Sprite" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/MainArea/CenterArea"]
+texture = ExtResource( 4 )
+
+[node name="Sprite" type="Sprite" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/MainArea/CenterArea"]
+texture = ExtResource( 1 )
+centered = false
+
+[node name="Area2D" type="Area2D" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/MainArea"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/MainArea/Area2D"]
+position = Vector2( 407, 245 )
+shape = SubResource( 1 )
+
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer2/ExitBtn" to="." method="_on_ExitBtn_button_down"]
+[connection signal="text_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3/EntityNameEdit" to="." method="_on_EntityNameEdit_text_changed"]
+[connection signal="mouse_entered" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/MainArea/Area2D" to="." method="_on_Area2D_mouse_entered"]
+[connection signal="mouse_exited" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/MainArea/Area2D" to="." method="_on_Area2D_mouse_exited"]

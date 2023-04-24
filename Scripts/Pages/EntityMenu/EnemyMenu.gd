@@ -4,14 +4,13 @@ export var entityCollection: String = ""
 export var entityDefaultName: String = ""
 
 
-
 onready var entity_item_t = preload("res://Scenes/Pages/EntityMenu/entityListItem.tscn")
 onready var entity_field_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItem.tscn")
 onready var field_property_string_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemPropertyString.tscn")
 onready var field_property_sprite_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemSprite.tscn")
 onready var field_property_triggerType_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemTriggerType.tscn")
 onready var field_property_triggerRect_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemAABB.tscn")
-
+onready var complex_entity_menu_t = preload("res://Scenes/Pages/EntityMenu/ComplexEntityMenu/ComplexEntityMenu.tscn")
 
 onready var entity_field_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/ScrollContainer/ContainerChooseField 
 onready var entity_list_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/EntityListContainer
@@ -21,7 +20,7 @@ onready var field_properties_container = $CanvasLayer/VBoxContainer/HBoxContaine
 onready var add_trigger_btn = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer5/addTriggerActivate
 onready var can_add_new_entity = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer6/canAddNewEntityBtn
 onready var change_amount_of_entity = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer6/changeAmountOfEntity
-
+onready var complex_menu_btn = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3/complexEntityEditorBtn
 
 var add_trigger_activated: bool = false
 
@@ -29,6 +28,7 @@ var add_trigger_activated: bool = false
 func _ready():
 	pass # Replace with function body.
 	print(get_path())
+	singleton.can_move_map = false
 	load_list_of_entity()
 
 
@@ -125,6 +125,7 @@ func load_field_properties(entity_name: String, field_name: String):
 	pass
 
 func enitity_name_edit_readonly(is_on: bool):
+	complex_menu_btn.disabled = false
 	entity_name_edit.readonly = is_on
 
 func load_list_of_entity():
@@ -137,17 +138,21 @@ func load_list_of_entity():
 	
 	if(entity_names_len == 0):
 		entity_name_edit.readonly = true
+		complex_menu_btn.disabled = true
 		add_new_field_btn.disabled = true
 	else:
 		entity_name_edit.readonly = false
 		add_new_field_btn.disabled = false
+		complex_menu_btn.disabled = false
 	if(singleton.cur_entity_type_ind == -1):
 		print("readonly")
 		entity_name_edit.readonly = true
+		complex_menu_btn.disabled = true
 	
-	for entity_name in entity_names:
+	for entity_dict in entity_names:
 		var entity_item = entity_item_t.instance()
-		entity_item.get_node("HBoxContainer/TextBtn").text = entity_name
+		entity_item.get_node("HBoxContainer/TextBtn").text = entity_dict["name"]
+		entity_item.defId = entity_dict["defId"]
 		entity_list_container.add_child(entity_item)
 		
 
@@ -256,6 +261,7 @@ func _on_EntityNameEdit_text_changed():
 
 
 func _on_ExitBtn_button_down():
+	singleton.can_move_map = true
 	singleton.cur_entity_type_ind = -1
 	get_tree().call_group("leftContainer", "clear_layer_values")
 	get_tree().call_group("tilemapEditorWindow", "load_entities_on_scene")
@@ -294,3 +300,14 @@ func _on_changeAmountOfEntity_text_changed():
 	
 	singleton.entity_types["defs"][entityCollection][singleton.cur_entity_type_ind]["amountOfEntity"] = val
 	pass # Replace with function body.
+
+
+
+func _on_complexEntityEditorBtn_button_down():
+	var node = complex_entity_menu_t.instance()
+	node.entityName = entity_name_edit.text
+	node.masterDefId = singleton.cur_entity_defId
+	get_parent().add_child(node)
+	
+	queue_free()
+	

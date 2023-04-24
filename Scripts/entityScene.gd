@@ -100,6 +100,8 @@ func show_fields_of_entity():
 			settings_field_node = settings_field_trigger_type_t.instance()
 			settings_field_node.level_ind = level_ind
 			settings_field_node.entityInst_id = entityInst_id
+			if(!entity_definition.has("triggerTypeName")):
+				entity_definition["triggerTypeName"] = "0"
 			settings_field_node.triggerType_name = entity_definition["triggerTypeName"]
 			settings_field_node.get_node("Label").text = str(field_inst["__identifier"])
 		elif field_inst["__type"] == "Sprite":

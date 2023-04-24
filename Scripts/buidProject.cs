@@ -346,6 +346,9 @@ public class buidProject : Node
 			result += "NULL, "; //trigger
 			result += "0, "; //triggerInd
 			result += "NULL, "; //spr
+			result += "FALSE, "; //activated
+			result += "{NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, "; //slaves_arr
+			result += "0, "; //slave_amount
 			if (showTriggerRects)
 			{
 				result += "NULL, "; //debugSpr1
@@ -480,6 +483,10 @@ public class buidProject : Node
 		result += "  Trigger* trigger;\n";
 		result += "  u16 triggerInd;\n";
 		result += "  Sprite* spr;\n";
+		result += "  bool activated;\n";
+		result += "  struct EntityMerged *slaves_arr[10];\n";
+		//result += "  u16 slaves_arr;\n";
+		result += "  u16 slave_amount;\n";
 
 		if (showTriggerRects)
 		{
@@ -940,15 +947,32 @@ public class buidProject : Node
 		return result;
 	}
 
+	private String convertSpritePathToSpriteName(String spritePath)
+	{
+		String result = "";
+		String rootFolderFilter = "build/res/sprites/";
+		result = spritePath.Substring(spritePath.FindLast(rootFolderFilter) + rootFolderFilter.Length);
+		result = result.Split(".")[0];
+		result = result.Split("-")[0];
+		result = result.Replace("/", "_");
+
+		return result;
+	}
+
+
 	private String genShowEntityCodeAll_entity()
 	{
+		GD.Print("In genShowEntityCodeAll_entity...");
 		String result = "";
 		Node singleton = (Node)GetNode("/root/singleton");
 		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
-		Godot.Collections.Array entityNames = (Godot.Collections.Array)singleton.Call("get_entity_names", "entities");
+		Godot.Collections.Array entityNames = (Godot.Collections.Array)singleton.Call("get_def_entityCollection_names", "entities");
 		//Generating funcs
-		foreach(String entityName in entityNames)
+		foreach(Godot.Collections.Dictionary entityDict in entityNames)
 		{
+			String entityName = entityDict["name"].ToString();
+			int defId = int.Parse(entityDict["defId"].ToString());
+			Godot.Collections.Dictionary entityDef = (Godot.Collections.Dictionary)singleton.Call("get_entityDef_by_defId", defId);
 			String defaultEntityCodePath = engineRootPath + "/code_template/showEntity/showDefault.c";
 			String checkPath = engineRootPath + "/code_template/showEntity/show" + entityName + ".c";
 			if (System.IO.File.Exists(checkPath))
@@ -956,19 +980,64 @@ public class buidProject : Node
 				String insertData = System.IO.File.ReadAllText(checkPath);
 				insertData = insertData.Replace("$entityName$", entityName);
 				insertData = insertData.Replace("$entityType$", "EntityMerged");
+				String addSpriteCode = "";
+				//Add slaves code
+				Godot.Collections.Array slaves = (Godot.Collections.Array)(Godot.Collections.Array)entityDef["subordinates"];
+				if(slaves.Count > 0)
+				{
+					int curSlaveInd = 0;
+					addSpriteCode += "if(!entity->activated) {\n";
+					//addSpriteCode += "EntityMerged* curSlave;\n";
+					foreach (Godot.Collections.Dictionary slaveDict in slaves)
+					{
+						//Moving slave, err, subordinate, to his position
+						Godot.Collections.Array slavePos = (Godot.Collections.Array)slaveDict["px"];
+						String x_pos = slavePos[0].ToString();
+						String y_pos = slavePos[1].ToString();
+
+						int slaveDefId = int.Parse(slaveDict["defId"].ToString());
+
+						Godot.Collections.Dictionary slaveEntityDef = (Godot.Collections.Dictionary)singleton.Call("get_entityDef_by_defId", slaveDefId);
+						String slaveEntityName = slaveEntityDef["identifier"].ToString();
+						//addSpriteCode += $"curSlave = entity->slaves_arr[{curSlaveInd.ToString()}];\n";
+						addSpriteCode += $"entity->slaves_arr[{curSlaveInd.ToString()}] = addNew_{slaveEntityName}((Vect2D_s16){{{x_pos}+entity->posInt.x, {y_pos}+entity->posInt.y}}, (Vect2D_f16){{0, 0}});\n";
+
+						//addSpriteCode += $"curSlave->posInt = (Vect2D_s16){{{x_pos}+entity->posInt.x, {y_pos}+entity->posInt.y}};\n";
+						//addSpriteCode += $"curSlave->pos = (Vect2D_f32){{FIX32({x_pos}+entity->posInt.x), FIX32({y_pos}+entity->posInt.y)}};\n";
+
+						/*
+						String spritePath = slaveDict["__spritePath"].ToString();
+						if (spritePath.Length > 0)
+						{
+							String spriteName = "&spr_" + convertSpritePathToSpriteName(spritePath);
+							//Adding sprite
+							addSpriteCode += $"curSlave->spr = SPR_addSprite({spriteName}, {x_pos}+posX_OnCam, {y_pos}+posY_OnCam, TILE_ATTR(ENEMY_PALETTE, 11, FALSE, FALSE));\n";
+						}
+						*/
+						
+
+						
+						
+						curSlaveInd++;
+					}
+					addSpriteCode += "entity->activated = TRUE;\n";
+					addSpriteCode += "}\n";
+				}
+					
+				//addSpriteCode += 
 				if (showTriggerRects)
 				{
 					String releaseSpriteCode = "if(entity->debugSpr1) SPR_releaseSprite(entity->debugSpr1);\n" +
 						"if(entity->debugSpr2) SPR_releaseSprite(entity->debugSpr2);\n";
 					insertData = insertData.Replace("//$showTriggerRects_releaseSprite$", releaseSpriteCode);
-					String addSpriteCode = "entity->debugSpr1 = SPR_addSprite(&spr_debugLeftTopCorner, posX_OnCam, posY_OnCam, TILE_ATTR(PAL3, 11, FALSE, FALSE));\n" +
+					addSpriteCode += "entity->debugSpr1 = SPR_addSprite(&spr_debugLeftTopCorner, posX_OnCam, posY_OnCam, TILE_ATTR(PAL3, 11, FALSE, FALSE));\n" +
 						"entity->debugSpr2 = SPR_addSprite(&spr_debugRightBottom, posX_OnCam, posY_OnCam, TILE_ATTR(PAL3, 11, FALSE, FALSE));\n";
-					insertData = insertData.Replace("//$showTriggerRects_addSprite$", addSpriteCode);
+					
 					String moveSpriteCode = "if(entity->debugSpr1) SPR_setPosition(entity->debugSpr1, (entity->trigger->pos.x-cameraPosition.x)+entity->trigger->rect.min.x, (entity->trigger->pos.y-cameraPosition.y)+entity->trigger->rect.min.y);\n" +
 						"if(entity->debugSpr2) SPR_setPosition(entity->debugSpr2, (entity->trigger->pos.x-cameraPosition.x)+entity->trigger->rect.max.x-8, (entity->trigger->pos.y-cameraPosition.y)+entity->trigger->rect.max.y-8);\n";
 					insertData = insertData.Replace("//$showTriggerRects_moveSprite$", moveSpriteCode);
-
 				}
+				insertData = insertData.Replace("//$showTriggerRects_addSprite$", addSpriteCode);
 				result += insertData + "\n";
 			} else
 			{
@@ -989,8 +1058,9 @@ public class buidProject : Node
 
 		//Putting this funcs in arr
 		result += "void(* showEntityFuncArr[])(EntityMerged*) = {";
-		foreach (String entityName in entityNames)
+		foreach (Godot.Collections.Dictionary entityDict in entityNames)
 		{
+			String entityName = entityDict["name"].ToString();
 			result += "show" + entityName + ", ";
 		}
 		result += "};\n";
@@ -1736,6 +1806,7 @@ public class buidProject : Node
 
 					int instId = 0;
 					instId = (int)int.Parse(entityInst["instId"].ToString());
+					
 
 					int[] spd = { 0, 0 };
 
@@ -1757,6 +1828,9 @@ public class buidProject : Node
 						  Trigger* trigger;
 						  u16 triggerInd;
 						  Sprite* spr;
+						  bool activated;
+						  struct EntityMerged *slaves_arr[10];
+						  u16 slave_amount;
 						} EntityMerged;
 
 					**********************************/
@@ -1791,6 +1865,12 @@ public class buidProject : Node
 					}
 					tempChunkCode += $"{curTriggerInd},"; //triggerInd small this is for unoptimized entity load algorithm
 					tempChunkCode += "NULL,"; //spr
+					tempChunkCode += "FALSE, "; // activated
+					tempChunkCode += "{NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, "; //slaves_arr
+					int defId = int.Parse(entityInst["defId"].ToString());
+					Godot.Collections.Dictionary entityDef = (Godot.Collections.Dictionary)singleton.Call("get_entityDef_by_defId", defId);
+					Godot.Collections.Array slaves = (Godot.Collections.Array)entityDef["subordinates"];
+					tempChunkCode += $"{slaves.Count.ToString()}, "; //slave_amount
 
 					if (showTriggerRects)
 					{
@@ -1945,6 +2025,9 @@ public class buidProject : Node
 				  Trigger* trigger;
 				  u16 triggerInd;
 				  Sprite* spr;
+				  bool activated;
+				  struct EntityMerged *slaves_arr[10];
+				  u16 slave_amount;
 				} EntityMerged;
 
 			**********************************/
@@ -1969,6 +2052,13 @@ public class buidProject : Node
 			}
 			result += $"{curTriggerInd},"; //triggerInd = curEntityInd, since all entity have trigger, which is not good for preformance reasons
 			result += "NULL,"; //spr
+			result += "FALSE, "; //activated
+			result += "{NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, "; //slaves_arr
+
+			int defId = int.Parse(entityInst["defId"].ToString());
+			Godot.Collections.Dictionary entityDef = (Godot.Collections.Dictionary)singleton.Call("get_entityDef_by_defId", defId);
+			Godot.Collections.Array slaves = (Godot.Collections.Array)entityDef["subordinates"];
+			result += $"{slaves.Count.ToString()}, "; //slave_amount
 
 			if (showTriggerRects)
 			{

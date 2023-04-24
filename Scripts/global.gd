@@ -19,15 +19,19 @@ var cur_editor_mode: int = EditorMode.NONE
 var prev_editor_mode: int = EditorMode.NONE
 
 var in_modal_window: bool = false
+var can_move_map: bool = true
 
+#Such a mess, it will be cleaned eventually... i hope?
 var cur_entity_type: String
 var cur_entity_type_ind: int = -1
+var cur_entity_defId: int = -1
 var cur_entity_field_ind: int
 var cur_entity_field_def_ind: int
 var cur_entity_inst_ind: int
 var cur_entity_instId: int
 var cur_messagePack_ind: int = -1
 var cur_message_ind: int = -1
+##############################################
 
 var draw_tile_ind:int = 0
 
@@ -51,7 +55,7 @@ var entity_types = {
 		"app": "Platformer Studio For SGDK",
 		"doc": "https://github.com/bolon667/SGDK_PlatformerStudio/wiki/Welcome-to-studio",
 		"appAuthor": "bolon667",
-		"appVersion": "1.8 beta",
+		"appVersion": "1.9 beta",
 		"url": "https://github.com/bolon667/SGDK_PlatformerStudio",
 	},
 	"jsonVersion": "1.0.0",
@@ -294,6 +298,7 @@ const entity_def_template = {
 	"triggerValue": -1,
 	"triggerValue2": -1,
 	"triggerValue3": -1,
+	"subordinates": [],
 	"defId": -1, #id of entity definition, for quick search of entity instance, when you changed
 	#entity name or field name in entity menu.
 	"color": "#0048FF",
@@ -623,6 +628,11 @@ func update_project():
 	if !entity_types["defs"].has("levelDefaultData"):
 		updateLevelDefaultData()
 	
+	for entity_def in entity_types["defs"]["entities"]:
+		if(!entity_def.has("subordinates")):
+			entity_def["subordinates"] = []
+	#subordinates
+	
 	if !entity_types.has("entityLoadOptimization"):
 		entity_types["entityLoadOptimization"] = 0
 	#Add arr entityBulletInstances arr to all entities
@@ -940,6 +950,14 @@ func change_cur_fieldInst(field_name: String, field_val):
 			if field_inst["__identifier"] == field_name:
 				field_inst["__value"] = field_val
 
+func change_fieldInst_instId(instId, levelInd, field_name: String, field_val):
+	for entity_inst in entity_types["levels"][levelInd]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+		if(instId == entity_inst["instId"]):
+			for field_inst in entity_inst["fieldInstances"]:
+				if field_inst["__identifier"] == field_name:
+					field_inst["__value"] = field_val
+			break
+
 func change_entityInstFieldName_by_fieldId(field_name: String, fieldId: int):
 	print(entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"])
 	print("THIS")
@@ -960,6 +978,21 @@ func get_unique_entity_fieldId():
 		continue
 	return fieldId
 	
+
+func get_unique_entity_slave_instId(masterDefId: int):
+	#Find masterDefId ind in arr
+	var target_ind: int = 0
+	for entity_def in entity_types["defs"]["entities"]:
+		if entity_def["defId"] == masterDefId:
+			break
+		target_ind += 1
+	var lastInstId: int = 0
+	#find last instId in entityInstances arr
+	for entity_inst in entity_types["defs"]["entities"][target_ind]["subordinates"]:
+		if lastInstId < int(entity_inst["instId"]):
+			lastInstId = entity_inst["instId"]
+	# +1 to make sure, that instId is unique
+	return lastInstId+1
 
 func get_unique_entity_instId():
 	var lastInstId: int = 0
@@ -1024,6 +1057,20 @@ func save_gateInst_pos(instId: int, posPx: Array):
 			break
 		posInArray += 1
 
+func save_entitySlaveInst_pos(masterDefId: int, instId: int, posPx: Array):
+	print("masterDefId: ", masterDefId, ", instId: ", instId)
+	#find masterDefId ind in arr
+	var targetInd: int = 0
+	for entity_def in entity_types["defs"]["entities"]:
+		if(entity_def["defId"] == masterDefId):
+			break
+		targetInd += 1
+
+	for entity_inst in entity_types["defs"]["entities"][targetInd]["subordinates"]:
+		if entity_inst["instId"] == instId:
+			entity_inst["px"] = [int(posPx[0]), int(posPx[1])]
+			break
+		
 func save_entityInst_pos(instId: int, posPx: Array):
 	var posInArray: int = 0
 	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
@@ -1136,10 +1183,9 @@ func change_fiendInst_value_by_levelInd_entityInstId(fieldName: String, fieldVal
 		cur_fieldInst_ind += 1
 	entity_types["levels"][level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"][inst_ind]["fieldInstances"][cur_fieldInst_ind]["__value"] = fieldValue
 	
-func change_sprite_by_instId(spritePath: String):
-	var instId = cur_entity_inst_ind
+func change_sprite_by_instId(spritePath: String, levelInd, instId):
 	var cur_inst_ind: int = 0
-	for entity_inst in entity_types["levels"][cur_level_ind]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
+	for entity_inst in entity_types["levels"][levelInd]["layerInstances"][cur_level_layer_ind]["entityInstances"]:
 		if entity_inst["instId"] == instId:
 			entity_inst["__spritePath"] = spritePath
 			break
@@ -1175,6 +1221,30 @@ func add_positionInstance():
 	if(layer_id == -1):
 		return
 	entity_types["levels"][cur_level_ind]["layerInstances"][layer_id]["entityInstances"].append(entity_instance)
+	return entity_instance
+
+func delete_entitySlave_by_instId(masterDefId: int, instId: int):
+	var deleteNum = 0
+	#find ind of masterDefId
+	var target_ind: int = 0
+	for entity_def in entity_types["defs"]["entities"]:
+		if(entity_def["defId"] == masterDefId):
+			break
+		target_ind += 1
+	for entityInst in entity_types["defs"]["entities"][target_ind]["subordinates"]:
+		if entityInst["instId"] == instId:
+			break
+	entity_types["defs"]["entities"][target_ind]["subordinates"].remove(deleteNum)
+
+func add_cur_entitySlave(masterDefId: int, slaveDefId: int):
+	var entity_instance = get_cur_entityInstance_slave_t(masterDefId, slaveDefId)
+	#find ind for masterDefId
+	var target_ind: int = 0
+	for entity_def in entity_types["defs"]["entities"]:
+		if(entity_def["defId"] == masterDefId):
+			break
+		target_ind += 1
+	entity_types["defs"]["entities"][target_ind]["subordinates"].append(entity_instance)
 	return entity_instance
 
 func add_cur_entityInstance():
@@ -1478,12 +1548,13 @@ func get_entity_names(entityCollectionDef: String):
 		
 		entity_names.append(entity["identifier"])
 	return entity_names
+
 	
 func get_def_entityCollection_names(collectionName: String):
 	var entity_names = []
 	for entity in entity_types["defs"][collectionName]:
 		if entity["show"]:
-			entity_names.append(entity["identifier"])
+			entity_names.append({"name": entity["identifier"], "defId": entity["defId"]})
 	return entity_names
 
 func get_gateInstance_t_defId(defId: int, level_ind: int):
@@ -1560,6 +1631,54 @@ func get_entityInstance_t_defId(defId: int):
 	
 	entity_inst["defId"] = def["defId"]
 	entity_inst["instId"] = get_unique_entity_instId()
+	var filed_inst_arr = []
+	#Get all fields from entityDef, and copy name,value to fields in entityInstance
+	#Entity definition - template for entity
+	#Entity instance - actual entity
+	for field in def["fieldDefs"]:	
+		var field_inst = field_inst_template.duplicate(true)
+		field_inst["__identifier"] = field["identifier"]
+		field_inst["__value"] = field["defaultValue"]
+		field_inst["__type"] = field["__type"]
+		field_inst["fieldId"] = field["fieldId"]
+		field_inst["__hasStruct"] = field["hasStruct"]
+		filed_inst_arr.append(field_inst)
+		if(field["identifier"] == "Trigger type"):
+			entity_inst["triggerType"] = int(field["defaultValue"])
+		elif(field["identifier"] == "Trigger value"):
+			entity_inst["triggerValue"] = int(field["defaultValue"])
+		elif(field["identifier"] == "Trigger value2"):
+			entity_inst["triggerValue2"] = int(field["defaultValue"])
+		elif(field["identifier"] == "Trigger value3"):
+			entity_inst["triggerValue3"] = int(field["defaultValue"])
+			
+	entity_inst["fieldInstances"] = filed_inst_arr
+	return entity_inst
+
+func get_cur_entityInstance_slave_t(masterDefId: int, slaveDefId: int):
+	var def = entity_types["defs"]["entities"][cur_entity_type_ind].duplicate(true)
+	var entity_inst = entity_inst_template.duplicate(true)
+	entity_inst["__identifier"] = def["identifier"]
+	entity_inst["triggerAABB"] = def["triggerAABB"]
+	entity_inst["triggerType"] = def["triggerType"]
+	entity_inst["triggerValue"] = def["triggerValue"]
+	
+	if(!def.has("triggerTypeName")):
+		def["triggerTypeName"] = ""
+	entity_inst["triggerTypeName"] = def["triggerTypeName"]
+	if(!def.has("triggerValue2")):
+		def["triggerValue2"] = 0
+	entity_inst["triggerValue2"] = def["triggerValue2"]
+	if(!def.has("triggerValue3")):
+		def["triggerValue3"] = 0
+	entity_inst["triggerValue3"] = def["triggerValue3"]
+	entity_inst["addTrigger"] = def["addTrigger"]
+	
+	#Loading sprite path
+	entity_inst["__spritePath"] = def["spritePath"]
+	
+	entity_inst["defId"] = slaveDefId
+	entity_inst["instId"] = get_unique_entity_slave_instId(masterDefId)
 	var filed_inst_arr = []
 	#Get all fields from entityDef, and copy name,value to fields in entityInstance
 	#Entity definition - template for entity

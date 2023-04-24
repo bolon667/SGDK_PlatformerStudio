@@ -11,6 +11,8 @@ struct pBody {
 	Sprite* debugSpr1;
 	Sprite* debugSpr2;
 	AABB aabb;
+	AABB normalAABB;
+	AABB slidingAABB;
 	AABB climbingStairAABB;
 
 	int facingDirection;
@@ -35,6 +37,8 @@ struct pBody {
 	bool damaged;
 	bool godMode;
 	bool isVisible;
+	bool sliding;
+	bool cantControl;
 
 	s16 animMode;
 	s16 val1;

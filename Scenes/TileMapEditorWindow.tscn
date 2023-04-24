@@ -15,7 +15,7 @@ margin_right = 40.0
 margin_bottom = 40.0
 mouse_filter = 2
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." groups=["mainCamera"]]
 anchor_mode = 0
 current = true
 editor_draw_screen = false

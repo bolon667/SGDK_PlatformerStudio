@@ -172,16 +172,17 @@ func move_camera(delta):
 		camera.zoom = Vector2(zoom, zoom)
 		var window_size = get_viewport_rect().size
 		$Area2D/CollisionShape2D.shape.extents = Vector2((window_size.x*zoom)-2, window_size.y*zoom)
-		
-	# This happens once 'move_map' is pressed
-	if Input.is_action_just_pressed('wheel_btn'):
-		var ref = get_viewport().get_mouse_position()
-		singleton.in_modal_window = false
-		get_tree().call_group("tempWindow", "queue_free")
-		fixed_toggle_point = ref
-	# This happens while 'move_map' is pressed
-	if Input.is_action_pressed('wheel_btn'):
-		move_map_around()
+	
+	if(singleton.can_move_map):
+		# This happens once 'move_map' is pressed
+		if Input.is_action_just_pressed('wheel_btn'):
+			var ref = get_viewport().get_mouse_position()
+			singleton.in_modal_window = false
+			get_tree().call_group("tempWindow", "queue_free")
+			fixed_toggle_point = ref
+		# This happens while 'move_map' is pressed
+		if Input.is_action_pressed('wheel_btn'):
+			move_map_around()
 	
 	#camera.position += Vector2(move_x*camera_speed*delta, move_y*camera_speed*delta)
 
