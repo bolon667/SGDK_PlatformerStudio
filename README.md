@@ -30,6 +30,11 @@ Studio wihich allows you easily create platformers for **Sega Genesis**, heavily
 - Chunk entity load optimization. You can choose between no optimization (all level entities in RAM), and chunk optimization (load entity only from on-screen chunks). 
 - Scene mode. You can shoose between scene and level mode.
 
+# What needs to be done
+- Fix bugs
+- Add more engines (like shmup, rpg, vn, engine)
+- Add custom animations.
+
 # Warning
 This programm in early development, if you will get bugs, tell me about them in **Issues** tab
 
