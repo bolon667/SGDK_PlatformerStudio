@@ -8,7 +8,7 @@
 You can download last version from **[Google Drive](https://drive.google.com/file/d/1zKqKB5Zd2cLrbKE1DPX3pojDyeEAXCpL/view)**
 # About project
 
-Studio wihich allows you easily create platformers for **Sega Genesis**, heavily inspired by **[LDTK](https://ldtk.io/)** simple interface.
+Studio wihich allows you easily create platformers for **Sega Genesis**, heavily inspired by **[LDTK](https://ldtk.io/)** simple interface. This studio, it's a just a code generator, which creates code for your SGDK project.
 
 # How to install
 1. Download latest studio from **[Google Drive](https://drive.google.com/file/d/1zKqKB5Zd2cLrbKE1DPX3pojDyeEAXCpL/view)**
