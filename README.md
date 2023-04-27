@@ -34,6 +34,7 @@ Studio wihich allows you easily create platformers for **Sega Genesis**, heavily
 - Fix bugs
 - Add more engines (like shmup, rpg, vn, engine)
 - Add custom animations.
+- May be add a multi-console development, will see.
 
 # Warning
 This programm in early development, if you will get bugs, tell me about them in **Issues** tab
