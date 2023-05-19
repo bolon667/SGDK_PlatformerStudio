@@ -1,3 +1,0 @@
-void useless_script(){
-    
-}

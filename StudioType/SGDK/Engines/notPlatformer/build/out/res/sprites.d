@@ -1,1 +1,0 @@
-out/res/sprites.o: res/sprites.res
