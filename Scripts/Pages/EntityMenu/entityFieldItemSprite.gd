@@ -26,16 +26,17 @@ func _on_changeSpriteBtn_button_down():
 	print($FileDialog.current_path)
 	$FileDialog.popup_centered()
 
-func change_spr_by_path(path: String):
+func change_spr_by_path(rel_path: String):
 	#Update sprite in settings
 	var img1 = Image.new()
-	img1.load(path)
+	img1.load(singleton.cur_project_folder_path + rel_path)
 	var imgTex = ImageTexture.new()
 	imgTex.create_from_image(img1, 1)
 	$HBoxContainer/VBoxContainer/Control/Sprite.texture = imgTex;
 
 func _on_FileDialog_file_selected(path):
 	print(path)
+	var rel_path = path.substr(len(singleton.cur_project_folder_path))
 	var spr_name: String
 	var find_ind: int = path.find(root_path,0)
 	if find_ind:
@@ -55,7 +56,7 @@ func _on_FileDialog_file_selected(path):
 	var spr_width = $HBoxContainer/VBoxContainer/Control/Sprite.texture.get_width()
 	
 	#Change spritePath if entity
-	singleton.entity_types["defs"][entityCollection][singleton.cur_entity_type_ind]["spritePath"] = path
+	singleton.entity_types["defs"][entityCollection][singleton.cur_entity_type_ind]["spritePath"] = rel_path
 	singleton.entity_types["defs"][entityCollection][singleton.cur_entity_type_ind]["height"] = spr_height
 	singleton.entity_types["defs"][entityCollection][singleton.cur_entity_type_ind]["width"] = spr_width
 	pass # Replace with function body.

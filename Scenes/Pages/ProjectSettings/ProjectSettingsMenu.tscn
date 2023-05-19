@@ -105,6 +105,9 @@ text = "Run from current level"
 margin_top = 72.0
 margin_right = 1024.0
 margin_bottom = 92.0
+__meta__ = {
+"_editor_description_": "Amount of additional slots for EntityMerged"
+}
 
 [node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer3"]
 margin_right = 192.0
@@ -129,14 +132,15 @@ text = "0"
 margin_top = 96.0
 margin_right = 1024.0
 margin_bottom = 116.0
+hint_tooltip = "Maximum amount of bullets in game"
 
 [node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer4"]
-margin_right = 194.0
+margin_right = 156.0
 margin_bottom = 20.0
-text = "Add BulletMerged Slots"
+text = "BulletMerged Slots"
 
 [node name="addBulletSlotsSlider" type="HSlider" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer4"]
-margin_left = 198.0
+margin_left = 160.0
 margin_right = 980.0
 margin_bottom = 16.0
 size_flags_horizontal = 3
@@ -149,25 +153,51 @@ margin_bottom = 20.0
 rect_min_size = Vector2( 40, 0 )
 text = "0"
 
-[node name="runFromCurLevelBtn" type="CheckButton" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
-visible = false
+[node name="HboxContainer5" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
 margin_top = 120.0
 margin_right = 1024.0
-margin_bottom = 158.0
+margin_bottom = 140.0
+hint_tooltip = "Set the maximum number of entities that 1 master entity can own."
+
+[node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer5"]
+margin_right = 156.0
+margin_bottom = 20.0
+text = "Entity Slaves Slots"
+
+[node name="addEntitySlavesSlider" type="HSlider" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer5"]
+margin_left = 160.0
+margin_right = 980.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+max_value = 50.0
+rounded = true
+
+[node name="addEntitySlavesLabel" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer5"]
+margin_left = 984.0
+margin_right = 1024.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 40, 0 )
+text = "0"
+
+[node name="runFromCurLevelBtn" type="CheckButton" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
+visible = false
+margin_top = 144.0
+margin_right = 1024.0
+margin_bottom = 182.0
 size_flags_horizontal = 3
 text = "Debug on"
 
 [node name="turnOnGatesBtn" type="CheckButton" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
-margin_top = 120.0
+margin_top = 144.0
 margin_right = 1024.0
-margin_bottom = 158.0
+margin_bottom = 182.0
 size_flags_horizontal = 3
 text = "Turn on gates"
 
 [node name="debugContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
-margin_top = 162.0
+margin_top = 186.0
 margin_right = 1024.0
-margin_bottom = 200.0
+margin_bottom = 224.0
 
 [node name="showTriggerRectsBtn" type="CheckButton" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/debugContainer"]
 margin_right = 1024.0
@@ -175,10 +205,19 @@ margin_bottom = 38.0
 size_flags_horizontal = 3
 text = "Show trigger rects"
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
-margin_top = 204.0
+[node name="stickyLevelsBtn" type="CheckButton" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
+margin_top = 228.0
 margin_right = 1024.0
-margin_bottom = 234.0
+margin_bottom = 266.0
+size_flags_horizontal = 3
+text = "Sticky Levels Mode"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
+margin_top = 270.0
+margin_right = 1024.0
+margin_bottom = 300.0
+hint_tooltip = "No optimization: All entities are in RAM. Entities outside screen, wasting CPU sycles.
+Chunk Optimization: Area of entities. little bigger than screen, are in memory. Entities outside a screen, doesn't affect on performance. "
 
 [node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HBoxContainer3"]
 margin_top = 5.0
@@ -197,9 +236,9 @@ items = [ "No Optimization", null, false, 0, null, "Chunk Optimization", null, f
 selected = 0
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
-margin_top = 238.0
+margin_top = 304.0
 margin_right = 1024.0
-margin_bottom = 264.0
+margin_bottom = 330.0
 
 [node name="Label" type="Label" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HBoxContainer4"]
 margin_top = 3.0
@@ -237,8 +276,10 @@ text = "px"
 [connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HBoxContainer/runFromCurLevelBtn" to="." method="_on_runFromCurLevelBtn_toggled"]
 [connection signal="value_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer3/addSlotsSlider" to="." method="_on_addSlotsSlider_value_changed"]
 [connection signal="value_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer4/addBulletSlotsSlider" to="." method="_on_addBulletSlotsSlider_value_changed"]
+[connection signal="value_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer5/addEntitySlavesSlider" to="." method="_on_addEntitySlavesSlider_value_changed"]
 [connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/turnOnGatesBtn" to="." method="_on_turnOnGatesBtn_toggled"]
 [connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/debugContainer/showTriggerRectsBtn" to="." method="_on_showTriggerRectsBtn_toggled"]
+[connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/stickyLevelsBtn" to="." method="_on_stickyLevelsBtn_toggled"]
 [connection signal="item_selected" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HBoxContainer3/entityOptBtn" to="." method="_on_entityOptBtn_item_selected"]
 [connection signal="text_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HBoxContainer4/chunkSizeX" to="." method="_on_chunkSizeX_text_changed"]
 [connection signal="text_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HBoxContainer4/chunkSizeY" to="." method="_on_chunkSizeY_text_changed"]

@@ -45,7 +45,7 @@ text = " X "
 [node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/VBoxContainer2"]
 margin_top = 34.0
 margin_right = 412.0
-margin_bottom = 184.0
+margin_bottom = 208.0
 size_flags_horizontal = 3
 
 [node name="Label" type="Label" parent="ColorRect/VBoxContainer2/VBoxContainer"]
@@ -70,20 +70,29 @@ margin_top = 58.0
 margin_right = 412.0
 margin_bottom = 72.0
 
-[node name="Control" type="Control" parent="ColorRect/VBoxContainer2/VBoxContainer"]
+[node name="curEngineOption" type="OptionButton" parent="ColorRect/VBoxContainer2/VBoxContainer"]
 margin_top = 76.0
 margin_right = 412.0
 margin_bottom = 96.0
+text = "Элемент 0"
+items = [ "Элемент 0", null, false, 0, null ]
+selected = 0
+
+[node name="Control" type="Control" parent="ColorRect/VBoxContainer2/VBoxContainer"]
+margin_top = 100.0
+margin_right = 412.0
+margin_bottom = 120.0
 rect_min_size = Vector2( 0, 20 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="Button" type="Button" parent="ColorRect/VBoxContainer2/VBoxContainer"]
-margin_top = 100.0
+margin_top = 124.0
 margin_right = 412.0
-margin_bottom = 150.0
+margin_bottom = 174.0
 rect_min_size = Vector2( 0, 50 )
 theme = ExtResource( 2 )
 text = "Create project"
 
 [connection signal="button_down" from="ColorRect/VBoxContainer2/HBoxContainer/ExitBtn" to="." method="_on_ExitBtn_button_down"]
+[connection signal="item_selected" from="ColorRect/VBoxContainer2/VBoxContainer/curEngineOption" to="." method="_on_curEngineOption_item_selected"]

@@ -6,6 +6,7 @@ export var zoom_step = 0.1
 var zoom = 1
 var fixed_toggle_point = Vector2(0,0)
 
+var is_selected:bool = false
 
 var mouse_on_level = false
 var highlight = false
@@ -16,6 +17,8 @@ const erase_tile_ind = -1
 var cell_pos = Vector2.ZERO
 var prev_cell_pos = Vector2.ZERO
 var prev_cell_pos_temp = Vector2.ZERO
+
+var parrent_pos = Vector2.ZERO
 
 var local_mouse_pos
 
@@ -28,6 +31,8 @@ var real_z_index = z_index
 
 var first_sides_check = true
 
+var parrent_child_pos_diff = Vector2.ZERO
+
 
 onready var temp_tile_map = $tempTileMap
 
@@ -39,6 +44,16 @@ onready var bgA_spr = $bgA
 onready var bgB_spr = $bgB
 
 var cur_level_ind: int = 0
+
+enum side_enum {
+	LEFT,
+	RIGHT,
+	UP,
+	DOWN,
+}
+
+var connected_level_containers = [null, null, null, null]
+var used_sides = [false, false, false, false]
 
 
 onready var camera = $"../../Camera2D"
@@ -57,6 +72,15 @@ func draw_frame(rect: Rect2, color, line_thickness):
 	draw_line(Vector2(rect.size.x+half_line_thickness, rect.size.y+half_line_thickness), Vector2(rect.position.x-line_thickness, rect.size.y+half_line_thickness), color, line_thickness)
 	draw_line(Vector2(rect.position.x-half_line_thickness, rect.size.y+half_line_thickness), Vector2(rect.position.x-half_line_thickness, rect.position.y-line_thickness), color, line_thickness)
 
+func check_connection_with_level():
+	var not_connection: bool = true
+	for connected_container in connected_level_containers:
+		if connected_container != null:
+			not_connection = false
+			break
+	if not_connection and not is_moving:
+		remove_from_group("connectedLevelContainers")
+
 func delete_self():
 	#singleton.entity_types["turnOnGates"] = false
 	
@@ -68,7 +92,14 @@ func delete_self():
 	#queue_free()
 
 func _draw():
-	if(highlight):
+	if is_selected:
+		var color: Color = Color( 1, 0, 0, 1 )
+		var line_thickness = 6
+		#line_thickness = stepify(line_thickness*camera2D.zoom,0)
+		#var rect = Rect2(Vector2(-line_thickness,-line_thickness), Vector2(level_size.x+line_thickness+line_thickness,level_size.y+line_thickness+line_thickness))
+		var rect = Rect2(Vector2(0,0), Vector2(map_size_px.x,map_size_px.y))
+		draw_frame(rect, color, line_thickness)
+	elif(highlight):
 		var color: Color = Color( 1, 0.84, 0, 1 )
 		var line_thickness = 6
 		#line_thickness = stepify(line_thickness*camera2D.zoom,0)
@@ -78,6 +109,7 @@ func _draw():
 	
 func turn_off_highlight():
 	highlight = false
+	is_selected = false
 	update()
 
 func change_bga(imgPath: String, bgaMode: int):
@@ -108,6 +140,42 @@ func change_bgb(imgPath: String, bgbMode: int):
 		singleton.change_level_size(cur_level_ind, map_size_px)
 	updateAreas()
 
+func add_global_pos(add_pos:Vector2):
+	global_position.x += add_pos.x
+	global_position.y += add_pos.y
+	
+func move_pos_with_parrent(parrent):
+	if parrent == self:
+		return
+	var parrentPos = parrent.global_position
+	print("1:", parrent_child_pos_diff.x)
+	print("2:", parrent_child_pos_diff.y)	
+	global_position.x = parrentPos.x + parrent_child_pos_diff.x
+	global_position.y = parrentPos.y + parrent_child_pos_diff.y
+
+func get_parrent_child_pos_diff(parrentPos: Vector2):
+	parrent_child_pos_diff.x = -(parrentPos.x - global_position.x)
+	parrent_child_pos_diff.y = -(parrentPos.y - global_position.y)
+
+func set_is_moving(val: bool):
+	is_moving = val
+
+func add_global_pos_filter_1(add_pos:Vector2, parrentPos: Vector2):
+	#May be in future
+	if(global_position.x >= parrentPos.x):
+		if(global_position.y >= parrentPos.y):
+			global_position.x += add_pos.x
+			global_position.y += add_pos.y
+			
+func find_sticky_level_containers():
+	pass
+	#May be in the future
+
+func save_levelContainer_pos():
+	#Save world coords of level
+	singleton.entity_types["levels"][cur_level_ind]["worldX"] = global_position.x
+	singleton.entity_types["levels"][cur_level_ind]["worldY"] = global_position.y
+
 func move_level():
 	
 	if(!mouse_on_level or !singleton.level_move_mode):
@@ -123,23 +191,39 @@ func move_level():
 	var ref = get_viewport().get_mouse_position()
 	if(Input.is_action_just_pressed("mouse1") && _is_on_top()):
 		get_tree().call_group("tempWindow", "queue_free")
+		
+		get_tree().call_group("connectedLevelContainers", "get_parrent_child_pos_diff", global_position)
+		
 		singleton.in_modal_window = false
-		is_moving = true
+		set_is_moving(true)
 		z_index = 100
 
 	if(is_moving):
-		global_position.x += (ref.x - fixed_toggle_point.x)*camera.zoom.x
-		global_position.y += (ref.y - fixed_toggle_point.y)*camera.zoom.y
+		var add_pos = Vector2((ref.x - fixed_toggle_point.x)*camera.zoom.x, (ref.y - fixed_toggle_point.y)*camera.zoom.y)
+		#Moving only right and sown levelConainters
+		if(is_in_group("connectedLevelContainers")):
+			add_global_pos(add_pos)
+			#print(add_pos)
+			
+			get_tree().call_group("connectedLevelContainers", "move_pos_with_parrent", self)
+		else:
+			add_global_pos(add_pos)
+	
 		
 	if(Input.is_action_just_released("mouse1")):
+		#if(singleton.entity_types["stickyLevels"] == true):
+		#	get_tree().call_group("connectedLevelContainers", "set_is_moving", false)
+		#else:
+		#	set_is_moving(false)
 		z_index = real_z_index
 		is_moving = false
 		
 		global_position.x = (round(global_position.x/8))*8
 		global_position.y = (round(global_position.y/8))*8
-		#Save world coords of level
-		singleton.entity_types["levels"][cur_level_ind]["worldX"] = global_position.x
-		singleton.entity_types["levels"][cur_level_ind]["worldY"] = global_position.y
+		if(is_in_group("connectedLevelContainers")):
+			get_tree().call_group("connectedLevelContainers", "save_levelContainer_pos")
+		else:
+			save_levelContainer_pos()
 		
 	if(Input.is_action_just_pressed("mouse2") and highlight):
 		get_tree().call_group("tempWindow", "queue_free")
@@ -727,7 +811,8 @@ func entity_list_handler():
 			if len(entity_inst["__spritePath"]) > 0:
 				var pic_path = entity_inst["__spritePath"]
 				var img1 = Image.new()
-				img1.load(pic_path)
+				#Converting relative path to full path
+				img1.load(singleton.cur_project_folder_path+pic_path)
 				var imgTex = ImageTexture.new()
 				imgTex.create_from_image(img1, 1)
 				entity_obj_node.get_node("Sprite").texture = imgTex;
@@ -780,9 +865,9 @@ func _physics_process(delta):
 		local_mouse_pos = get_local_mouse_position()
 		if(singleton.cur_editor_mode == singleton.EditorMode.ENTITY):
 			entity_list_handler()
-		if(singleton.cur_editor_mode == singleton.EditorMode.POSITION):
+		elif(singleton.cur_editor_mode == singleton.EditorMode.POSITION):
 			position_list_handler()
-		if(singleton.cur_editor_mode == singleton.EditorMode.COLLISION):
+		elif(singleton.cur_editor_mode == singleton.EditorMode.COLLISION):
 			temp_tile_map_handler(delta)
 			tile_map_handler(delta)
 
@@ -794,6 +879,7 @@ func _on_Area2D_mouse_entered():
 	cell_pos = prev_cell_pos
 	add_to_group("level_hovered")
 	mouse_on_level = true
+	
 	pass # Replace with function body.
 
 
@@ -812,6 +898,12 @@ func _on_AreaLeft_area_entered(area):
 	var levelContainerAdjacent = area.get_parent()
 	if(levelContainerAdjacent == self):
 		return
+	
+	connected_level_containers[side_enum.LEFT] = levelContainerAdjacent
+	used_sides[side_enum.LEFT] = true
+	levelContainerAdjacent.used_sides[side_enum.RIGHT] = true
+	#add_adjucent_container(levelContainerAdjacent)
+		
 	var trigger_width = 1
 	is_moving = false
 	
@@ -885,13 +977,21 @@ func _on_AreaLeft_area_entered(area):
 	adjacent_gates.add_child(gate_node_adjacent)
 		
 
+
 func _on_AreaRight_area_entered(area):
 	if(!highlight):
 		return
 	var levelContainerAdjacent = area.get_parent()
+	
 	if(levelContainerAdjacent == self):
 		return
 	var trigger_width = 1
+	
+	connected_level_containers[side_enum.RIGHT] = levelContainerAdjacent
+	
+	used_sides[side_enum.RIGHT] = true
+	levelContainerAdjacent.used_sides[side_enum.LEFT] = true
+	#add_adjucent_container(levelContainerAdjacent)
 	
 	is_moving = false
 	#global_position.x = levelContainerAdjacent.global_position.x - levelContainerAdjacent.map_size_px.x
@@ -973,6 +1073,27 @@ func _on_AreaRight_area_entered(area):
 	adjacent_gates.add_child(gate_node_adjacent)
 	
 
+func find_connected_level_containers():
+	for levelContainer in connected_level_containers:
+		if levelContainer == null:
+			continue
+		#AAAAAAAAAAGH ITS TOO HARD FOR MY small BRAIN!
+		#TODO: Later, or Never.
+			
+	pass
+
+func make_deselected():
+	if(is_in_group("connectedLevelContainers")):
+		remove_from_group("connectedLevelContainers")
+	is_selected = false
+	update()
+
+func connect_adjucent_container(levelContainerAdjacent):
+	#Abandandoned, mb delete this?!?!
+	if(!levelContainerAdjacent.is_in_group("connectedLevelContainers")):
+		levelContainerAdjacent.add_to_group("connectedLevelContainers")
+	if(!is_in_group("connectedLevelContainers")):
+		add_to_group("connectedLevelContainers")
 
 func _on_AreaUp_area_entered(area):
 	if(!(first_sides_check || highlight)):
@@ -980,6 +1101,13 @@ func _on_AreaUp_area_entered(area):
 	var levelContainerAdjacent = area.get_parent()
 	if(levelContainerAdjacent == self):
 		return
+	
+	connected_level_containers[side_enum.UP] = levelContainerAdjacent
+	used_sides[side_enum.UP] = true
+	levelContainerAdjacent.used_sides[side_enum.DOWN] = true
+	#add_adjucent_container(levelContainerAdjacent)
+	
+		
 	var trigger_width = 1
 	is_moving = false
 	#global_position.y = levelContainerAdjacent.global_position.y + levelContainerAdjacent.map_size_px.y
@@ -1063,6 +1191,13 @@ func _on_AreaDown_area_entered(area):
 		return
 	var trigger_width = 1
 	is_moving = false
+	
+	connected_level_containers[side_enum.DOWN] = levelContainerAdjacent
+	
+	used_sides[side_enum.DOWN] = true
+	levelContainerAdjacent.used_sides[side_enum.UP] = true
+	
+	#add_adjucent_container(levelContainerAdjacent)
 	
 	var pos_x_start = global_position.x
 	var pos_x_end = global_position.x + map_size_px.x
@@ -1149,6 +1284,8 @@ func _on_AreaLeft_area_exited(area):
 	for gate in adjacent_node.get_children():
 		singleton.delete_gateInstance(levelContainerAdjacent.cur_level_ind, gate.inst_id)
 		gate.queue_free()
+	connected_level_containers[side_enum.LEFT] = null
+	check_connection_with_level()
 
 func delete_bga():
 	$bgA.texture = null;
@@ -1171,6 +1308,8 @@ func _on_AreaRight_area_exited(area):
 		singleton.delete_gateInstance(levelContainerAdjacent.cur_level_ind, gate_adjucent.inst_id)
 		print("Deleting2 ", gate_adjucent.inst_id)
 		gate_adjucent.queue_free()
+	connected_level_containers[side_enum.RIGHT] = null
+	check_connection_with_level()
 
 
 func _on_AreaUp_area_exited(area):
@@ -1184,7 +1323,14 @@ func _on_AreaUp_area_exited(area):
 	for gate_adjucent in adjacent_node.get_children():
 		singleton.delete_gateInstance(levelContainerAdjacent.cur_level_ind, gate_adjucent.inst_id)
 		gate_adjucent.queue_free()
+	connected_level_containers[side_enum.UP] = null
+	check_connection_with_level()
 
+func make_selected():
+	add_to_group("connectedLevelContainers")
+	is_selected = true
+	update()
+	
 
 func _on_AreaDown_area_exited(area):
 	for gate in $Gates/Down.get_children():
@@ -1197,3 +1343,5 @@ func _on_AreaDown_area_exited(area):
 	for gate in adjacent_node.get_children():
 		singleton.delete_gateInstance(levelContainerAdjacent.cur_level_ind, gate.inst_id)
 		gate.queue_free()
+	connected_level_containers[side_enum.DOWN] = null
+	check_connection_with_level()

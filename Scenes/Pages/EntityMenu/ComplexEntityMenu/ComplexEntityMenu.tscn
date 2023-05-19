@@ -157,6 +157,11 @@ centered = false
 position = Vector2( 407, 245 )
 shape = SubResource( 1 )
 
+[node name="Control" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_default_cursor_shape = 3
+
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer2/ExitBtn" to="." method="_on_ExitBtn_button_down"]
 [connection signal="text_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3/EntityNameEdit" to="." method="_on_EntityNameEdit_text_changed"]
 [connection signal="mouse_entered" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/MainArea/Area2D" to="." method="_on_Area2D_mouse_entered"]

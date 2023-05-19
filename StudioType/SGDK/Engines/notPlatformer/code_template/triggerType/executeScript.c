@@ -1,0 +1,1 @@
+customScriptArr[trigger->val1]();

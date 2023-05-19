@@ -323,6 +323,7 @@ public class buidProject : Node
 		//Godot.Collections.Array mergedFieldDef_arr
 		String result = "";
 		Node singleton = (Node)GetNode("/root/singleton");
+		int slaveAmount = int.Parse(singleton.Call("get_slave_amount").ToString());
 		Dictionary mergedFieldDefs2 = (Dictionary)singleton.Call("get_merged_fieldDefs_v2", "entities");
 		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
 		Godot.Collections.Array entityDefs = (Godot.Collections.Array)singleton.Call("get_entity_defs", "entities");
@@ -347,7 +348,15 @@ public class buidProject : Node
 			result += "0, "; //triggerInd
 			result += "NULL, "; //spr
 			result += "FALSE, "; //activated
-			result += "{NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, "; //slaves_arr
+
+			//slaves_arr
+			result += "{";
+			for (int i=0; i< slaveAmount; i++)
+			{
+				result += "NULL, ";
+			}
+			result += "}, ";
+
 			result += "0, "; //slave_amount
 			if (showTriggerRects)
 			{
@@ -468,6 +477,8 @@ public class buidProject : Node
 		Node singleton = (Node)GetNode("/root/singleton");
 		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
 
+		int slaveAmount = int.Parse(singleton.Call("get_slave_amount").ToString());
+
 
 		String result = "typedef struct {\n";
 		//Predefined strct vars
@@ -484,8 +495,7 @@ public class buidProject : Node
 		result += "  u16 triggerInd;\n";
 		result += "  Sprite* spr;\n";
 		result += "  bool activated;\n";
-		result += "  struct EntityMerged *slaves_arr[10];\n";
-		//result += "  u16 slaves_arr;\n";
+		result += $"  struct EntityMerged *slaves_arr[{slaveAmount.ToString()}];\n";
 		result += "  u16 slave_amount;\n";
 
 		if (showTriggerRects)
@@ -1724,6 +1734,7 @@ public class buidProject : Node
 		GD.Print("Gen EntityMerged Code: chunkOpt1...");
 		String result = "";
 		Node singleton = (Node)GetNode("/root/singleton");
+		int slaveAmount = int.Parse(singleton.Call("get_slave_amount").ToString());
 		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
 		Godot.Collections.Array mergedFieldDef_arr = (Godot.Collections.Array)singleton.Call("get_merged_fieldDef", "entities");
 		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict", "entities");
@@ -1866,7 +1877,14 @@ public class buidProject : Node
 					tempChunkCode += $"{curTriggerInd},"; //triggerInd small this is for unoptimized entity load algorithm
 					tempChunkCode += "NULL,"; //spr
 					tempChunkCode += "FALSE, "; // activated
-					tempChunkCode += "{NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, "; //slaves_arr
+					//slaves_arr
+					tempChunkCode += "{";
+					for (int i = 0; i < slaveAmount; i++)
+					{
+						tempChunkCode += "NULL, ";
+					}
+					tempChunkCode += "}, ";
+
 					int defId = int.Parse(entityInst["defId"].ToString());
 					Godot.Collections.Dictionary entityDef = (Godot.Collections.Dictionary)singleton.Call("get_entityDef_by_defId", defId);
 					Godot.Collections.Array slaves = (Godot.Collections.Array)entityDef["subordinates"];
@@ -1961,6 +1979,7 @@ public class buidProject : Node
 	{
 		GD.Print("Gen EntityMerged Code...");
 		Node singleton = (Node)GetNode("/root/singleton");
+		int slaveAmount = int.Parse(singleton.Call("get_slave_amount").ToString());
 		bool showTriggerRects = (bool)singleton.Call("get_show_trigger_rects");
 		Godot.Collections.Array mergedFieldDef_arr = (Godot.Collections.Array)singleton.Call("get_merged_fieldDef", "entities");
 		//GD.Print(1);
@@ -2053,7 +2072,13 @@ public class buidProject : Node
 			result += $"{curTriggerInd},"; //triggerInd = curEntityInd, since all entity have trigger, which is not good for preformance reasons
 			result += "NULL,"; //spr
 			result += "FALSE, "; //activated
-			result += "{NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}, "; //slaves_arr
+			//slaves_arr
+			result += "{";
+			for (int i = 0; i < slaveAmount; i++)
+			{
+				result += "NULL, ";
+			}
+			result += "}, ";
 
 			int defId = int.Parse(entityInst["defId"].ToString());
 			Godot.Collections.Dictionary entityDef = (Godot.Collections.Dictionary)singleton.Call("get_entityDef_by_defId", defId);
@@ -2262,7 +2287,7 @@ public class buidProject : Node
 		result += "{";
 
 		//Bullet count
-		int bulletAmount = 10;
+		String bulletAmount = singleton.Call("get_bullet_amount").ToString();
 		//AdditionalSlots count		
 		String additionalSlots = singleton.Call("get_addEntityMergedSlots").ToString();
 		//Entity count
@@ -2274,7 +2299,7 @@ public class buidProject : Node
 		result += additionalSlots + ", ";
 
 		//Bullet
-		result += bulletAmount.ToString() + ", ";
+		result += bulletAmount + ", ";
 		result += "NULL, ";
 		//Entity all
 		switch (entityLoadMode)

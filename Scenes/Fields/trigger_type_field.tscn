@@ -24,8 +24,6 @@ size_flags_vertical = 3
 
 [node name="OptionButton" type="OptionButton" parent="VBoxContainer"]
 margin_right = 990.0
-margin_bottom = 600.0
-size_flags_horizontal = 3
-size_flags_vertical = 3
+margin_bottom = 26.0
 
 [connection signal="item_selected" from="VBoxContainer/OptionButton" to="." method="_on_OptionButton_item_selected"]

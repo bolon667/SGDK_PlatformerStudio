@@ -12,6 +12,7 @@ var cell_size: int = 8
 
 var cur_engine: String = "platformer"
 
+
 var cur_project_path: String = ""
 var cur_project_folder_path: String = ""
 
@@ -54,8 +55,9 @@ var entity_types = {
 		"fileType": "PS4SGDK Project JSON",
 		"app": "Platformer Studio For SGDK",
 		"doc": "https://github.com/bolon667/SGDK_PlatformerStudio/wiki/Welcome-to-studio",
+		"doc_ru": "https://under-prog.ru/sgdk-studiya-dlya-sozdaniya-platformerov/",
 		"appAuthor": "bolon667",
-		"appVersion": "1.9 beta",
+		"appVersion": "1.10 beta",
 		"url": "https://github.com/bolon667/SGDK_PlatformerStudio",
 	},
 	"jsonVersion": "1.0.0",
@@ -652,6 +654,8 @@ func update_project():
 		entity_types["chunkSizeX"] = 80;
 	if(!entity_types.has("chunkSizeY")):
 		entity_types["chunkSizeY"] = 80;
+	if(!entity_types.has("entitySlavesAmount")):
+		entity_types["entitySlavesAmount"] = 10
 	#autoupdate triggers
 	add_trigger_enum()
 
@@ -1101,6 +1105,12 @@ func get_positionInstances(level_ind: int):
 		
 	return entity_types["levels"][level_ind]["layerInstances"][cur_ind]["entityInstances"]
 
+func get_bullet_amount():
+	return entity_types["addEntityBulletMergedSlots"]
+
+func get_slave_amount():
+	return entity_types["entitySlavesAmount"]
+
 func get_entityInstances(level_ind: int):
 	#Finding entity layer
 	var cur_ind: int = 0
@@ -1336,7 +1346,7 @@ func change_fieldDef(entityCollectionDef: String, field_property_name: String, f
 			break
 	pass
 
-func change_cur_field(entityCollectionDef: String, field_property_name: String, field_property_value: String):
+func change_cur_field(entityCollectionDef: String, field_property_name: String, field_property_value):
 	entity_types["defs"][entityCollectionDef][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind][field_property_name] = field_property_value
 	pass
 

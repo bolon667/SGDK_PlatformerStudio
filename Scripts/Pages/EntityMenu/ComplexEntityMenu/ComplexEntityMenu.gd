@@ -9,6 +9,7 @@ export var entityCollection: String = "entities"
 onready var entity_layer_value_btn_t = preload("res://Scenes/EntityLayerValueButton.tscn")
 onready var entityScene_t = preload("res://Scenes/Pages/EntityMenu/ComplexEntityMenu/entitySceneComplexDef.tscn")
 
+onready var collShapeMain = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/MainArea/Area2D/CollisionShape2D
 onready var entity_list_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/EntityListContainer
 onready var entityNameEdit = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer3/EntityNameEdit
 onready var mainArea = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/MainArea
@@ -18,7 +19,7 @@ onready var centerArea = mainArea.get_node("CenterArea")
 var masterDefId: int = -1
 var slaveDefId: int = -1
 
-export var max_amount_of_slaves: int = 10
+var max_amount_of_slaves: int = 10
 var cur_amount_of_slaves: int = 0
 
 
@@ -82,12 +83,16 @@ func load_root_sprite():
 func _ready():
 	singleton.can_move_map = false
 	singleton.cur_editor_mode = singleton.EditorMode.NONE
+	max_amount_of_slaves = singleton.entity_types["entitySlavesAmount"]
+	get_tree().get_root().connect("size_changed", self, "_on_size_changed")
 	load_list_of_entity()
 	load_root_sprite()
 	load_slaves()
 	update_main_area_res()
 	entityNameEdit.text = entityName
 
+func _on_size_changed():
+	collShapeMain.shape.extents = get_viewport_rect().size
 
 func _process(delta):
 	if(in_area):
@@ -123,7 +128,7 @@ func add_cur_entity():
 	print(entity_def["spritePath"])
 	print(entity_def["identifier"])
 	if(entity_def["spritePath"]):
-		entity_node.get_node("Sprite").texture = load(entity_def["spritePath"])
+		entity_node.get_node("Sprite").texture = load(singleton.cur_project_folder_path+entity_def["spritePath"])
 		var temp_sprite_size = singleton.get_sprite_size_from_path(entity_def["spritePath"])
 		if temp_sprite_size:
 			entity_node.sprite_size = temp_sprite_size

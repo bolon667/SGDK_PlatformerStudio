@@ -15,6 +15,12 @@ var cell_pos = Vector2.ZERO
 var prev_cell_pos = Vector2.ZERO
 var prev_cell_pos_temp = Vector2.ZERO
 
+var drawing_rect_mode: bool = false
+
+var rect_pos_1:Vector2 = Vector2.ZERO
+var rect_pos_2:Vector2 = Vector2.ZERO
+
+
 var local_mouse_pos
 
 var level_size
@@ -26,9 +32,12 @@ var levelContainer_t = preload("res://Scenes/levelContainer.tscn")
 onready var VBoxContainerRight: VBoxContainer = $"../CanvasLayer/ContainerRight/VBoxContainerRight"
 onready var ContainerRight: Control = $"../CanvasLayer/ContainerRight"
 onready var world: Control = $World
+onready var collisionShape = $Area2D/CollisionShape2D
+onready var colorRect = $ColorRect
 
 #onready var camera = get_parent().get_node("Camera2D")
 onready var camera = $Camera2D
+
 
 func remove_fields_of_entity():
 	ContainerRight.visible = false
@@ -126,12 +135,19 @@ func move_map_around():
 
 func _ready():
 	var window_size = get_viewport_rect().size
+	get_tree().get_root().connect("size_changed", self, "_on_size_changed")
 	print(window_size)
-	$Area2D/CollisionShape2D.shape.extents = window_size
+	collisionShape.shape.extents = window_size
 	load_levels()
+
+func _on_size_changed():
+	collisionShape.shape.extents = get_viewport_rect().size
 
 func area2d_follow_camera():
 	$Area2D.global_position = camera.global_position
+
+func _draw():
+	pass
 
 func move_camera(delta):
 	var move_x = 0
@@ -159,7 +175,7 @@ func move_camera(delta):
 			zoom = 0.5
 		camera.zoom = Vector2(zoom, zoom)
 		var window_size = get_viewport_rect().size
-		$Area2D/CollisionShape2D.shape.extents = Vector2((window_size.x*zoom)-2, window_size.y*zoom)
+		collisionShape.shape.extents = Vector2((window_size.x*zoom)-2, window_size.y*zoom)
 	if(Input.is_action_just_released("wheel_down") && focused_editor_window):
 		zoom += zoom_step
 		if(zoom > move_mode_trigger_zoom):
@@ -171,7 +187,7 @@ func move_camera(delta):
 		
 		camera.zoom = Vector2(zoom, zoom)
 		var window_size = get_viewport_rect().size
-		$Area2D/CollisionShape2D.shape.extents = Vector2((window_size.x*zoom)-2, window_size.y*zoom)
+		collisionShape.shape.extents = Vector2((window_size.x*zoom)-2, window_size.y*zoom)
 	
 	if(singleton.can_move_map):
 		# This happens once 'move_map' is pressed
@@ -189,7 +205,80 @@ func move_camera(delta):
 func _physics_process(delta):
 	move_camera(delta)
 	area2d_follow_camera()
+	select_rect()
 
+
+func select_levelContainers_in_rect(rect_pos_1:Vector2, rect_pos_2:Vector2):
+	print("run select_levelContainers_in_rect(...)")
+	for levelContainer in world.get_children():
+		var level_size:Vector2 = levelContainer.map_size_px
+		var level_pos:Vector2 = levelContainer.global_position
+		
+		#Swap positions if necessary
+		if rect_pos_1.x > rect_pos_2.x:
+			var temp_x = rect_pos_2.x
+			rect_pos_2.x = rect_pos_1.x
+			rect_pos_1.x = temp_x
+		if rect_pos_1.y > rect_pos_2.y:
+			var temp_y = rect_pos_2.y
+			rect_pos_2.y = rect_pos_1.y
+			rect_pos_1.y = temp_y
+			
+		if((rect_pos_1.x < (level_pos.x+level_size.x)) and (rect_pos_2.x > level_pos.x)):
+			if((rect_pos_1.y < (level_pos.y+level_size.y)) and (rect_pos_2.y > level_pos.y)):
+				print(levelContainer.cur_level_ind)
+				levelContainer.make_selected()
+
+func deselect_levelContainers():
+	#get_tree().call_group("connectedLevelContainers", "make_deselected")
+	#Efficient way was too buggy, not worth it
+	get_tree().call_group("levelContainer", "make_deselected")
+	
+	#world.add
+
+func is_mouse_on_levelContainer():
+	return len(get_tree().get_nodes_in_group("level_hovered")) != 0
+
+func select_rect():
+	if singleton.level_move_mode == false:
+		return
+	#if singleton.cur_editor_mode == singleton.EditorMode.NONE:
+	#	return
+	if (not drawing_rect_mode) and is_mouse_on_levelContainer():
+		return
+		
+	if Input.is_action_just_pressed("mouse1"):
+		colorRect.visible = true
+		drawing_rect_mode = true
+		deselect_levelContainers()
+		
+		rect_pos_1 = get_local_mouse_position()
+		
+	if Input.is_action_pressed("mouse1"):
+		rect_pos_2 = get_local_mouse_position()
+		
+	if Input.is_action_just_released("mouse1"):
+		colorRect.visible = false
+		drawing_rect_mode = false
+		
+		
+		select_levelContainers_in_rect(rect_pos_1, rect_pos_2)
+	
+	if rect_pos_1.x < rect_pos_2.x:
+		colorRect.rect_position.x = rect_pos_1.x
+		colorRect.rect_size.x = rect_pos_2.x-rect_pos_1.x
+	else:
+		colorRect.rect_position.x = rect_pos_2.x
+		colorRect.rect_size.x = rect_pos_1.x - rect_pos_2.x
+	
+	if rect_pos_1.y < rect_pos_2.y:
+		colorRect.rect_position.y = rect_pos_1.y
+		colorRect.rect_size.y = rect_pos_2.y-rect_pos_1.y
+	else:
+		colorRect.rect_position.y = rect_pos_2.y
+		colorRect.rect_size.y = rect_pos_1.y - rect_pos_2.y
+		
+	
 func _on_Area2D_mouse_entered():
 	print("area entered")
 	focused_editor_window = true

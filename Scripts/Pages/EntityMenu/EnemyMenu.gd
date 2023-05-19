@@ -10,7 +10,10 @@ onready var field_property_string_t = preload("res://Scenes/Pages/EntityMenu/ent
 onready var field_property_sprite_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemSprite.tscn")
 onready var field_property_triggerType_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemTriggerType.tscn")
 onready var field_property_triggerRect_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemAABB.tscn")
+onready var field_property_num_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemPropertyNumber.tscn")
+onready var field_property_bool_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemPropertyBool.tscn")
 onready var complex_entity_menu_t = preload("res://Scenes/Pages/EntityMenu/ComplexEntityMenu/ComplexEntityMenu.tscn")
+
 
 onready var entity_field_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer2/VBoxContainer/ScrollContainer/ContainerChooseField 
 onready var entity_list_container = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/EntityListContainer
@@ -27,6 +30,8 @@ var add_trigger_activated: bool = false
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
+	singleton.level_move_mode = false
+	singleton.cur_editor_mode = singleton.EditorMode.NONE
 	print(get_path())
 	singleton.can_move_map = false
 	load_list_of_entity()
@@ -76,18 +81,7 @@ func load_field_properties(entity_name: String, field_name: String):
 	clear_field_properties()
 	var defId = singleton.entity_types["defs"][entityCollection][singleton.cur_entity_type_ind]["defId"]
 	var field_data = singleton.get_cur_entity_one_field(entityCollection)
-	match field_data["identifier"]:
-		"sprDef":
-			var key
-			var val
-			var field_property_node
-			
-			key = "defaultValue"
-			val = field_data[key]
-			field_property_node = field_property_sprite_t.instance()
-			field_property_node.get_node("HBoxContainer/Label").text = key
-			field_property_node.get_node("HBoxContainer/VBoxContainer/TextEdit").text = str(val)
-			field_properties_container.add_child(field_property_node)
+	match(field_data["identifier"]):
 		"Trigger type":
 			var key
 			var val
@@ -99,7 +93,21 @@ func load_field_properties(entity_name: String, field_name: String):
 			#field_property_node.get_node("HBoxContainer/Label").text = key
 			#field_property_node.get_node("HBoxContainer/VBoxContainer/TextEdit").text = str(val)
 			field_properties_container.add_child(field_property_node)
-		"Trigger rect":
+			return
+	match field_data["__type"]:
+		"Sprite":
+			var key
+			var val
+			var field_property_node
+			
+			key = "defaultValue"
+			val = field_data[key]
+			field_property_node = field_property_sprite_t.instance()
+			field_property_node.get_node("HBoxContainer/Label").text = key
+			field_property_node.get_node("HBoxContainer/VBoxContainer/TextEdit").text = str(val)
+			field_properties_container.add_child(field_property_node)
+			return
+		"AABB":
 			var key
 			var val
 			var field_property_node
@@ -110,6 +118,26 @@ func load_field_properties(entity_name: String, field_name: String):
 			field_property_node.defId = defId
 			#field_property_node.get_node("HBoxContainer/Label").text = key
 			#field_property_node.get_node("HBoxContainer/VBoxContainer/TextEdit").text = str(val)
+			field_properties_container.add_child(field_property_node)
+			return
+		"Integer":
+			var key = "defaultValue"
+			var val = field_data[key]
+			var field_property_node = field_property_num_t.instance()
+			field_property_node.defId = defId
+			field_property_node.fieldName = field_name
+			field_property_node.get_node("Label").text = key
+			field_property_node.get_node("TextEdit").text = str(val)
+			field_properties_container.add_child(field_property_node)
+		"Bool":
+			var key = "defaultValue"
+			var val = field_data[key]
+			var field_property_node = field_property_bool_t.instance()
+			field_property_node.defId = defId
+			field_property_node.fieldName = field_name
+			field_property_node.get_node("Label").text = key
+
+			field_property_node.get_node("CheckButton").pressed = bool(val)
 			field_properties_container.add_child(field_property_node)
 		_:
 			for key in field_data:
@@ -122,7 +150,7 @@ func load_field_properties(entity_name: String, field_name: String):
 				field_property_node.get_node("Label").text = key
 				field_property_node.get_node("TextEdit").text = str(val)
 				field_properties_container.add_child(field_property_node)
-	pass
+			return
 
 func enitity_name_edit_readonly(is_on: bool):
 	complex_menu_btn.disabled = false

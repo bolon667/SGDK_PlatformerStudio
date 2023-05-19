@@ -1,0 +1,1 @@
+out/res/gfx.o: res/gfx.res
