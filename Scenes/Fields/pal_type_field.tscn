@@ -1,0 +1,34 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Scripts/Fields/pal_type_field.gd" type="Script" id=1]
+[ext_resource path="res://Styles/style1.tres" type="Theme" id=2]
+
+[node name="Control" type="HBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+theme = ExtResource( 2 )
+script = ExtResource( 1 )
+
+[node name="Label" type="Label" parent="."]
+margin_top = 290.0
+margin_right = 57.0
+margin_bottom = 310.0
+text = "Palette"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = 61.0
+margin_right = 1024.0
+margin_bottom = 600.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="OptionButton" type="OptionButton" parent="VBoxContainer"]
+margin_right = 963.0
+margin_bottom = 26.0
+size_flags_horizontal = 3
+text = "PAL0"
+items = [ "PAL0", null, false, 0, null, "PAL1", null, false, 1, null, "PAL2", null, false, 2, null, "PAL3", null, false, 3, null ]
+selected = 0
+
+[connection signal="item_selected" from="VBoxContainer/OptionButton" to="." method="_on_OptionButton_item_selected"]

@@ -30,5 +30,7 @@ func load_icon():
 
 
 func _on_prevProjectButton_button_down():
+	singleton.cur_engine = engineTypeLabel.text
 	get_tree().call_group("startUpMenu", "load_prev_project", text)
+	
 	pass # Replace with function body.

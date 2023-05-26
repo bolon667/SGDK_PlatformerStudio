@@ -18,7 +18,7 @@
 
 
 void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
-
+	KLog_S1("Go to level: ", levelNum);
 	//Reset everything
 	VDP_resetScreen();
 	VDP_setPlaneSize(64,32,TRUE);
@@ -42,6 +42,8 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 	}
 	if(curLvlData->levelMode == 0){
 		playerInit((Vect2D_s16)startPos);
+		playerBody.globalPosition.x = 0;
+		playerBody.globalPosition.y = 0;
 	} else {
 		playerBody.globalPosition.x = 0;
 		playerBody.globalPosition.y = 0;
@@ -162,6 +164,8 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 		(*curLvlData->afterLevelFunc)();
 	}
 	
+	
+	//$loadScreenChunks$
 
 	KLog_U1("FreeMem: ", MEM_getFree());
 }

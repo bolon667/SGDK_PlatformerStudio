@@ -8,6 +8,8 @@
 #include "../res/sprites.h"
 #include "../res/resources.h"
 
+//Platformer Engine
+
 void playerInputChanged() {
 	input.prevState = input.state;
 	input.state = JOY_readJoypad(JOY_1);

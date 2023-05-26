@@ -1,0 +1,45 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Styles/style1.tres" type="Theme" id=1]
+[ext_resource path="res://Scripts/Pages/EntityMenu/entityFieldItemPalType.gd" type="Script" id=2]
+
+[node name="entityFieldItemPalType" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme = ExtResource( 1 )
+script = ExtResource( 2 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Label" type="Label" parent="HBoxContainer"]
+margin_right = 123.0
+margin_bottom = 20.0
+size_flags_vertical = 0
+text = "Palette index: "
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer"]
+margin_left = 127.0
+margin_right = 1024.0
+margin_bottom = 600.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="OptionButton" type="OptionButton" parent="HBoxContainer/VBoxContainer"]
+margin_right = 897.0
+margin_bottom = 26.0
+text = "PAL0"
+items = [ "PAL0", null, false, 0, null, "PAL1", null, false, 1, null, "PAL2", null, false, 2, null, "PAL3", null, false, 3, null ]
+selected = 0
+
+[node name="applyAllBtn" type="Button" parent="HBoxContainer/VBoxContainer"]
+margin_top = 30.0
+margin_right = 897.0
+margin_bottom = 56.0
+text = "Apply to ALL entity"
+
+[connection signal="item_selected" from="HBoxContainer/VBoxContainer/OptionButton" to="." method="_on_OptionButton_item_selected"]
+[connection signal="button_down" from="HBoxContainer/VBoxContainer/applyAllBtn" to="." method="_on_applyAllBtn_button_down"]

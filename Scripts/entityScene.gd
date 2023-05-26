@@ -4,7 +4,7 @@ extends Area2D
 
 export var entity_name: String = "testEntity"
 onready var ContainerRight: Control = $"../../../../../CanvasLayer/ContainerRight"
-onready var VBoxContainerRight: VBoxContainer = ContainerRight.get_node("VBoxContainerRight")
+onready var VBoxContainerRight: VBoxContainer = ContainerRight.get_node("ScrollContainer/VBoxContainerRight")
 onready var ContainerRightColorRect: ColorRect = $"../../../CanvasLayer/ContainerRight/ColorRect"
 onready var mainController = $"../../../"
 onready var camera2D = $"../../../../Camera2D"
@@ -13,6 +13,8 @@ onready var settings_field_t = preload("res://Scenes/Fields/string_field.tscn")
 onready var settings_field_sprite_t = preload("res://Scenes/Fields/sprite_field.tscn")
 onready var settings_field_aabb_t = preload("res://Scenes/Fields/aabb_field.tscn")
 onready var settings_field_trigger_type_t = preload("res://Scenes/Fields/trigger_type_field.tscn")
+onready var settings_field_pal_type_t = preload("res://Scenes/Fields/pal_type_field.tscn")
+
 onready var settings_head_t = preload("res://Scenes/Fields/settings_head.tscn")
 
 var entityInst_id = -1
@@ -127,14 +129,21 @@ func show_fields_of_entity():
 			settings_field_node.get_node("HBoxContainer/VBoxContainer/GridContainer/TextEdit2").text = info_arr[1]
 			settings_field_node.get_node("HBoxContainer/VBoxContainer/GridContainer/TextEdit3").text = info_arr[2]
 			settings_field_node.get_node("HBoxContainer/VBoxContainer/GridContainer/TextEdit4").text = info_arr[3]
-
+		elif field_inst["__type"] == "Palette":
+			settings_field_node = settings_field_pal_type_t.instance()
+			settings_field_node.level_ind = level_ind
+			settings_field_node.entityInst_id = entityInst_id
+			
+			settings_field_node.get_node("Label").text = field_inst["__identifier"]
+			settings_field_node.get_node("VBoxContainer/OptionButton").select(int(field_inst["__value"]))
+			
 		else:
 			settings_field_node = settings_field_t.instance()
 			settings_field_node.level_ind = level_ind
 			settings_field_node.entityInst_id = entityInst_id
 			
 			settings_field_node.get_node("Label").text = field_inst["__identifier"]
-			settings_field_node.get_node("LineEdit").text = field_inst["__value"]
+			settings_field_node.get_node("LineEdit").text = str(field_inst["__value"])
 			
 		VBoxContainerRight.add_child(settings_field_node)
 	

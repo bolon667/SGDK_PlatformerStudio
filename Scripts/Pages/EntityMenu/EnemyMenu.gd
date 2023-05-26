@@ -9,6 +9,9 @@ onready var entity_field_t = preload("res://Scenes/Pages/EntityMenu/entityFieldI
 onready var field_property_string_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemPropertyString.tscn")
 onready var field_property_sprite_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemSprite.tscn")
 onready var field_property_triggerType_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemTriggerType.tscn")
+
+onready var field_property_pal_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemPalType.tscn")
+
 onready var field_property_triggerRect_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemAABB.tscn")
 onready var field_property_num_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemPropertyNumber.tscn")
 onready var field_property_bool_t = preload("res://Scenes/Pages/EntityMenu/entityFieldItemPropertyBool.tscn")
@@ -120,6 +123,18 @@ func load_field_properties(entity_name: String, field_name: String):
 			#field_property_node.get_node("HBoxContainer/VBoxContainer/TextEdit").text = str(val)
 			field_properties_container.add_child(field_property_node)
 			return
+		"Palette":
+			var key
+			var val
+			var field_property_node
+			
+			key = "defaultValue"
+			val = field_data[key]
+			field_property_node = field_property_pal_t.instance()
+			field_property_node.defId = defId
+			field_properties_container.add_child(field_property_node)
+			return
+			
 		"Integer":
 			var key = "defaultValue"
 			var val = field_data[key]

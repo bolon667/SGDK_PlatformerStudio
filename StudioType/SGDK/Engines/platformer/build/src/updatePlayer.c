@@ -4,6 +4,8 @@
 #include "../inc/global.h"
 #include "../inc/maps.h"
 
+//Platformer Engine
+
 void updatePlayer() {
 	//Check if the player wants to climb a stair
 	if(collidingAgainstStair && ((playerBody.onStair && playerBody.input.y > 0) || (!playerBody.onStair && playerBody.input.y < 0))){

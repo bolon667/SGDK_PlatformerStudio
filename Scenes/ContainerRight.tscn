@@ -26,7 +26,13 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 color = Color( 0.235294, 0.454902, 0.921569, 1 )
 
-[node name="VBoxContainerRight" type="VBoxContainer" parent="."]
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
+
+[node name="VBoxContainerRight" type="VBoxContainer" parent="ScrollContainer"]
+margin_right = 300.0
+margin_bottom = 600.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
 alignment = 1

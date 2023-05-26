@@ -29,7 +29,7 @@ var map_size_px:Vector2
 var map_size_tiles:Vector2
 
 var levelContainer_t = preload("res://Scenes/levelContainer.tscn")
-onready var VBoxContainerRight: VBoxContainer = $"../CanvasLayer/ContainerRight/VBoxContainerRight"
+onready var VBoxContainerRight: VBoxContainer = $"../CanvasLayer/ContainerRight/ScrollContainer/VBoxContainerRight"
 onready var ContainerRight: Control = $"../CanvasLayer/ContainerRight"
 onready var world: Control = $World
 onready var collisionShape = $Area2D/CollisionShape2D
@@ -165,28 +165,45 @@ func move_camera(delta):
 	if(Input.is_action_just_released("wheel_up") && !singleton.in_modal_window && focused_editor_window):
 		print("wheel_up")
 		print("camera.zoom", camera.zoom)
+		var window_size = get_viewport_rect().size
 		if(zoom == move_mode_trigger_zoom):
 			singleton.level_move_mode = false
 			get_tree().call_group("levelContainer", "move_level_off")
 		zoom -= zoom_step
 		
-		
 		if(zoom < 0.5):
 			zoom = 0.5
-		camera.zoom = Vector2(zoom, zoom)
-		var window_size = get_viewport_rect().size
+		else:
+			
+			#var screen_center = window_size / 2
+			#var screen_center_global = camera.global_position
+			#var local_mouse_pos = get_viewport().get_mouse_position()
+			
+			#var newCameraPos:Vector2
+			#newCameraPos = camera.global_position + local_mouse_pos - screen_center
+			#newCameraPos.x *= camera.zoom.x
+			#newCameraPos.y *= camera.zoom.y
+			
+			#camera.global_position = newCameraPos
+			camera.zoom = Vector2(zoom, zoom)
+		
+		
+		
 		collisionShape.shape.extents = Vector2((window_size.x*zoom)-2, window_size.y*zoom)
 	if(Input.is_action_just_released("wheel_down") && focused_editor_window):
 		zoom += zoom_step
+		var window_size = get_viewport_rect().size
 		if(zoom > move_mode_trigger_zoom):
 			zoom = move_mode_trigger_zoom
 			if(!singleton.level_move_mode):
 				print("level move mode activated")
 				get_tree().call_group("levelContainer", "move_level_on")
 				singleton.level_move_mode = true
+		else:
+			
+			camera.zoom = Vector2(zoom, zoom)
 		
-		camera.zoom = Vector2(zoom, zoom)
-		var window_size = get_viewport_rect().size
+		
 		collisionShape.shape.extents = Vector2((window_size.x*zoom)-2, window_size.y*zoom)
 	
 	if(singleton.can_move_map):
@@ -211,6 +228,8 @@ func _physics_process(delta):
 func select_levelContainers_in_rect(rect_pos_1:Vector2, rect_pos_2:Vector2):
 	print("run select_levelContainers_in_rect(...)")
 	for levelContainer in world.get_children():
+		if not levelContainer.is_in_group("leftContainer"):
+			continue
 		var level_size:Vector2 = levelContainer.map_size_px
 		var level_pos:Vector2 = levelContainer.global_position
 		

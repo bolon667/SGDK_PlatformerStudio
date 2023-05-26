@@ -341,7 +341,7 @@ func load_entities_on_scene():
 		
 		if len(entity_inst["__spritePath"]) > 0:
 			var img1 = Image.new()
-			img1.load(entity_inst["__spritePath"])
+			img1.load(singleton.cur_project_folder_path + entity_inst["__spritePath"])
 			var imgTex = ImageTexture.new()
 			imgTex.create_from_image(img1, 1)
 			entity_node.get_node("Sprite").texture = imgTex;

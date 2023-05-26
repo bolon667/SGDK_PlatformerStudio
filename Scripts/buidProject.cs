@@ -34,6 +34,7 @@ public class buidProject : Node
 		Node singleton = (Node)GetNode("/root/singleton");
 		engineRootPath = (String)singleton.Call("get_project_folder_path");
 		workingDir = System.IO.Directory.GetCurrentDirectory();
+		String curEngineName = singleton.Call("get_cur_engine").ToString();
 		//fullEngineRootPath = workingDir + engineRootPath.Substring(1);
 		fullEngineRootPath = engineRootPath;
 
@@ -42,7 +43,7 @@ public class buidProject : Node
 		fullEngineResPath = fullEngineRootPath + "/build/res";
 		fullEmulatorPath = workingDir + "/Emulators/BlastEm/blastem.exe";
 
-		fullTemplatePath = workingDir + "/StudioType/SGDK/Engines/platformer";
+		fullTemplatePath = workingDir + $"/StudioType/SGDK/Engines/{curEngineName}";
 	}
 
 	private static void CopyFilesRecursively(string sourcePath, string targetPath)
@@ -332,7 +333,7 @@ public class buidProject : Node
 		String entityType = "EntityMerged";
 		foreach (Dictionary entityDef in entityDefs)
 		{
-			String entityName = (String)entityDef["identifier"];
+			String entityName = entityDef["identifier"].ToString();
 			//Add entity default const
 			result += $"const {entityType} const {entityName}_default = {{";
 			//Predefined values for const
@@ -369,7 +370,7 @@ public class buidProject : Node
 				{
 					continue;
 				}
-				String fieldVal = (String)field["defaultValue"];
+				String fieldVal = field["defaultValue"].ToString();
 				result += $"{fieldVal}, ";
 			}
 			result += "};\n";
@@ -580,6 +581,7 @@ public class buidProject : Node
 				toPath = engineRootPath + "/build/inc/";
 				CopyFilesRecursively(fromPath, toPath);
 				loadChunkRuntimeC_CodeReplacer();
+				loadChunkFullC_CodeReplacer();
 				break;
 		}
 	}
@@ -716,6 +718,7 @@ public class buidProject : Node
 		playerC_CodeReplacer();
 		updatePlayerC_CodeReplacer();
 		playerInitC_CodeReplacer();
+		loadLevelC_CodeReplacer();
 
 		levelsC_CodeReplacer();
 		typesH_CodeReplacer();
@@ -2392,6 +2395,24 @@ public class buidProject : Node
 		System.IO.File.WriteAllText(loadChunkRuntime_path, loadChunkRuntimeCode);
 		GD.Print("loadChunkRuntime.c code replaced");
 	}
+
+	private void loadChunkFullC_CodeReplacer()
+	{
+		GD.Print("loadChunkFull.c code replacing...");
+		Node singleton = (Node)GetNode("/root/singleton");
+		String loadChunkFull_path = engineRootPath + "/build/src/loadChunkFull.c";
+		String loadChunkFullCode = System.IO.File.ReadAllText(loadChunkFull_path);
+
+		String chunkSizeX = singleton.Call("get_chunkSizeX").ToString();
+		String chunkSizeY = singleton.Call("get_chunkSizeY").ToString();
+
+		loadChunkFullCode = loadChunkFullCode.Replace("$chunkSizeX$", chunkSizeX);
+		loadChunkFullCode = loadChunkFullCode.Replace("$chunkSizeY$", chunkSizeY);
+
+		System.IO.File.WriteAllText(loadChunkFull_path, loadChunkFullCode);
+		GD.Print("loadChunkFull.c code replaced");
+	}
+
 	private void mapsC_CodeReplacer()
 	{
 		GD.Print("maps.c code replacing...");
@@ -2450,6 +2471,24 @@ public class buidProject : Node
 
 		System.IO.File.WriteAllText(codePath, codeText);
 		GD.Print("playerInit.c code replaced");
+	}
+
+	private void loadLevelC_CodeReplacer()
+	{
+		Node singleton = (Node)GetNode("/root/singleton");
+		int entityLoadMode = int.Parse(singleton.Call("get_entity_load_opt_mode").ToString());
+
+		String codePath = engineRootPath + "/build/src/loadLevel.c";
+		String codeText = System.IO.File.ReadAllText(codePath);
+
+		switch (entityLoadMode)
+		{
+			case 1: //Chunk optimization
+				codeText = codeText.Replace("//$loadScreenChunks$", "loadChunkFull();");
+				break;
+		}
+		System.IO.File.WriteAllText(codePath, codeText);
+		GD.Print("loadLevel.c code replaced");
 	}
 
 	private void updatePlayerC_CodeReplacer()

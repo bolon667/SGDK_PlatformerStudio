@@ -5,6 +5,8 @@
 #include "../inc/maps.h"
 
 
+//Platformer Engine
+
 void checkCollisions_forEntityMerged(EntityMerged* entity){	
 	//We can see this variables as a way to avoid thinking that a ground tile is a wall tile
 	//Skin width (yIntVelocity) changes depending on the vertical velocity

@@ -57,7 +57,7 @@ var entity_types = {
 		"doc": "https://github.com/bolon667/SGDK_PlatformerStudio/wiki/Welcome-to-studio",
 		"doc_ru": "https://under-prog.ru/sgdk-studiya-dlya-sozdaniya-platformerov/",
 		"appAuthor": "bolon667",
-		"appVersion": "1.10 beta",
+		"appVersion": "1.11 beta",
 		"url": "https://github.com/bolon667/SGDK_PlatformerStudio",
 	},
 	"jsonVersion": "1.0.0",
@@ -71,6 +71,7 @@ var entity_types = {
 	"chunkSizeX": 80,
 	"chunkSizeY": 80,
 	"turnOnGates": false,
+	"entitySlavesAmount": 10,
 	"defs": 
 	{
 		"layers":
@@ -223,6 +224,17 @@ const field_def_hp = {
 	"fieldId": -1,
 	"canBeNull": true,
 	"defaultValue": "1",
+	"canBeDeleted": false,
+	"hasStruct": true,
+}
+
+const field_def_pal = {	
+	"identifier": "pal",
+	"__type": "Palette",
+	"inCodeType": "u8",
+	"fieldId": -1,
+	"canBeNull": true,
+	"defaultValue": "0",
 	"canBeDeleted": false,
 	"hasStruct": true,
 }
@@ -460,6 +472,9 @@ func updateLevelDefaultData():
 		"pal2SpriteName": "",
 		"pal3SpriteName": "",
 	}
+
+func get_cur_engine():
+	return cur_engine
 
 func change_load_image_mode_bga_all_levels():
 	for level_ind in range(len(entity_types["levels"])):
@@ -829,7 +844,10 @@ func get_start_pos_for_level(l_ind: int):
 func change_level_size(level_ind, size: Vector2):
 	entity_types["levels"][level_ind]["pxWid"] = size.x
 	entity_types["levels"][level_ind]["pxHei"] = size.y
-	
+
+func change_cur_engine(new_val: String):
+	cur_engine = new_val
+
 func get_level_size(levelNum):
 	return Vector2(entity_types["levels"][levelNum]["pxWid"], entity_types["levels"][levelNum]["pxHei"]);
 
@@ -1353,6 +1371,10 @@ func change_cur_field(entityCollectionDef: String, field_property_name: String, 
 func get_cur_fieldDef_name():
 	return entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind]["identifier"]
 
+func get_cur_fieldDef():
+	return entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind]
+
+
 func change_name_of_cur_fieldDef(text: String):
 	
 	entity_types["defs"]["entities"][cur_entity_type_ind]["fieldDefs"][cur_entity_field_ind]["identifier"] = text
@@ -1838,6 +1860,7 @@ func add_entity_def_to_entityCollection(entityCollection: String, entity_name: S
 	if(entityCollection == "bulletEntities"):
 		add_fieldDef_to_entity_in_entityCollection(entityCollection, field_def_damage)
 	
+	add_fieldDef_to_entity_in_entityCollection(entityCollection, field_def_pal)
 	add_fieldDef_to_entity_in_entityCollection(entityCollection, field_def_hp)
 	add_fieldDef_to_entity_in_entityCollection(entityCollection, field_def_damaged)
 	add_fieldDef_to_entity_in_entityCollection(entityCollection, field_def_onGround)

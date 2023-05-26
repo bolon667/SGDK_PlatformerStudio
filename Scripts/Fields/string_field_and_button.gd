@@ -37,9 +37,10 @@ func _on_FileDialog_file_selected(path: String):
 	spr_name = "&spr_" + spr_name
 	$HBoxContainer/VBoxContainer/TextEdit.text = spr_name
 	
+	var rel_path = path.substr(len(singleton.cur_project_folder_path))
 	#update value in database
 	singleton.change_fieldInst_instId(entityInst_id, level_ind, $HBoxContainer/Label.text, spr_name)
-	singleton.change_sprite_by_instId(path, level_ind, entityInst_id)
+	singleton.change_sprite_by_instId(rel_path, level_ind, entityInst_id)
 	
 	#change entity obj sprite
 	get_tree().call_group("levelContainer", "change_cur_entity_pic", path, level_ind, entityInst_id)

@@ -75,6 +75,7 @@ public class InputDialog : Control
 		singleton.Call("update_cur_project_path", dataJsonPath);
 		singleton.Call("update_cur_project_folder_path", ditrectoryPath);
 		singleton.Call("create_new_project");
+		singleton.Call("change_cur_engine", curEngineOption.GetItemText(curEngineOption.Selected));
 		singleton.Call("save_project_last_paths");
 		GetTree().ChangeScene("res://Scenes/mapEditorScene.tscn");
 	}
