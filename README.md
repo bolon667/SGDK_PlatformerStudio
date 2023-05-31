@@ -47,7 +47,7 @@ This programm in early development, if you will get bugs, tell me about them in 
 
 **[Shmup Test1](https://bolon667.itch.io/shmup-test1)**
 
-![Shmup Test1 Logo](https://github.com/bolon667/SGDK_PlatformerStudio/blob/main/Images/shmup_test_1_logo.png)
+![Shmup Test1 Logo](https://github.com/bolon667/SGDK_PlatformerStudio/blob/main/Images/shmup_test_1_logo2.png)
 
 
 
