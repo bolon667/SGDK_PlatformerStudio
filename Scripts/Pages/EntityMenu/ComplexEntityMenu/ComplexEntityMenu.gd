@@ -51,7 +51,7 @@ func load_slaves():
 		entity_node.entityInst_id = entityInst["instId"]
 		
 		if(entityInst["__spritePath"]):
-			entity_node.get_node("Sprite").texture = load(entityInst["__spritePath"])
+			entity_node.get_node("Sprite").texture = load(singleton.cur_project_folder_path + entityInst["__spritePath"])
 			var temp_sprite_size = singleton.get_sprite_size_from_path(entityInst["__spritePath"])
 			if temp_sprite_size:
 				entity_node.sprite_size = temp_sprite_size
@@ -77,7 +77,7 @@ func load_root_sprite():
 	var entity_def = singleton.get_entityDef_by_defId(masterDefId)
 	if(entity_def == null):
 		return
-	centerArea.get_node("Sprite").texture = load(entity_def["spritePath"])
+	centerArea.get_node("Sprite").texture = load(singleton.cur_project_folder_path + entity_def["spritePath"])
 	
 # Called when the node enters the scene tree for the first time.
 func _ready():

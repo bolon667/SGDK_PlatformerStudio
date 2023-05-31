@@ -331,6 +331,7 @@ public class buidProject : Node
 		//Godot.Collections.Array entityNames = (Godot.Collections.Array)singleton.Call("get_entity_names");
 		Dictionary mergedIdsDict = (Dictionary)singleton.Call("get_entityMeged_ids_dict", "entities");
 		String entityType = "EntityMerged";
+
 		foreach (Dictionary entityDef in entityDefs)
 		{
 			String entityName = entityDef["identifier"].ToString();
@@ -358,7 +359,7 @@ public class buidProject : Node
 			}
 			result += "}, ";
 
-			result += "0, "; //slave_amount
+			result += $"{slaveAmount.ToString()}, "; //slave_amount
 			if (showTriggerRects)
 			{
 				result += "NULL, "; //debugSpr1
@@ -994,10 +995,16 @@ public class buidProject : Node
 				insertData = insertData.Replace("$entityName$", entityName);
 				insertData = insertData.Replace("$entityType$", "EntityMerged");
 				String addSpriteCode = "";
+				String releaseSpriteCode = "";
 				//Add slaves code
 				Godot.Collections.Array slaves = (Godot.Collections.Array)(Godot.Collections.Array)entityDef["subordinates"];
 				if(slaves.Count > 0)
 				{
+					releaseSpriteCode += "for(u16 curSlaveInd=0; curSlaveInd<entity->slave_amount; curSlaveInd++){\n" +
+							"curSlave = entity->slaves_arr[curSlaveInd];\n" +
+							"curSlave->trigger->alive = FALSE;\n" +
+							"}\n";
+
 					int curSlaveInd = 0;
 					addSpriteCode += "if(!entity->activated) {\n";
 					//addSpriteCode += "EntityMerged* curSlave;\n";
@@ -1015,6 +1022,8 @@ public class buidProject : Node
 						//addSpriteCode += $"curSlave = entity->slaves_arr[{curSlaveInd.ToString()}];\n";
 						addSpriteCode += $"entity->slaves_arr[{curSlaveInd.ToString()}] = addNew_{slaveEntityName}((Vect2D_s16){{{x_pos}+entity->posInt.x, {y_pos}+entity->posInt.y}}, (Vect2D_f16){{0, 0}});\n";
 
+						
+
 						//addSpriteCode += $"curSlave->posInt = (Vect2D_s16){{{x_pos}+entity->posInt.x, {y_pos}+entity->posInt.y}};\n";
 						//addSpriteCode += $"curSlave->pos = (Vect2D_f32){{FIX32({x_pos}+entity->posInt.x), FIX32({y_pos}+entity->posInt.y)}};\n";
 
@@ -1027,10 +1036,10 @@ public class buidProject : Node
 							addSpriteCode += $"curSlave->spr = SPR_addSprite({spriteName}, {x_pos}+posX_OnCam, {y_pos}+posY_OnCam, TILE_ATTR(ENEMY_PALETTE, 11, FALSE, FALSE));\n";
 						}
 						*/
-						
 
-						
-						
+
+
+
 						curSlaveInd++;
 					}
 					addSpriteCode += "entity->activated = TRUE;\n";
@@ -1040,9 +1049,9 @@ public class buidProject : Node
 				//addSpriteCode += 
 				if (showTriggerRects)
 				{
-					String releaseSpriteCode = "if(entity->debugSpr1) SPR_releaseSprite(entity->debugSpr1);\n" +
+					releaseSpriteCode += "if(entity->debugSpr1) SPR_releaseSprite(entity->debugSpr1);\n" +
 						"if(entity->debugSpr2) SPR_releaseSprite(entity->debugSpr2);\n";
-					insertData = insertData.Replace("//$showTriggerRects_releaseSprite$", releaseSpriteCode);
+					
 					addSpriteCode += "entity->debugSpr1 = SPR_addSprite(&spr_debugLeftTopCorner, posX_OnCam, posY_OnCam, TILE_ATTR(PAL3, 11, FALSE, FALSE));\n" +
 						"entity->debugSpr2 = SPR_addSprite(&spr_debugRightBottom, posX_OnCam, posY_OnCam, TILE_ATTR(PAL3, 11, FALSE, FALSE));\n";
 					
@@ -1050,6 +1059,7 @@ public class buidProject : Node
 						"if(entity->debugSpr2) SPR_setPosition(entity->debugSpr2, (entity->trigger->pos.x-cameraPosition.x)+entity->trigger->rect.max.x-8, (entity->trigger->pos.y-cameraPosition.y)+entity->trigger->rect.max.y-8);\n";
 					insertData = insertData.Replace("//$showTriggerRects_moveSprite$", moveSpriteCode);
 				}
+				insertData = insertData.Replace("//$showTriggerRects_releaseSprite$", releaseSpriteCode);
 				insertData = insertData.Replace("//$showTriggerRects_addSprite$", addSpriteCode);
 				result += insertData + "\n";
 			} else

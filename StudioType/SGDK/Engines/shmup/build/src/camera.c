@@ -31,13 +31,19 @@ void setupCamera(Vect2D_u16 deadZoneCenter, u16 deadZoneWidth, u16 deadZoneHeigh
 
 void updateCamera() {
 	//Update camera only if the center of the player is outside the deadZone of the camera
-	cameraSpd.x = FIX16(1.0);
+	//cameraSpd.x = FIX16(1.0);
 	cameraSpdBuffer.x += cameraSpd.x;
+	cameraSpdBuffer.y += cameraSpd.y;
 	
 	const s16 integerPartX = fix16ToInt(cameraSpdBuffer.x);
 	cameraPosition.x += integerPartX;
 	//geting only reminder
 	cameraSpdBuffer.x -= FIX16(integerPartX);
+
+	const s16 integerPartY = fix16ToInt(cameraSpdBuffer.y);
+	cameraPosition.y += integerPartY;
+	//geting only reminder
+	cameraSpdBuffer.y -= FIX16(integerPartY);
 
 	//Clamp camera to the limits of the level
 	u16 maxCameraPosX = curLvlData->sizeinPx.x - 320;
@@ -45,6 +51,7 @@ void updateCamera() {
 
 	if(cameraPosition.x < 0){
 		cameraPosition.x = 0;
+		cameraSpd.x = 0;
 	} else if(cameraPosition.x > maxCameraPosX){
 		cameraPosition.x = maxCameraPosX;
 		cameraSpd.x = 0;
@@ -52,6 +59,7 @@ void updateCamera() {
 
 	if(cameraPosition.y < 0){
 		cameraPosition.y = 0;
+		cameraSpd.y = 0;
 	} else if(cameraPosition.y > maxCameraPosY){
 		cameraPosition.y = maxCameraPosY;
 		cameraSpd.y = 0;

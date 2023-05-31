@@ -426,9 +426,10 @@ void checkCollisions() {
 				if (getTileRightEdge(x) == levelLimits.min.x || getTileLeftEdge(x) == levelLimits.max.x)
 					continue;
 
+				//I have problem with upwards collision, i created this stupid hacky crunch to fix that problem
 				u16 upperEdgePos = getTileBottomEdge(y);
-				if (upperEdgePos < levelLimits.max.y) {
-					levelLimits.min.y = upperEdgePos;
+				if (upperEdgePos < levelLimits.max.y+1) { // <-- crunch 
+					levelLimits.min.y = upperEdgePos+1; // <-- crunch 
 					break;
 				}
 			}

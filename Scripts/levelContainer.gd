@@ -385,7 +385,10 @@ func load_entities_on_scene():
 				var pic_path = entityInst["__spritePath"]
 				var temp_spr = slave_node.get_node("Sprite")
 				if(pic_path):
-					temp_spr.texture = load(pic_path)
+					temp_spr.texture = load(singleton.cur_project_folder_path + pic_path)
+					if(not temp_spr.texture):
+						print("ERROR")
+						print(pic_path)
 				var temp_sprite_size = singleton.get_sprite_size_from_path(pic_path)
 				var colorRect = slave_node.get_node("ColorRect")
 				if temp_sprite_size:
@@ -394,10 +397,14 @@ func load_entities_on_scene():
 					colorRect.rect_size = Vector2(temp_sprite_size.x, temp_sprite_size.y)
 					temp_spr.region_rect = Rect2(0,0,temp_sprite_size.x, temp_sprite_size.y)
 				else:
-					var sprite_size = slave_node.get_node("Sprite").texture.get_size()
+					var sprite_size_t = slave_node.get_node("Sprite").texture
+					if not sprite_size_t:
+						sprite_size_t = load("res://InternalData/noSpr.png")
+					var sprite_size = sprite_size_t.get_size()
 					colorRect.rect_position = Vector2(0,0)
 					colorRect.rect_size = Vector2(sprite_size.x, sprite_size.y)
 					temp_spr.region_rect = Rect2(0,0,sprite_size.x, sprite_size.y)
+					
 				#sprite.set_region_rect(Rect2(-100,-100,200, 200))
 				slavesContainer.add_child(slave_node)
 
@@ -835,7 +842,7 @@ func entity_list_handler():
 					var pic_path = entityInst["__spritePath"]
 					var temp_spr = slave_node.get_node("Sprite")
 					if(pic_path):
-						temp_spr.texture = load(pic_path)
+						temp_spr.texture = load(singleton.cur_project_folder_path + pic_path)
 					var temp_sprite_size = singleton.get_sprite_size_from_path(pic_path)
 					var colorRect = slave_node.get_node("ColorRect")
 					if temp_sprite_size:
