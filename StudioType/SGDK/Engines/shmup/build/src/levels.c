@@ -19,6 +19,8 @@ Level* curLvlData;
 EntityAllPlayer* curEntityAll;
 MessagePack* curMessagePacks;
 LocalVariableMerged* curLocalVariables;
+u16** curSprTileIndexes[20];
+PreloadSprDefs* curPreloadSprDefs;
 
 u16 palette_full[64];
 

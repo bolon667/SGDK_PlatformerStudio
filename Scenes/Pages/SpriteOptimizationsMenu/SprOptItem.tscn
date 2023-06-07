@@ -1,0 +1,64 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/Pages/SpriteOptimizationsMenu/SprOptItem.gd" type="Script" id=1]
+
+[node name="SprDataContainer" type="HBoxContainer"]
+margin_top = 30.0
+margin_right = 1024.0
+margin_bottom = 80.0
+script = ExtResource( 1 )
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="."]
+margin_right = 148.0
+margin_bottom = 50.0
+
+[node name="IfOnLevelBtn" type="CheckButton" parent="VBoxContainer3"]
+margin_right = 148.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 0, 50 )
+text = "If on level:"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_left = 152.0
+margin_right = 566.0
+margin_bottom = 50.0
+size_flags_horizontal = 3
+
+[node name="label1" type="Label" parent="VBoxContainer"]
+margin_right = 414.0
+margin_bottom = 14.0
+text = "SpriteDefinition name: "
+
+[node name="edit1" type="LineEdit" parent="VBoxContainer"]
+margin_top = 18.0
+margin_right = 414.0
+margin_bottom = 48.0
+rect_min_size = Vector2( 0, 30 )
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="."]
+margin_left = 570.0
+margin_right = 984.0
+margin_bottom = 50.0
+size_flags_horizontal = 3
+
+[node name="label1" type="Label" parent="VBoxContainer2"]
+margin_right = 414.0
+margin_bottom = 14.0
+text = "Optimization mode (using only first option right now): "
+
+[node name="OptionButton" type="OptionButton" parent="VBoxContainer2"]
+margin_top = 18.0
+margin_right = 414.0
+margin_bottom = 48.0
+rect_min_size = Vector2( 0, 30 )
+text = "preLoadTilesInVRAM"
+items = [ "preLoadTilesInVRAM", null, false, 0, null, "OneAnimForSpriteDefinition", null, false, 1, null ]
+selected = 0
+
+[node name="killBtn" type="Button" parent="."]
+margin_left = 988.0
+margin_right = 1024.0
+margin_bottom = 50.0
+text = "  X  "
+
+[connection signal="button_down" from="killBtn" to="." method="_on_killBtn_button_down"]

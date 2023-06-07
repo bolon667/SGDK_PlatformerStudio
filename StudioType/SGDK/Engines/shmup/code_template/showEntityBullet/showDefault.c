@@ -20,7 +20,13 @@ void show$entityName$($entityType$* entity){
     else
     {
 		if(!entity->onScreen) {
-			if(entity->sprDef) entity->spr = SPR_addSprite(entity->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(entity->pal, 11, FALSE, FALSE));
+			entity->spr = SPR_addSpriteSafe(entity->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(entity->pal, 11, FALSE, FALSE));
+			entity->spr->data = findSprOptIndexBySpriteDefinition(entity->sprDef);
+			if(entity->spr->data != 9999){
+				SPR_setAutoTileUpload(entity->spr, FALSE);
+				entity->spr->data = findSprOptIndexBySpriteDefinition(entity->sprDef);
+				SPR_setFrameChangeCallback(entity->spr, &frameChangedSprOpt1);
+			}
 			//$showTriggerRects_addSprite$
 		}
         if(entity->sprDef) {

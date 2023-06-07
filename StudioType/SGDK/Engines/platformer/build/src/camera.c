@@ -5,6 +5,9 @@
 #include "../res/resources.h"
 
 Vect2D_s16 cameraPosition;
+Vect2D_f16 cameraSpd;
+Vect2D_f16 cameraSpdBuffer;
+
 
 AABB cameraDeadzone;
 
@@ -14,6 +17,7 @@ void setupCamera(Vect2D_u16 deadZoneCenter, u16 deadZoneWidth, u16 deadZoneHeigh
 	cameraDeadzone.max.x = deadZoneCenter.x + (deadZoneWidth >> 1);
 	cameraDeadzone.min.y = deadZoneCenter.y - (deadZoneHeight >> 1);
 	cameraDeadzone.max.y = deadZoneCenter.y + (deadZoneHeight >> 1);
+	
 
 	updateCamera();
 	SYS_doVBlankProcess();

@@ -8,6 +8,7 @@
 #include "../inc/global.h"
 #include "../inc/player.h"
 #include "../inc/customScripts.h"
+#include "../inc/entityHandler.h"
 
 #include "../res/resources.h"
 #include "../res/gfx.h"
@@ -15,6 +16,14 @@
 #include "../res/sounds.h"
 #include "../res/music.h"
 #include "../res/images.h"
+
+void preloadSpriteTiles(){
+	u16 numTile;
+	for(u16 i=0;i < curPreloadSprDefs->len; i++){
+		curSprTileIndexes[i] = SPR_loadAllFrames(curPreloadSprDefs->sprDefArr[i], VDPTilesFilled, &numTile);
+		VDPTilesFilled += numTile;
+	}
+}
 
 void stopLevel(){
 	//Cleaning screen and deallocating sprites
@@ -30,6 +39,9 @@ void stopLevel(){
 }
 
 void reloadLevelSprites(){
+	//preloadTilesForSprites
+	preloadSpriteTiles();
+	//Return entity sprites
 	EntityMerged *curEntity;
 	for(u16 i=0; i<curEntityAll->EntityMerged_size; i++){
 		curEntity = &curEntityAll->EntityMerged_arr[i];
@@ -37,10 +49,17 @@ void reloadLevelSprites(){
 			if(curEntity->sprDef) {
 				s16 posX_OnCam = curEntity->posInt.x-cameraPosition.x;
 				s16 posY_OnCam = curEntity->posInt.y-cameraPosition.y;
-				curEntity->spr = SPR_addSprite(curEntity->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(curEntity->pal, 11, FALSE, FALSE));
+				curEntity->spr = SPR_addSpriteSafe(curEntity->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(curEntity->pal, 11, FALSE, FALSE));
+				curEntity->spr->data = findSprOptIndexBySpriteDefinition(curEntity->sprDef);
+				if(curEntity->spr->data != 9999){
+					SPR_setAutoTileUpload(curEntity->spr, FALSE);
+					curEntity->spr->data = findSprOptIndexBySpriteDefinition(curEntity->sprDef);
+					SPR_setFrameChangeCallback(curEntity->spr, &frameChangedSprOpt1);
+				}
 			}
 		}
 	}
+	//Return bullet sprites
 	EntityBulletMerged *curBullet;
 	for(u16 i=0; i<curEntityAll->EntityBulletMerged_size; i++){
 		curBullet = &curEntityAll->EntityBulletMerged_arr[i];
@@ -48,7 +67,13 @@ void reloadLevelSprites(){
 			if(curBullet->sprDef) {
 				s16 posX_OnCam = curBullet->posInt.x-cameraPosition.x;
 				s16 posY_OnCam = curBullet->posInt.y-cameraPosition.y;
-				curBullet->spr = SPR_addSprite(curBullet->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(curBullet->pal, 11, FALSE, FALSE));
+				curBullet->spr = SPR_addSpriteSafe(curBullet->sprDef, posX_OnCam, posY_OnCam, TILE_ATTR(curBullet->pal, 11, FALSE, FALSE));
+				curBullet->spr->data = findSprOptIndexBySpriteDefinition(curBullet->sprDef);
+				if(curBullet->spr->data != 9999){
+					SPR_setAutoTileUpload(curBullet->spr, FALSE);
+					curBullet->spr->data = findSprOptIndexBySpriteDefinition(curBullet->sprDef);
+					SPR_setFrameChangeCallback(curBullet->spr, &frameChangedSprOpt1);
+				}
 			}
 		}
 	}
@@ -301,6 +326,8 @@ void loadLevel(u16 levelNum, Vect2D_s16 startPos) {
 	}
 	
 	//$loadScreenChunks$
+
+	preloadSpriteTiles();
 	
 
 	KLog_U1("FreeMem: ", MEM_getFree());

@@ -1,4 +1,6 @@
 #include "../inc/levels.h"
+#include "../res/sprites.h"
+
 void allocLevel(){
 	//imposible pos, to make sure, that you will get entities from chunk, when you appeared on level
 	curChunkPos.x = -1;
@@ -6,6 +8,9 @@ void allocLevel(){
 
     curLvlData = LevelFull_arr[levelNum].lvl;
 	curMessagePacks = LevelFull_arr[levelNum].messagePacks;
+
+    curPreloadSprDefs = LevelFull_arr[levelNum].preloadSprDef_arr;
+
 	curLocalVariables = MEM_alloc(sizeof(LocalVariableMerged));
 	memcpy(curLocalVariables, LevelFull_arr[levelNum].variable_arr, sizeof(LocalVariableMerged));
 	//duplicate entityAll

@@ -28,7 +28,7 @@ onready var chunkSizeYEdit = $CanvasLayer/VBoxContainer/HBoxContainer/VBoxChoose
 func _ready():
 	pass # Replace with function body.
 	load_run_from_cur_level()
-	load_sticky_levels()
+	#load_sticky_levels()
 	load_shot_trigger_rects()
 	load_add_EntityMerged_slots()
 	load_add_EntityBulletMerged_slots()
@@ -53,6 +53,7 @@ func load_run_from_cur_level():
 		runFromCurLevelBtn.pressed = singleton.entity_types["runFromCurrentLevel"]
 		
 func load_sticky_levels():
+	return
 	if(singleton.entity_types.has("stickyLevels")):
 		stickyLevelsBtn.pressed = singleton.entity_types["stickyLevels"]
 func load_shot_trigger_rects():
@@ -120,5 +121,5 @@ func _on_addEntitySlavesSlider_value_changed(value):
 	singleton.entity_types["entitySlavesAmount"] = int_val
 
 
-func _on_stickyLevelsBtn_toggled(button_pressed):
-	singleton.entity_types["stickyLevels"] = button_pressed
+func _on_testFuncBtn_toggled(button_pressed):
+	singleton.entity_types["testFunc"] = button_pressed

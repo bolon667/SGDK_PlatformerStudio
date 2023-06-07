@@ -16,6 +16,23 @@
 #include "../inc/customScripts.h"
 
 
+u32 findSprOptIndexBySpriteDefinition(SpriteDefinition* sprDef){
+	for(u16 i=0;i < curPreloadSprDefs->len; i++){
+		if(curPreloadSprDefs->sprDefArr[i] == sprDef){
+			return i;
+		}
+	}
+	return 9999;
+
+}
+
+void frameChangedSprOpt1(Sprite* sprite)
+{
+    u16 enemyIndex = sprite->data;
+    u16 tileIndex = curSprTileIndexes[enemyIndex][sprite->animInd][sprite->frameInd];
+    SPR_setVRAMTileIndex(sprite, tileIndex);
+}
+
 //$entityDefaultConsts$
 
 //$entityBulletDefaultConsts$

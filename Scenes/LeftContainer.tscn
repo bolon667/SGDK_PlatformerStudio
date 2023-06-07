@@ -60,27 +60,36 @@ size_flags_horizontal = 3
 theme = ExtResource( 4 )
 text = "Global Variables"
 
-[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
-modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
+[node name="SpriteOptimizationsBtn" type="Button" parent="VBoxContainer"]
 margin_top = 176.0
 margin_right = 200.0
-margin_bottom = 180.0
+margin_bottom = 216.0
+rect_min_size = Vector2( 0, 40 )
+size_flags_horizontal = 3
+theme = ExtResource( 4 )
+text = "Sprite Optimizations"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
+margin_top = 220.0
+margin_right = 200.0
+margin_bottom = 224.0
 
 [node name="LayerList" type="VBoxContainer" parent="VBoxContainer"]
-margin_top = 184.0
+margin_top = 228.0
 margin_right = 200.0
-margin_bottom = 184.0
+margin_bottom = 228.0
 size_flags_horizontal = 3
 theme = ExtResource( 3 )
 
 [node name="HSeparator4" type="HSeparator" parent="VBoxContainer"]
 modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
-margin_top = 188.0
+margin_top = 232.0
 margin_right = 200.0
-margin_bottom = 192.0
+margin_bottom = 236.0
 
 [node name="LayerValuesList" type="ScrollContainer" parent="VBoxContainer"]
-margin_top = 196.0
+margin_top = 240.0
 margin_right = 200.0
 margin_bottom = 588.0
 size_flags_horizontal = 3
@@ -107,3 +116,4 @@ margin_bottom = 600.0
 [connection signal="button_down" from="VBoxContainer/bulletDefinitionsBtn" to="." method="_on_bulletDefinitionsBtn_button_down"]
 [connection signal="button_down" from="VBoxContainer/projectSettingsBtn" to="." method="_on_projectSettingsBtn_button_down"]
 [connection signal="button_down" from="VBoxContainer/GlobalVariablesBtn" to="." method="_on_GlobalVariablesBtn_button_down"]
+[connection signal="button_down" from="VBoxContainer/SpriteOptimizationsBtn" to="." method="_on_SpriteOptimizationsBtn_button_down"]

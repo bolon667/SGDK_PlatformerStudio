@@ -55,6 +55,11 @@ typedef struct {
 	u8 freshMusicStart;
 } Level;
 
+typedef struct {
+	SpriteDefinition** sprDefArr;
+	u16 len;
+} PreloadSprDefs;
+
 
 typedef struct {
 	bool alive;
@@ -137,6 +142,8 @@ typedef struct {
     EntityAll* entityAll_arr;
 	MessagePack* messagePacks;
 	LocalVariableMerged* variable_arr;
+	PreloadSprDefs* preloadSprDef_arr;
+	u16** sprTileIndexes;
 } LevelFull;
 
 AABB newAABB(s16 x1, s16 x2, s16 y1, s16 y2);

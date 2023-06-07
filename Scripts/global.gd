@@ -57,7 +57,7 @@ var entity_types = {
 		"doc": "https://github.com/bolon667/SGDK_PlatformerStudio/wiki/Welcome-to-studio",
 		"doc_ru": "https://under-prog.ru/sgdk-studiya-dlya-sozdaniya-platformerov/",
 		"appAuthor": "bolon667",
-		"appVersion": "1.11 beta",
+		"appVersion": "1.12 beta",
 		"url": "https://github.com/bolon667/SGDK_PlatformerStudio",
 	},
 	"jsonVersion": "1.0.0",
@@ -917,6 +917,11 @@ func fix_level_inst_ids(level_ind):
 		cur_ind += 1
 	print("InstIds are fixed on level ", level_ind)
 
+func get_testFunc_on():
+	if not entity_types.has("testFunc"):
+		entity_types["testFunc"] = false
+	return entity_types["testFunc"]
+
 func change_entityInstTriggerAABB(aabb: Array, level_ind: int, entityInst_id: int):
 	var entity_layer_ind: int = -1
 	var temp_entity_layer_ind: int = 0
@@ -1391,6 +1396,22 @@ func get_entityMeged_ids_dict(entityCollectionDef: String):
 			dict[entity_name] = cur_ind
 			cur_ind += 1
 	return dict
+
+func get_sprOpt1_arr(level_num: int):
+	var arr: Array = []
+	for sprOpt1Info in entity_types["defs"]["SpriteOptList"]:
+		var sprDefName = sprOpt1Info["sprDefName"]
+		if(!sprOpt1Info["onlyOnLevel"]):
+			if not(sprDefName in arr):
+				arr.append(sprDefName)
+			continue
+		#Check if on level
+		for entityInst in entity_types["levels"][level_num]["layerInstances"][0]["entityInstances"]:
+			for fieldInst in entityInst["fieldInstances"]:
+				if fieldInst["__identifier"] == "sprDef" and fieldInst["__value"] == sprDefName:
+					if not(sprDefName in arr):
+						arr.append(sprDefName)
+	return arr
 
 func get_cur_level_layer_names():
 	var layer_names = []

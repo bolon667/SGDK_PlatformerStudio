@@ -11,6 +11,7 @@ onready var level_settings_menu_t = preload("res://Scenes/Pages/LevelSettings/Le
 onready var project_settings_menu_t = preload("res://Scenes/Pages/ProjectSettings/ProjectSettingsMenu.tscn")
 onready var layer_button_t = preload("res://Scenes/LayerButton.tscn")
 onready var variables_menu_t = preload("res://Scenes/Pages/GlobalVariablesMenu/VariablesMenu.tscn")
+onready var sprOpt_menu_t = preload("res://Scenes/Pages/SpriteOptimizationsMenu/SprOptMenu.tscn")
 
 onready var entity_layer_value_btn_t = preload("res://Scenes/EntityLayerValueButton.tscn")
 
@@ -73,4 +74,9 @@ func _on_bulletDefinitionsBtn_button_down():
 
 func _on_GlobalVariablesBtn_button_down():
 	var node = variables_menu_t.instance()
+	add_child(node)
+
+
+func _on_SpriteOptimizationsBtn_button_down():
+	var node = sprOpt_menu_t.instance()
 	add_child(node)

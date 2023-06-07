@@ -175,13 +175,16 @@ public class buidProject : Node
 	{
 		GD.Print("globalH_CodeReplacer running...");
 		Node singleton = (Node)GetNode("/root/singleton");
-
+		bool testFuncOn = (bool)singleton.Call("get_testFunc_on");
 
 		String globalH_path = engineRootPath + "/build/inc/global.h";
 		String globalCode = System.IO.File.ReadAllText(globalH_path);
 		//Adding merged struct for entity
 		Godot.Collections.Array variables_arr = (Godot.Collections.Array)singleton.Call("get_global_variables");
 		String variablesCode = genGlobalVariablesCode_h(variables_arr);
+
+		
+		
 
 		globalCode = globalCode.Replace("//$globalVariables$", variablesCode);
 
@@ -194,7 +197,7 @@ public class buidProject : Node
 	{
 		GD.Print("globalC_CodeReplacer running...");
 		Node singleton = (Node)GetNode("/root/singleton");
-
+		bool testFuncOn = (bool)singleton.Call("get_testFunc_on");
 
 		String globalC_path = engineRootPath + "/build/src/global.c";
 		String globalCode = System.IO.File.ReadAllText(globalC_path);
@@ -203,8 +206,7 @@ public class buidProject : Node
 		String variablesCode = genGlobalVariablesCode_c(variables_arr);
 
 		globalCode = globalCode.Replace("//$globalVariables$", variablesCode);
-
-
+		
 		System.IO.File.WriteAllText(globalC_path, globalCode);
 		GD.Print("global.c code replaced");
 	}
@@ -717,6 +719,9 @@ public class buidProject : Node
 		mapsC_CodeReplacer();
 		mapsH_CodeReplacer();
 		playerC_CodeReplacer();
+
+		allocLevelC_CodeReplacer();
+
 		updatePlayerC_CodeReplacer();
 		playerInitC_CodeReplacer();
 		loadLevelC_CodeReplacer();
@@ -2282,6 +2287,36 @@ public class buidProject : Node
 		return result;
 	}
 
+	private String genPreloadSprDefCode(int curLevel)
+	{
+		GD.Print("Gen genPreloadSprDefCode code...");
+		Node singleton = (Node)GetNode("/root/singleton");
+		String result = "";
+		Godot.Collections.Array sprPreloadOptArr = (Godot.Collections.Array)singleton.Call("get_sprOpt1_arr", curLevel);
+		String sprPreloadOptArrStr = "{";
+
+		foreach (String sprDefName in sprPreloadOptArr)
+		{
+			GD.Print(sprDefName);
+			sprPreloadOptArrStr += sprDefName + ", ";
+
+		}
+		sprPreloadOptArrStr += "}";
+		if(sprPreloadOptArr.Count == 0)
+		{
+			result += $"const PreloadSprDefs const PreloadSprDef_arr_Level_{curLevel.ToString()} = {{NULL, 0}};\n";
+		} 
+		else
+		{
+			result += $"const SpriteDefinition** const SprDef_PreloadSprDef_arr_Level_{curLevel.ToString()}[] = " + sprPreloadOptArrStr + ";\n";
+			result += $"const PreloadSprDefs const PreloadSprDef_arr_Level_{curLevel.ToString()} = {{&SprDef_PreloadSprDef_arr_Level_{curLevel.ToString()}, {sprPreloadOptArr.Count.ToString()}}};\n";
+		}
+		
+		
+
+		return result;
+	}
+
 	private String genEntityAllCode(int curLevel)
 	{
 		Node singleton = (Node)GetNode("/root/singleton");
@@ -2376,12 +2411,15 @@ public class buidProject : Node
 
 			result += genLvlCode(curLevel);
 
+			result += genPreloadSprDefCode(curLevel);
+
 		}
 		//return result;
 		result += "const LevelFull const LevelFull_arr[] = {";
 		for (int curLevel = 0; curLevel < amountOfLevel; curLevel++)
 		{
-			result += "{" + $"&lvl_Level_{curLevel.ToString()}, &EntityAll_arr_Level_{curLevel.ToString()}, &MessagePack_Level_{curLevel.ToString()}, &LocalVariable_arr_Level_{curLevel.ToString()}" + "}, ";
+			String curLevelStr = curLevel.ToString();
+			result += "{" + $"&lvl_Level_{curLevelStr}, &EntityAll_arr_Level_{curLevelStr}, &MessagePack_Level_{curLevelStr}, &LocalVariable_arr_Level_{curLevelStr},  &PreloadSprDef_arr_Level_{curLevelStr}, NULL," + "}, ";
 		}
 		result += "};\n";
 
@@ -2501,6 +2539,24 @@ public class buidProject : Node
 		GD.Print("loadLevel.c code replaced");
 	}
 
+	private void allocLevelC_CodeReplacer()
+	{
+		Node singleton = (Node)GetNode("/root/singleton");
+
+		String codePath = engineRootPath + "/build/src/allocLevel.c";
+		String codeText = System.IO.File.ReadAllText(codePath);
+
+		if (true)
+		{
+			String replaceText = "SPR_setPosition(playerBody.debugSpr1, playerBody.position.x+playerBody.aabb.min.x, playerBody.position.y+playerBody.aabb.min.y);\n" +
+			"SPR_setPosition(playerBody.debugSpr2, playerBody.position.x+playerBody.aabb.max.x-8, playerBody.position.y+playerBody.aabb.max.y-8);\n";
+			codeText = codeText.Replace("//$spriteTileAlloc$", replaceText);
+
+		}
+
+		System.IO.File.WriteAllText(codePath, codeText);
+		GD.Print("allocLevel.c code replaced");
+	}
 	private void updatePlayerC_CodeReplacer()
 	{
 		Node singleton = (Node)GetNode("/root/singleton");

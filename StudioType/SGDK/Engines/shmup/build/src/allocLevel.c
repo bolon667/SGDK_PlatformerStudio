@@ -1,7 +1,24 @@
 #include "../inc/levels.h"
 void allocLevel(){
+
+	//Prealloc sprite tiles
+
+	//$spriteTileAlloc$
+
+	
+
     curLvlData = LevelFull_arr[levelNum].lvl;
 	curMessagePacks = LevelFull_arr[levelNum].messagePacks;
+	curPreloadSprDefs = LevelFull_arr[levelNum].preloadSprDef_arr;
+
+	u16 numTile;
+	KLog_S1("curPreloadSprDefs->len: ", curPreloadSprDefs->len);
+	for(u16 i=0;i < curPreloadSprDefs->len; i++){
+		KLog_S1("curIndexAAAAAAA: ", i);
+		curSprTileIndexes[i] = SPR_loadAllFrames(&curPreloadSprDefs->sprDefArr[i], VDPTilesFilled, &numTile);
+		VDPTilesFilled += numTile;
+	}
+
 	curLocalVariables = MEM_alloc(sizeof(LocalVariableMerged));
 	memcpy(curLocalVariables, LevelFull_arr[levelNum].variable_arr, sizeof(LocalVariableMerged));
 	//duplicate entityAll

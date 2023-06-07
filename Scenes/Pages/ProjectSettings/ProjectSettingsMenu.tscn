@@ -205,12 +205,12 @@ margin_bottom = 38.0
 size_flags_horizontal = 3
 text = "Show trigger rects"
 
-[node name="stickyLevelsBtn" type="CheckButton" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
+[node name="testFuncBtn" type="CheckButton" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
 margin_top = 228.0
 margin_right = 1024.0
 margin_bottom = 266.0
 size_flags_horizontal = 3
-text = "Sticky Levels Mode"
+text = "Test function (can be anything)"
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer"]
 margin_top = 270.0
@@ -279,7 +279,7 @@ text = "px"
 [connection signal="value_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HboxContainer5/addEntitySlavesSlider" to="." method="_on_addEntitySlavesSlider_value_changed"]
 [connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/turnOnGatesBtn" to="." method="_on_turnOnGatesBtn_toggled"]
 [connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/debugContainer/showTriggerRectsBtn" to="." method="_on_showTriggerRectsBtn_toggled"]
-[connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/stickyLevelsBtn" to="." method="_on_stickyLevelsBtn_toggled"]
+[connection signal="toggled" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/testFuncBtn" to="." method="_on_testFuncBtn_toggled"]
 [connection signal="item_selected" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HBoxContainer3/entityOptBtn" to="." method="_on_entityOptBtn_item_selected"]
 [connection signal="text_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HBoxContainer4/chunkSizeX" to="." method="_on_chunkSizeX_text_changed"]
 [connection signal="text_changed" from="CanvasLayer/VBoxContainer/HBoxContainer/VBoxChooseEntity/ScrollContainer/SettingsContainer/HBoxContainer4/chunkSizeY" to="." method="_on_chunkSizeY_text_changed"]

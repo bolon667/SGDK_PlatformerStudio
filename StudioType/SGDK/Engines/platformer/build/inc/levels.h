@@ -13,6 +13,8 @@ extern Level* curLvlData;
 extern EntityAllPlayer* curEntityAll;
 extern MessagePack* curMessagePacks;
 extern LocalVariableMerged* curLocalVariables;
+extern u16** curSprTileIndexes[20];
+extern PreloadSprDefs* curPreloadSprDefs;
 
 extern u16 palette_full[];
 

@@ -40,6 +40,8 @@ struct pBody {
 	bool sliding;
 	bool cantControl;
 
+	bool gravityOn;
+
 	s16 animMode;
 	s16 val1;
 	s16 state;
@@ -61,6 +63,7 @@ struct pBody {
 		fix16 fixX;
 		s16 x;
 		fix16 fixY;
+		s16 y;
 		fix16 bufferFixX;
 		fix16 bufferFixY;
 	}velocity;
