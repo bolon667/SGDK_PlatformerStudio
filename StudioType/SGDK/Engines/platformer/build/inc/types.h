@@ -5,6 +5,7 @@
 
 //$definesCode$
 
+#pragma pack(push, 1)
 typedef struct {
 	u8 x;
 	u8 y;
@@ -159,6 +160,8 @@ typedef struct {
 	PreloadSprDefs* preloadSprDef_arr;
 	u16** sprTileIndexes;
 } LevelFull;
+
+#pragma pack(pop)
 
 AABB newAABB(s16 x1, s16 x2, s16 y1, s16 y2);
 
