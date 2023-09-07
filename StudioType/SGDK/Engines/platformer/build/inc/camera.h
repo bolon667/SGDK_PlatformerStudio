@@ -7,7 +7,8 @@
 #include "physics.h"
 #include "levels.h"
 
-extern Vect2D_s16 cameraPosition;
+extern Vect2D_s32 cameraPosition;
+extern Vect2D_s32 cameraPosition2;
 extern Vect2D_f16 cameraSpdBuffer;
 extern Vect2D_f16 cameraSpd;
 

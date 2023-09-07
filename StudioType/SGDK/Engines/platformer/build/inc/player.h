@@ -6,7 +6,7 @@
 #include "types.h"
 #include "camera.h"
 
-struct pBody {
+typedef struct {
 	Sprite* sprite;
 	Sprite* debugSpr1;
 	Sprite* debugSpr2;
@@ -14,6 +14,8 @@ struct pBody {
 	AABB normalAABB;
 	AABB slidingAABB;
 	AABB climbingStairAABB;
+
+	AABB playerBounds;
 
 	int facingDirection;
 	int speed;
@@ -56,7 +58,8 @@ struct pBody {
 	u16 vdpIndexPos;
 	
 	Vect2D_s16 position;
-	Vect2D_s16 globalPosition;
+	Vect2D_s32 globalPosition;
+	Vect2D_s32 testGlobalPosition;
 	Vect2D_u16 centerOffset;
 
 	struct {
@@ -74,9 +77,16 @@ struct pBody {
 	s16 maxAmountOfJumps;
 
 	Vect2D_s16 input;
-};
 
-extern struct pBody playerBody;
+	struct {
+		u16 state;
+		u16 prevState;
+	}inputStates;
+} pBody;
+
+extern pBody playerBody;
+extern pBody playerBody2;
+
 extern bool runningAnim;
 
 extern const s16 coyoteTime;

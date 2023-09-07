@@ -55,6 +55,12 @@ __meta__ = {
 
 [node name="PositionList" type="Node2D" parent="."]
 
+[node name="GeneratorList" type="Node2D" parent="."]
+
+[node name="MenuContainer" type="Node2D" parent="GeneratorList" groups=["noRemove"]]
+
+[node name="DefaultContainer" type="Node2D" parent="GeneratorList" groups=["noRemove"]]
+
 [node name="AreaLevel" type="Area2D" parent="."]
 collision_layer = 2
 collision_mask = 2

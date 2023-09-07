@@ -62,14 +62,13 @@ size_flags_vertical = 3
 scroll_horizontal_enabled = false
 
 [node name="SettingsContainer" type="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer"]
-margin_right = 1014.0
-margin_bottom = 642.0
+margin_right = 1024.0
+margin_bottom = 546.0
 rect_min_size = Vector2( 200, 200 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="levelMode" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 5 )]
-margin_right = 1014.0
 margin_bottom = 64.0
 levelAttrName = "levelMode"
 
@@ -80,40 +79,80 @@ text = "Level Mode: "
 
 [node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode" index="1"]
 margin_left = 113.0
-margin_right = 1014.0
 margin_bottom = 64.0
 
 [node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer" index="0"]
-margin_right = 901.0
+margin_right = 911.0
 margin_bottom = 20.0
 
 [node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer" index="1"]
 margin_top = 24.0
-margin_right = 901.0
+margin_right = 911.0
 margin_bottom = 64.0
 
 [node name="OptionButton" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 564.0
+margin_right = 574.0
 text = "Level"
 items = [ "Level", null, false, 0, null, "Scene", null, false, 1, null ]
 selected = 0
 
 [node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer/HBoxContainer" index="1"]
-margin_left = 568.0
-margin_right = 683.0
+margin_left = 578.0
+margin_right = 693.0
 
 [node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 687.0
-margin_right = 857.0
+margin_left = 697.0
+margin_right = 867.0
 
 [node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode/VBoxContainer/HBoxContainer" index="3"]
-margin_left = 861.0
-margin_right = 901.0
+margin_left = 871.0
+margin_right = 911.0
+
+[node name="changeLevelAnim" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 5 )]
+margin_top = 68.0
+margin_bottom = 132.0
+levelAttrName = "changeLevelAnim"
+defaultVal = "0"
+
+[node name="Label" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/changeLevelAnim" index="0"]
+margin_right = 164.0
+margin_bottom = 42.0
+text = "Change Level Anim:"
+
+[node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/changeLevelAnim" index="1"]
+margin_left = 168.0
+margin_bottom = 64.0
+
+[node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/changeLevelAnim/VBoxContainer" index="0"]
+margin_right = 856.0
+margin_bottom = 20.0
+
+[node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/changeLevelAnim/VBoxContainer" index="1"]
+margin_top = 24.0
+margin_right = 856.0
+margin_bottom = 64.0
+
+[node name="OptionButton" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/changeLevelAnim/VBoxContainer/HBoxContainer" index="0"]
+margin_right = 519.0
+text = "No Anim"
+items = [ "No Anim", null, false, 0, null, "Fade In", null, false, 1, null ]
+selected = 0
+
+[node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/changeLevelAnim/VBoxContainer/HBoxContainer" index="1"]
+margin_left = 523.0
+margin_right = 638.0
+
+[node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/changeLevelAnim/VBoxContainer/HBoxContainer" index="2"]
+margin_left = 642.0
+margin_right = 812.0
+
+[node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/changeLevelAnim/VBoxContainer/HBoxContainer" index="3"]
+margin_left = 816.0
+margin_right = 856.0
 
 [node name="ControlScript" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
-margin_top = 68.0
-margin_right = 1014.0
-margin_bottom = 132.0
+margin_top = 136.0
+margin_bottom = 200.0
 levelAttrName = "controlScript"
 defaultVal = "updatePlayer"
 
@@ -124,33 +163,32 @@ text = "Control Script: "
 
 [node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript" index="1"]
 margin_left = 131.0
-margin_right = 1014.0
 margin_bottom = 64.0
 
 [node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer" index="0"]
-margin_right = 883.0
+margin_right = 893.0
 margin_bottom = 20.0
 
 [node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer" index="1"]
 margin_top = 24.0
-margin_right = 883.0
+margin_right = 893.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 546.0
+margin_right = 556.0
 text = "Choose replacement for updatePlayer func"
 
 [node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer/HBoxContainer" index="1"]
-margin_left = 550.0
-margin_right = 665.0
+margin_left = 560.0
+margin_right = 675.0
 
 [node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 669.0
-margin_right = 839.0
+margin_left = 679.0
+margin_right = 849.0
 
 [node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript/VBoxContainer/HBoxContainer" index="3"]
-margin_left = 843.0
-margin_right = 883.0
+margin_left = 853.0
+margin_right = 893.0
 
 [node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript" index="2"]
 margin_left = 612.0
@@ -158,9 +196,8 @@ margin_right = 1012.0
 filters = PoolStringArray( "*.c" )
 
 [node name="UpdateCameraScript" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 2 )]
-margin_top = 136.0
-margin_right = 1014.0
-margin_bottom = 200.0
+margin_top = 204.0
+margin_bottom = 268.0
 levelAttrName = "updateCameraScript"
 defaultVal = "updateCamera"
 
@@ -171,33 +208,32 @@ text = "Camera Script: "
 
 [node name="VBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript" index="1"]
 margin_left = 133.0
-margin_right = 1014.0
 margin_bottom = 64.0
 
 [node name="infoLabel" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer" index="0"]
-margin_right = 881.0
+margin_right = 891.0
 margin_bottom = 20.0
 
 [node name="HBoxContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer" index="1"]
 margin_top = 24.0
-margin_right = 881.0
+margin_right = 891.0
 margin_bottom = 64.0
 
 [node name="Button" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer/HBoxContainer" index="0"]
-margin_right = 544.0
+margin_right = 554.0
 text = "Choose replacement for updateCamera func"
 
 [node name="makeDefaultBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer/HBoxContainer" index="1"]
-margin_left = 548.0
-margin_right = 663.0
+margin_left = 558.0
+margin_right = 673.0
 
 [node name="applyAllLevelsBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer/HBoxContainer" index="2"]
-margin_left = 667.0
-margin_right = 837.0
+margin_left = 677.0
+margin_right = 847.0
 
 [node name="removeBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript/VBoxContainer/HBoxContainer" index="3"]
-margin_left = 841.0
-margin_right = 881.0
+margin_left = 851.0
+margin_right = 891.0
 
 [node name="FileDialog" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript" index="2"]
 margin_left = 612.0
@@ -205,13 +241,9 @@ margin_right = 1012.0
 filters = PoolStringArray( "*.c" )
 
 [node name="DropDownContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 4 )]
-margin_top = 204.0
-margin_right = 1014.0
-margin_bottom = 234.0
+margin_top = 272.0
+margin_bottom = 302.0
 groupName = "Scripts"
-
-[node name="pressGroupBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer" index="0"]
-margin_right = 1014.0
 
 [node name="GroupContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer" index="1"]
 margin_top = 34.0
@@ -344,16 +376,11 @@ margin_right = 1012.0
 filters = PoolStringArray( "*.c" )
 
 [node name="DropDownContainer3" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 4 )]
-margin_top = 238.0
-margin_right = 1014.0
-margin_bottom = 608.0
+margin_top = 306.0
+margin_bottom = 336.0
 groupName = "Music"
 
-[node name="pressGroupBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3" index="0"]
-margin_right = 1014.0
-
 [node name="GroupContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer3" index="1"]
-visible = true
 margin_top = 34.0
 margin_right = 1014.0
 margin_bottom = 370.0
@@ -562,13 +589,9 @@ margin_left = 970.0
 margin_right = 1010.0
 
 [node name="DropDownContainer2" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer" instance=ExtResource( 4 )]
-margin_top = 612.0
-margin_right = 1014.0
-margin_bottom = 642.0
+margin_top = 340.0
+margin_bottom = 370.0
 groupName = "Palette"
-
-[node name="pressGroupBtn" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2" index="0"]
-margin_right = 1014.0
 
 [node name="GroupContainer" parent="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer2" index="1"]
 margin_top = 34.0
@@ -850,6 +873,7 @@ filters = PoolStringArray( "*.png", "*.bmp", "*.pal" )
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/HBoxContainer2/ExitBtn" to="." method="_on_ExitBtn_pressed"]
 
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/levelMode"]
+[editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/changeLevelAnim"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/ControlScript"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/UpdateCameraScript"]
 [editable path="CanvasLayer/VBoxContainer/ScrollContainer/SettingsContainer/DropDownContainer"]

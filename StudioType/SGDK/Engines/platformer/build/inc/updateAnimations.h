@@ -6,4 +6,4 @@
 #include "types.h"
 #include "camera.h"
 
-extern void updateAnimations();
+extern void updateAnimations(pBody* plr);

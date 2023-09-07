@@ -43,10 +43,11 @@ int main(bool resetType) {
 		showEntityAll();		
 
 		//Then we update sprites and after that we tell the Mega Drive that we have finished processing all the frame data
-		SPR_update();
-		SYS_doVBlankProcess();
+		
 		(*curLvlData->everyFrameFunc)();
 		//$chunkLoadFunc$
+		SPR_update();
+		SYS_doVBlankProcess();
 	}
 
 	return 0;

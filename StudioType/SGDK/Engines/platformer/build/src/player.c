@@ -6,7 +6,8 @@
 #include "../res/resources.h"
 #include "../res/sprites.h"
 
-struct pBody playerBody;
+pBody playerBody;
+pBody playerBody2;
 
 bool runningAnim;
 

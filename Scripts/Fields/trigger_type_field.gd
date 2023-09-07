@@ -14,7 +14,7 @@ var entityInst_id = 0
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
-	$Label.text = label_text
+	#$Label.text = label_text
 	load_trigger_enum()
 	
 
@@ -65,6 +65,6 @@ func _on_OptionButton_item_selected(index):
 	var triggerTypeName = $VBoxContainer/OptionButton.get_item_text(index)
 	#singleton.change_entityInst_by_instId(singleton.cur_entity_inst_ind, "triggerType", index)
 	#singleton.change_entityInst_by_instId(singleton.cur_entity_inst_ind, "triggerType", index)
-	singleton.change_entityInst_by_instId(entityInst_id, level_ind, "triggerTypeName", triggerTypeName)
+	singleton.change_entityInst_root_by_instId(entityInst_id, level_ind, "triggerTypeName", triggerTypeName)
 	singleton.change_fiendInst_value_by_levelInd_entityInstId("Trigger type", index, level_ind, entityInst_id)
 	#singleton.change_fiendInst_value("Trigger type", str(index))

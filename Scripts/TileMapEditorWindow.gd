@@ -106,6 +106,14 @@ func generate_tilesets():
 			ts.tile_set_texture(id, texture)
 		ResourceSaver.save("res://TileSets/16x16TileSet.tres", ts)
 
+func load_last_level():
+	var amount_of_levels: int = singleton.get_amount_of_levels()
+	var level_ind = amount_of_levels-1
+	print("Adding levelInd ", level_ind, " to world")
+	var levelContainer_node = levelContainer_t.instance()
+	levelContainer_node.cur_level_ind = level_ind
+	world.add_child(levelContainer_node)
+	
 func load_levels():
 	generate_tilesets()
 	clean_levels()
@@ -223,12 +231,93 @@ func _physics_process(delta):
 	move_camera(delta)
 	area2d_follow_camera()
 	select_rect()
+	shortcuts_handler()
 
+func shortcuts_handler():
+	var left_btn: bool = false
+	var right_btn: bool = false
+	var up_btn: bool = false
+	var down_btn: bool = false
+	
+	var shift_btn: bool = false
+	
+	if Input.is_action_just_pressed("ui_left"):
+		left_btn = true
+	if Input.is_action_just_pressed("ui_right"):
+		right_btn = true
+	if Input.is_action_just_pressed("ui_up"):
+		up_btn = true
+	if Input.is_action_just_pressed("ui_down"):
+		down_btn = true
+	if Input.is_action_pressed("shift"):
+		shift_btn = true
+	
+	if left_btn and shift_btn:
+		left_select_levels()
+	if right_btn and shift_btn:
+		right_select_levels()
+	if up_btn and shift_btn:
+		up_select_levels()
+	if down_btn and shift_btn:
+		down_select_levels()
+
+func left_select_levels():
+	print("LEFT select")
+	var mouse_pos = get_local_mouse_position()
+	for levelContainer in world.get_children():
+		if not levelContainer.is_in_group("levelContainer"):
+			continue
+		var level_size:Vector2 = levelContainer.map_size_px
+		var level_pos:Vector2 = levelContainer.global_position
+		
+		if(mouse_pos.x > (level_pos.x+level_size.x)):
+			print(levelContainer.cur_level_ind)
+			levelContainer.make_selected()
+			
+func right_select_levels():
+	print("RIGHT select")
+	var mouse_pos = get_local_mouse_position()
+	for levelContainer in world.get_children():
+		if not levelContainer.is_in_group("levelContainer"):
+			continue
+		var level_size:Vector2 = levelContainer.map_size_px
+		var level_pos:Vector2 = levelContainer.global_position
+		
+		if(mouse_pos.x < (level_pos.x+level_size.x)):
+			print(levelContainer.cur_level_ind)
+			levelContainer.make_selected()
+			
+func up_select_levels():
+	print("UP select")
+	var mouse_pos = get_local_mouse_position()
+	for levelContainer in world.get_children():
+		if not levelContainer.is_in_group("levelContainer"):
+			continue
+		var level_size:Vector2 = levelContainer.map_size_px
+		var level_pos:Vector2 = levelContainer.global_position
+		
+		if(mouse_pos.y > (level_pos.y+level_size.y)):
+			print(levelContainer.cur_level_ind)
+			levelContainer.make_selected()
+
+func down_select_levels():
+	print("DOWN select")
+	var mouse_pos = get_local_mouse_position()
+	for levelContainer in world.get_children():
+		if not levelContainer.is_in_group("levelContainer"):
+			continue
+		var level_size:Vector2 = levelContainer.map_size_px
+		var level_pos:Vector2 = levelContainer.global_position
+		
+		if(mouse_pos.y < (level_pos.y+level_size.y)):
+			print(levelContainer.cur_level_ind)
+			levelContainer.make_selected()
+	
 
 func select_levelContainers_in_rect(rect_pos_1:Vector2, rect_pos_2:Vector2):
 	print("run select_levelContainers_in_rect(...)")
 	for levelContainer in world.get_children():
-		if not levelContainer.is_in_group("leftContainer"):
+		if not levelContainer.is_in_group("levelContainer"):
 			continue
 		var level_size:Vector2 = levelContainer.map_size_px
 		var level_pos:Vector2 = levelContainer.global_position

@@ -39,6 +39,7 @@ onready var temp_tile_map = $tempTileMap
 onready var tile_map = $TileMap
 onready var entity_obj_list = $EntityList
 onready var position_obj_list = $PositionList
+onready var generator_obj_list = $GeneratorList
 
 onready var bgA_spr = $bgA
 onready var bgB_spr = $bgB
@@ -60,10 +61,12 @@ onready var camera = $"../../Camera2D"
 #onready var camera = $Camera2D
 
 onready var entity_obj_t = preload("res://Scenes/entityScene.tscn")
+onready var generator_obj_t = preload("res://Scenes/generatorScene.tscn")
 onready var position_obj_t = preload("res://Scenes/positionScene.tscn")
 onready var gate_obj_t = preload("res://Scenes/gateScene.tscn")
 onready var level_buttons_t = preload("res://Scenes/modalWindows/levelContainerContextButtons.tscn")
 onready var slaveSceneLite_t = preload("res://Scenes/slaveSceneLite.tscn")
+
 
 func draw_frame(rect: Rect2, color, line_thickness):
 	var half_line_thickness = int(line_thickness/2)
@@ -81,15 +84,56 @@ func check_connection_with_level():
 	if not_connection and not is_moving:
 		remove_from_group("connectedLevelContainers")
 
+func paste_bga_settings():
+	if !(is_selected or highlight):
+		return
+	var temp_level = singleton.entity_types["levels"][cur_level_ind]
+	temp_level["bgRelPath"] = singleton.level_settings_buffer["bgRelPath"]
+	temp_level["bgaMode"] = singleton.level_settings_buffer["bgaMode"]
+	
+	change_bga(temp_level["bgRelPath"], temp_level["bgaMode"])
+	
+func paste_bgb_settings():
+	if !(is_selected or highlight):
+		return
+	var temp_level = singleton.entity_types["levels"][cur_level_ind]
+	temp_level["bgRelPath2"] = singleton.level_settings_buffer["bgRelPath2"]
+	temp_level["bgbMode"] = singleton.level_settings_buffer["bgbMode"]
+	
+	change_bgb(temp_level["bgRelPath2"], temp_level["bgbMode"])
+
+func paste_level_settings():
+	if !(is_selected or highlight):
+		return
+	var temp_level = singleton.entity_types["levels"][cur_level_ind]
+	temp_level["afterLevelScript"] = singleton.level_settings_buffer["afterLevelScript"]
+	temp_level["backPalIndex"] = singleton.level_settings_buffer["backPalIndex"] 
+	temp_level["beforeLevelScript"] = singleton.level_settings_buffer["beforeLevelScript"] 
+	
+	temp_level["controlScript"] = singleton.level_settings_buffer["controlScript"]
+	temp_level["everyFrameScript"] = singleton.level_settings_buffer["everyFrameScript"]
+	temp_level["forePalIndex"] = singleton.level_settings_buffer["forePalIndex"]
+	temp_level["freshMusicStart"] = singleton.level_settings_buffer["freshMusicStart"] 
+	temp_level["levelMode"] = singleton.level_settings_buffer["levelMode"]
+	temp_level["musicLoop"] = singleton.level_settings_buffer["musicLoop"]
+	temp_level["musicMode"] = singleton.level_settings_buffer["musicMode"]
+	temp_level["musicName"] = singleton.level_settings_buffer["musicName"] 
+	temp_level["pal0SpriteName"] = singleton.level_settings_buffer["pal0SpriteName"]
+	temp_level["pal1SpriteName"] = singleton.level_settings_buffer["pal1SpriteName"]
+	temp_level["pal2SpriteName"] = singleton.level_settings_buffer["pal2SpriteName"]
+	temp_level["pal3SpriteName"] = singleton.level_settings_buffer["pal3SpriteName"]
+	temp_level["pcmChannel"] = singleton.level_settings_buffer["pcmChannel"] 
+	temp_level["updateCameraScript"] = singleton.level_settings_buffer["updateCameraScript"]
+
 func delete_self():
 	#singleton.entity_types["turnOnGates"] = false
 	
 	disable_side_areas()
 	yield(get_tree(), "idle_frame")
+	
 	#get_tree.
 	singleton.delete_level(cur_level_ind)
-	get_tree().call_group("tilemapEditorWindow", "load_levels")
-	#queue_free()
+	queue_free()
 
 func _draw():
 	if is_selected:
@@ -147,6 +191,8 @@ func add_global_pos(add_pos:Vector2):
 func move_pos_with_parrent(parrent):
 	if parrent == self:
 		return
+	if is_selected == false:
+		return
 	var parrentPos = parrent.global_position
 	print("1:", parrent_child_pos_diff.x)
 	print("2:", parrent_child_pos_diff.y)	
@@ -154,6 +200,7 @@ func move_pos_with_parrent(parrent):
 	global_position.y = parrentPos.y + parrent_child_pos_diff.y
 
 func get_parrent_child_pos_diff(parrentPos: Vector2):
+	disable_side_areas()
 	parrent_child_pos_diff.x = -(parrentPos.x - global_position.x)
 	parrent_child_pos_diff.y = -(parrentPos.y - global_position.y)
 
@@ -172,6 +219,8 @@ func find_sticky_level_containers():
 	#May be in the future
 
 func save_levelContainer_pos():
+	if !is_selected and !highlight:
+		return
 	#Save world coords of level
 	singleton.entity_types["levels"][cur_level_ind]["worldX"] = global_position.x
 	singleton.entity_types["levels"][cur_level_ind]["worldY"] = global_position.y
@@ -189,10 +238,10 @@ func move_level():
 	
 	
 	var ref = get_viewport().get_mouse_position()
-	if(Input.is_action_just_pressed("mouse1") && _is_on_top()):
+	if(Input.is_action_just_pressed("mouse1") and on_top):
 		get_tree().call_group("tempWindow", "queue_free")
 		
-		get_tree().call_group("connectedLevelContainers", "get_parrent_child_pos_diff", global_position)
+		get_tree().call_group("levelContainer", "get_parrent_child_pos_diff", global_position)
 		
 		singleton.in_modal_window = false
 		set_is_moving(true)
@@ -201,11 +250,11 @@ func move_level():
 	if(is_moving):
 		var add_pos = Vector2((ref.x - fixed_toggle_point.x)*camera.zoom.x, (ref.y - fixed_toggle_point.y)*camera.zoom.y)
 		#Moving only right and sown levelConainters
-		if(is_in_group("connectedLevelContainers")):
+		if(is_in_group("levelContainer")):
 			add_global_pos(add_pos)
 			#print(add_pos)
 			
-			get_tree().call_group("connectedLevelContainers", "move_pos_with_parrent", self)
+			get_tree().call_group("levelContainer", "move_pos_with_parrent", self)
 		else:
 			add_global_pos(add_pos)
 	
@@ -220,8 +269,8 @@ func move_level():
 		
 		global_position.x = (round(global_position.x/8))*8
 		global_position.y = (round(global_position.y/8))*8
-		if(is_in_group("connectedLevelContainers")):
-			get_tree().call_group("connectedLevelContainers", "save_levelContainer_pos")
+		if(is_in_group("levelContainer")):
+			get_tree().call_group("levelContainer", "save_levelContainer_pos")
 		else:
 			save_levelContainer_pos()
 		
@@ -299,12 +348,14 @@ func load_positions_on_scene():
 	clear_positions_on_scene()
 	var entity_instantes = singleton.get_positionInstances(cur_level_ind)
 	print("AMOUNT: ", len(entity_instantes))
+	#Adding pos objects
 	for entity_inst in entity_instantes:
 		var entity_node = position_obj_t.instance()
 		var entity_pos = entity_inst["px"]
 		entity_node.position = Vector2(entity_pos[0], entity_pos[1])
 		entity_node.entityInst_id = entity_inst["instId"]
 		entity_node.level_ind = cur_level_ind
+		entity_node.second_pos_obj_arr_ids = entity_inst["tiedWith"]
 		
 		
 		entity_node.get_node("CollisionShape2D").shape = RectangleShape2D.new()
@@ -312,12 +363,93 @@ func load_positions_on_scene():
 
 		entity_node.get_node("CollisionShape2D").shape.extents = draggableShape
 		position_obj_list.add_child(entity_node)
-		
+	
+	var position_children = position_obj_list.get_children()
+	#Updating ties on this objects
+	for entity_obj in position_children:
+		for tied_id in entity_obj.second_pos_obj_arr_ids:
+			for entity_obj_internal in position_children:
+				if tied_id != entity_obj_internal.entityInst_id:
+					continue
+				entity_obj.second_pos_obj_arr.append(entity_obj_internal)
+				break
 
 func clear_entities_on_scene():
 	var children = entity_obj_list.get_children()
 	for child in children:
 		child.queue_free()
+
+func remove_entities_by_defId(defId: int, mode: int = 0):
+	match mode:
+		0:
+			for entity_obj in entity_obj_list.get_children():
+				if entity_obj.def_id == defId:
+					entity_obj.queue_free()
+		1:
+			for child in generator_obj_list.get_children():
+				if child.is_in_group("noRemove"):
+					continue
+				if child.def_id == defId:
+					child.queue_free()
+
+func clear_generators_on_scene():
+	var children = generator_obj_list.get_node("MenuContainer").get_children()
+	for child in children:
+		child.queue_free()
+	children = generator_obj_list.get_node("DefaultContainer").get_children()
+	for child in children:
+		child.queue_free()
+
+func load_generators_on_scene():
+	clear_generators_on_scene()
+	var generator_instantes = singleton.get_entityInstances(cur_level_ind, "Generator")
+	for generator_inst in generator_instantes:
+		var sprite_rect: Rect2
+		var entity_node = generator_obj_t.instance()
+		var entity_pos = generator_inst["px"]
+		entity_node.position = Vector2(entity_pos[0], entity_pos[1])
+		entity_node.entityInst_id = generator_inst["instId"]
+		entity_node.def_id = generator_inst["defId"]
+		entity_node.type = generator_inst["type"]
+		
+		entity_node.get_node("textLabel").text = generator_inst["fieldInstances"][0]["__value"]
+		#entity_node.get_node("Sprite").flip_h = entity_inst["hFlip"]
+		#entity_node.get_node("Sprite").flip_v = entity_inst["vFlip"]
+		entity_node.level_ind = cur_level_ind
+		
+		var entity_def = singleton.get_entityDef_by_defId(entity_node.def_id)
+
+		entity_node.triggerAABB = generator_inst["triggerAABB"].duplicate(true)
+		
+		if len(generator_inst["__spritePath"]) > 0:
+			var img1 = Image.new()
+			img1.load(singleton.cur_project_folder_path + generator_inst["__spritePath"])
+			var imgTex = ImageTexture.new()
+			imgTex.create_from_image(img1, 1)
+			entity_node.get_node("Sprite").texture = imgTex;
+			
+			var texture_size = entity_node.get_node("Sprite").texture.get_size()
+			sprite_rect = Rect2(0,0,texture_size.x,texture_size.y)
+				
+				#texture_size.x
+		#entity_node.get_node("ColorRect").rect_position = 
+		entity_node.get_node("CollisionShape2D").shape = RectangleShape2D.new()
+		var draggableShape: Vector2 = Vector2(8,8);
+		if(sprite_rect.size.x > 8):
+			draggableShape.x = sprite_rect.size.x/2
+		if(sprite_rect.size.y > 8):
+			draggableShape.y = sprite_rect.size.y/2
+		entity_node.get_node("CollisionShape2D").shape.extents = draggableShape
+		entity_node.sprite_size = sprite_rect.size
+		
+		match entity_node.type:
+			0, 1:
+				generator_obj_list.get_node("DefaultContainer").add_child(entity_node)
+			_:
+				generator_obj_list.get_node("MenuContainer").add_child(entity_node)
+		
+
+		entity_node.change_sprite_rect(sprite_rect)
 
 func load_entities_on_scene():
 	clear_entities_on_scene()
@@ -331,6 +463,8 @@ func load_entities_on_scene():
 		entity_node.position = Vector2(entity_pos[0], entity_pos[1])
 		entity_node.entityInst_id = entity_inst["instId"]
 		entity_node.def_id = entity_inst["defId"]
+		entity_node.get_node("Sprite").flip_h = entity_inst["hFlip"]
+		entity_node.get_node("Sprite").flip_v = entity_inst["vFlip"]
 		entity_node.level_ind = cur_level_ind
 		
 		var entity_def = singleton.get_entityDef_by_defId(entity_node.def_id)
@@ -466,6 +600,7 @@ func load_level():
 	load_positions_on_scene()
 	#add entities on scene from database (singleton.entity_types)
 	load_entities_on_scene()
+	load_generators_on_scene()
 	#Fill tilemap with data from json (singleton.entity_types)
 	load_tileMap()
 	
@@ -474,6 +609,7 @@ func move_level_off():
 	disable_side_areas()
 	enable_position_list()
 	enable_entity_list()
+	
 	get_tree().call_group("tempWindow", "queue_free")
 
 func move_level_on():
@@ -772,91 +908,140 @@ func position_list_handler():
 			var entity_inst = singleton.add_positionInstance()
 			#Put entityInst in database
 			position_obj_node.entityInst_id = entity_inst["instId"]
+			position_obj_node.level_ind = singleton.cur_level_ind
 			
 			var savePos = [position_obj_node.position.x, position_obj_node.position.y]
 			
 			position_obj_list.add_child(position_obj_node)
-			
-			singleton.save_entityInst_pos(position_obj_node.entityInst_id, savePos)
 		
 	if(Input.is_action_pressed("mouse2")):
 		pass
 		#singleton.can_create_entity_obj = true
 
 func entity_list_handler():
-	
-	var entity_obj_node = entity_obj_t.instance()
-	
-	if(Input.is_action_just_pressed("mouse1") and singleton.cur_entity_type_ind != -1):
-		var can_create_entity: bool = true
-		for entityScene in get_tree().get_nodes_in_group("entityScene"):
-			if entityScene.can_move == true:
-				can_create_entity = false
-				break
-		if(can_create_entity):
-			var mouse_pos = get_local_mouse_position()
-			if singleton.entity_snap_to_grid:
-				var x_pos = (round((mouse_pos.x)/8)) * 8
-				var y_pos = (round((mouse_pos.y)/8)) * 8
-				entity_obj_node.position = Vector2(x_pos, y_pos)
-			else:
-				entity_obj_node.position = Vector2(mouse_pos.x, mouse_pos.y)
-			#Got uid for entityInst
-			var entity_inst = singleton.add_cur_entityInstance()
-			var entity_def = singleton.get_entityDef_by_defId(singleton.cur_entity_defId)
-			#Put entityInst in database
-			entity_obj_node.entityInst_id = entity_inst["instId"]
-			entity_obj_node.level_ind = cur_level_ind
-			entity_obj_node.def_id = entity_inst["defId"]
-			
-			var savePos = [entity_obj_node.position.x, entity_obj_node.position.y]
-			
-			entity_obj_list.add_child(entity_obj_node)
-			#(defId: int, instId: int, posPx: Array):
-			singleton.save_entityInst_pos(entity_obj_node.entityInst_id, savePos)
-			#If sprite path, not null, than changing sprite of new entity obj
-			if len(entity_inst["__spritePath"]) > 0:
-				var pic_path = entity_inst["__spritePath"]
-				var img1 = Image.new()
-				#Converting relative path to full path
-				img1.load(singleton.cur_project_folder_path+pic_path)
-				var imgTex = ImageTexture.new()
-				imgTex.create_from_image(img1, 1)
-				entity_obj_node.get_node("Sprite").texture = imgTex;
-				
-				var temp_sprite_size = singleton.get_sprite_size_from_path(pic_path)
-				if temp_sprite_size:
-					entity_obj_node.sprite_size = temp_sprite_size
-					entity_obj_node.change_sprite_rect(Rect2(0,0,temp_sprite_size.x, temp_sprite_size.y))
-					entity_obj_node.get_node("CollisionShape2D").shape.extents = Vector2(temp_sprite_size.x/2, temp_sprite_size.y/2)
-				else:
-					entity_obj_node.sprite_size = entity_obj_node.get_node("Sprite").texture.get_size()
-					entity_obj_node.change_sprite_rect(Rect2(0,0,entity_obj_node.sprite_size.x, entity_obj_node.sprite_size.y))
-					entity_obj_node.get_node("CollisionShape2D").shape.extents = entity_obj_node.sprite_size/2
-			#Adding slaves(subordinates) if exists
-			if len(entity_def["subordinates"]) > 0:
-				var slavesContainer = entity_obj_node.get_node("slavesContainer")
-				for entityInst in entity_def["subordinates"]:
-					var slave_node = slaveSceneLite_t.instance()
-					slave_node.position = Vector2(int(entityInst["px"][0]), int(entityInst["px"][1]))
-					var pic_path = entityInst["__spritePath"]
-					var temp_spr = slave_node.get_node("Sprite")
-					if(pic_path):
-						temp_spr.texture = load(singleton.cur_project_folder_path + pic_path)
-					var temp_sprite_size = singleton.get_sprite_size_from_path(pic_path)
-					var colorRect = slave_node.get_node("ColorRect")
-					if temp_sprite_size:
-						var sprite_size = temp_sprite_size
-						colorRect.rect_position = Vector2(0,0)
-						colorRect.rect_size = Vector2(temp_sprite_size.x, temp_sprite_size.y)
-						temp_spr.region_rect = Rect2(0,0,temp_sprite_size.x, temp_sprite_size.y)
-					else:
-						var sprite_size = slave_node.get_node("Sprite").texture.get_size()
-						colorRect.rect_position = Vector2(0,0)
-						colorRect.rect_size = Vector2(sprite_size.x, sprite_size.y)
-						temp_spr.region_rect = Rect2(0,0,sprite_size.x, sprite_size.y)
+	if(Input.is_action_just_pressed("mouse1")):
+		match singleton.cur_editor_mode:
+			singleton.EditorMode.GENERATOR:
+				var entity_obj_node = generator_obj_t.instance()
+				var can_create_entity: bool = true
+				for entityScene in get_tree().get_nodes_in_group("generatorScene"):
+					
+					if entityScene.can_move == true:
+						can_create_entity = false
+						break
+				if(can_create_entity):
+					var mouse_pos = get_local_mouse_position()
+					#Always snap, because it is a tile layer
+					var x_pos = (round((mouse_pos.x)/8)) * 8
+					var y_pos = (round((mouse_pos.y)/8)) * 8
+					entity_obj_node.position = Vector2(x_pos, y_pos)
+					#Got uid for entityInst
+					var entity_inst = singleton.add_cur_generatorInstance()
+					var entity_def = singleton.get_entityDef_by_defId(singleton.cur_entity_defId, "generators")
+					#Put entityInst in database
+					entity_obj_node.entityInst_id = entity_inst["instId"]
+					entity_obj_node.level_ind = cur_level_ind
+					entity_obj_node.def_id = entity_inst["defId"]
+					entity_obj_node.type = entity_inst["type"]
+					
+					var savePos = [entity_obj_node.position.x, entity_obj_node.position.y]
+					
+					# 0 - Text
+					# 1 - Image
+					# 2 - Menu btn
+					# 3 - Menu sound test
+					# 4 - Menu music test
+					match entity_obj_node.type:
+						0,1:
+							#entity_obj_node.get_node("textLabel").hide()
+							#entity_obj_node.get_node("indexLabel").hide()							
+							generator_obj_list.get_node("DefaultContainer").add_child(entity_obj_node)
+						_:
+							generator_obj_list.get_node("MenuContainer").add_child(entity_obj_node)
+					#If sprite path, not null, than changing sprite of new entity obj
+					if len(entity_inst["__spritePath"]) > 0:
+						var pic_path = entity_inst["__spritePath"]
+						var img1 = Image.new()
+						#Converting relative path to full path
+						img1.load(singleton.cur_project_folder_path+pic_path)
+						var imgTex = ImageTexture.new()
+						imgTex.create_from_image(img1, 1)
+						entity_obj_node.get_node("Sprite").texture = imgTex;
 						
-					slavesContainer.add_child(slave_node)
+						entity_obj_node.sprite_size = entity_obj_node.get_node("Sprite").texture.get_size()
+						entity_obj_node.change_sprite_rect(Rect2(0,0,entity_obj_node.sprite_size.x, entity_obj_node.sprite_size.y))
+						entity_obj_node.get_node("CollisionShape2D").shape.extents = entity_obj_node.sprite_size/2
+			singleton.EditorMode.ENTITY:
+				var entity_obj_node = entity_obj_t.instance()
+				var can_create_entity: bool = true
+				for entityScene in get_tree().get_nodes_in_group("entityScene"):
+					if entityScene.can_move == true:
+						can_create_entity = false
+						break
+				if(can_create_entity):
+					var mouse_pos = get_local_mouse_position()
+					if singleton.entity_snap_to_grid:
+						var x_pos = (round((mouse_pos.x)/8)) * 8
+						var y_pos = (round((mouse_pos.y)/8)) * 8
+						entity_obj_node.position = Vector2(x_pos, y_pos)
+					else:
+						entity_obj_node.position = Vector2(mouse_pos.x, mouse_pos.y)
+					#Got uid for entityInst
+					var entity_inst = singleton.add_cur_entityInstance()
+					var entity_def = singleton.get_entityDef_by_defId(singleton.cur_entity_defId)
+					#Put entityInst in database
+					entity_obj_node.entityInst_id = entity_inst["instId"]
+					entity_obj_node.level_ind = cur_level_ind
+					entity_obj_node.def_id = entity_inst["defId"]
+					
+					var savePos = [entity_obj_node.position.x, entity_obj_node.position.y]
+					
+					entity_obj_list.add_child(entity_obj_node)
+					#(defId: int, instId: int, posPx: Array):
+					#singleton.save_entityInst_pos(entity_obj_node.entityInst_id, savePos)
+					#If sprite path, not null, than changing sprite of new entity obj
+					if len(entity_inst["__spritePath"]) > 0:
+						var pic_path = entity_inst["__spritePath"]
+						var img1 = Image.new()
+						#Converting relative path to full path
+						img1.load(singleton.cur_project_folder_path+pic_path)
+						var imgTex = ImageTexture.new()
+						imgTex.create_from_image(img1, 1)
+						entity_obj_node.get_node("Sprite").texture = imgTex;
+						
+						var temp_sprite_size = singleton.get_sprite_size_from_path(pic_path)
+						if temp_sprite_size:
+							entity_obj_node.sprite_size = temp_sprite_size
+							entity_obj_node.change_sprite_rect(Rect2(0,0,temp_sprite_size.x, temp_sprite_size.y))
+							entity_obj_node.get_node("CollisionShape2D").shape.extents = Vector2(temp_sprite_size.x/2, temp_sprite_size.y/2)
+						else:
+							entity_obj_node.sprite_size = entity_obj_node.get_node("Sprite").texture.get_size()
+							entity_obj_node.change_sprite_rect(Rect2(0,0,entity_obj_node.sprite_size.x, entity_obj_node.sprite_size.y))
+							entity_obj_node.get_node("CollisionShape2D").shape.extents = entity_obj_node.sprite_size/2
+					#Adding slaves(subordinates) if exists
+					if len(entity_def["subordinates"]) > 0:
+						var slavesContainer = entity_obj_node.get_node("slavesContainer")
+						for entityInst in entity_def["subordinates"]:
+							var slave_node = slaveSceneLite_t.instance()
+							slave_node.position = Vector2(int(entityInst["px"][0]), int(entityInst["px"][1]))
+							var pic_path = entityInst["__spritePath"]
+							var temp_spr = slave_node.get_node("Sprite")
+							if(pic_path):
+								temp_spr.texture = load(singleton.cur_project_folder_path + pic_path)
+							var temp_sprite_size = singleton.get_sprite_size_from_path(pic_path)
+							var colorRect = slave_node.get_node("ColorRect")
+							if temp_sprite_size:
+								var sprite_size = temp_sprite_size
+								colorRect.rect_position = Vector2(0,0)
+								colorRect.rect_size = Vector2(temp_sprite_size.x, temp_sprite_size.y)
+								temp_spr.region_rect = Rect2(0,0,temp_sprite_size.x, temp_sprite_size.y)
+							else:
+								var sprite_size = slave_node.get_node("Sprite").texture.get_size()
+								colorRect.rect_position = Vector2(0,0)
+								colorRect.rect_size = Vector2(sprite_size.x, sprite_size.y)
+								temp_spr.region_rect = Rect2(0,0,sprite_size.x, sprite_size.y)
+								
+							slavesContainer.add_child(slave_node)
 		
 	if(Input.is_action_pressed("mouse2")):
 		get_tree().call_group("tilemapEditorWindow", "remove_fields_of_entity")
@@ -870,7 +1055,7 @@ func _physics_process(delta):
 	move_level()
 	if(mouse_on_level && !singleton.level_move_mode):
 		local_mouse_pos = get_local_mouse_position()
-		if(singleton.cur_editor_mode == singleton.EditorMode.ENTITY):
+		if(singleton.cur_editor_mode in [singleton.EditorMode.ENTITY, singleton.EditorMode.GENERATOR]):
 			entity_list_handler()
 		elif(singleton.cur_editor_mode == singleton.EditorMode.POSITION):
 			position_list_handler()
@@ -1334,7 +1519,7 @@ func _on_AreaUp_area_exited(area):
 	check_connection_with_level()
 
 func make_selected():
-	add_to_group("connectedLevelContainers")
+	#add_to_group("connectedLevelContainers")
 	is_selected = true
 	update()
 	

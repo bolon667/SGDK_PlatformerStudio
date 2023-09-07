@@ -6,11 +6,12 @@
 #include "types.h"
 
 
+
 extern const LevelFull const LevelFull_arr[];
 extern u16 levelNum;
 
 extern Level* curLvlData;
-extern EntityAllPlayer* curEntityAll;
+extern EntityAll* curEntityAll;
 extern MessagePack* curMessagePacks;
 extern LocalVariableMerged* curLocalVariables;
 extern u16** curSprTileIndexes[20];
@@ -22,4 +23,7 @@ void updateRoomSize(Level* lvl);
 
 u16 getTileValue(s16 x, s16 y);
 
-Vect2D_s16 getLevelPos(u16 posNum);
+extern Position* getLevelPos(u16 posNum);
+extern Position* getLevelPosById(u16 posInstId);
+
+extern Vect2D_s32 getLevelPosCoords(u16 posNum);

@@ -15,5 +15,6 @@
 #include "../res/sounds.h"
 #include "../res/music.h"
 #include "../res/images.h"
+#include "../res/tilesets.h"
 
 //$customScripts$

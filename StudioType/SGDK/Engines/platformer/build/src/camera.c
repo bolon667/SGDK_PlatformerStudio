@@ -4,7 +4,8 @@
 
 #include "../res/resources.h"
 
-Vect2D_s16 cameraPosition;
+Vect2D_s32 cameraPosition;
+Vect2D_s32 cameraPosition2;
 Vect2D_f16 cameraSpd;
 Vect2D_f16 cameraSpdBuffer;
 

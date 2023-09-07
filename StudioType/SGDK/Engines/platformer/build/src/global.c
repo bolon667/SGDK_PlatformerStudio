@@ -10,8 +10,6 @@ Map* bgb;
 
 //Size in pixels of the room
 AABB roomSize;
-//Player collider bounds position
-AABB playerBounds;
 
 u8* curMusic;
 
@@ -23,5 +21,18 @@ Vect2D_s16 prevChunkPos = {0,0};
 
 //Index of the last tile that has been placed, useful to avoid overlapping
 u16 VDPTilesFilled = TILE_USER_INDEX;
+
+s16 curMenuInd = 0;
+bool menuBool1 = FALSE;
+
+bool twoPlayers = FALSE;
+
+u8 joy_value = 0;
+u8 prev_joy_value = 0;
+
+s16 menuTimer = 0;
+
+bool skipTriggers = FALSE;
+
 
 //$globalVariables$

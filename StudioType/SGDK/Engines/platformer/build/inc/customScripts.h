@@ -4,5 +4,6 @@
 
 #include "global.h"
 #include "types.h"
+#include "levels.h"
 
 //$customScripts$

@@ -4,15 +4,16 @@
 #include "../inc/messages.h"
 #include "../inc/global.h"
 #include "../inc/enums.h"
+#include "../inc/physics.h"
 
 #include "../res/resources.h"
 #include "../res/images.h"
 #include "../res/music.h"
 #include "../res/gfx.h"
 #include "../res/sprites.h"
-#include "../inc/camera.h"
+#include "../res/tilesets.h"
 
-#include "../inc/messages.h"
+#include "../inc/camera.h"
 #include "../inc/customScripts.h"
 
 
@@ -31,6 +32,22 @@ void frameChangedSprOpt1(Sprite* sprite)
     u16 enemyIndex = sprite->data;
     u16 tileIndex = curSprTileIndexes[enemyIndex][sprite->animInd][sprite->frameInd];
     SPR_setVRAMTileIndex(sprite, tileIndex);
+}
+
+void updatePosEntityMerged_trigger(EntityMerged* entity){
+	entity->pos.x += entity->spd.x;
+	entity->pos.y += entity->spd.y;
+	entity->posInt.x = fix32ToInt(entity->pos.x);
+	entity->posInt.y = fix32ToInt(entity->pos.y);
+	entity->trigger->pos.x = entity->posInt.x;
+	entity->trigger->pos.y = entity->posInt.y;
+}
+
+void updatePosEntityMerged(EntityMerged* entity){
+	entity->pos.x += entity->spd.x;
+	entity->pos.y += entity->spd.y;
+	entity->posInt.x = fix32ToInt(entity->pos.x);
+	entity->posInt.y = fix32ToInt(entity->pos.y);
 }
 
 //$entityDefaultConsts$
@@ -87,10 +104,7 @@ EntityMerged* addNew_EntityMerged(EntityMerged* entity){
     return NULL;
 }
 
-    
-    
-
-void entityCheckForBullet(EntityMerged* entity){
+EntityMerged* entityCheckForBullet(EntityMerged* entity){
 	//WARNING
 	//If you wanna make an enemy which not desappearing after death, then, make sure that enemy does not call this function, otherwise you will get a MEMORY LEAK!!!
 	entity->damaged = FALSE;
@@ -116,10 +130,11 @@ void entityCheckForBullet(EntityMerged* entity){
 				entity->hp -= curBullet->damage;
 				entity->damaged = TRUE;
 				curBullet->preDeath = TRUE;
-				return;
+				return curBullet;
 			}
 		}
 	}
+	return NULL;
 }
 
 void entityCheckForBulletBySize(EntityMerged* entity){
@@ -222,7 +237,7 @@ u16 getTriggerParrentIndInArr(Trigger* trigger){
 
 //$triggerTypeFuncs$
 
-void checkTriggerForPlayer(Trigger* trigger){
+void checkTriggerForPlayer(Trigger* trigger, pBody* plr){
 	if(!trigger->alive){
 		return;
 	}
@@ -236,7 +251,7 @@ void checkTriggerForPlayer(Trigger* trigger){
 	//KLog_S1("trigger->activated: ", trigger->activated);
 	//KLog_S1("trigger->prevActivated: ", trigger->prevActivated);
 	trigger->prevActivated = trigger->activated;
-	if((playerBounds.min.x < triggerBounds.max.x) && (playerBounds.max.x > triggerBounds.min.x) && (playerBounds.min.y < triggerBounds.max.y) && (playerBounds.max.y > triggerBounds.min.y)){
+	if((plr->playerBounds.min.x < triggerBounds.max.x) && (plr->playerBounds.max.x > triggerBounds.min.x) && (plr->playerBounds.min.y < triggerBounds.max.y) && (plr->playerBounds.max.y > triggerBounds.min.y)){
 		trigger->activated = TRUE;
 			// KLog_S1("trigger->type: ", trigger->type);
 			// KLog_S1("trigger->val1: ", trigger->val1);
@@ -245,6 +260,39 @@ void checkTriggerForPlayer(Trigger* trigger){
 		triggerTypeFuncArr[trigger->type](trigger, &triggerBounds);
 	} else {
 		trigger->activated = FALSE;
+		if(trigger->prevActivated) {
+			triggerTypeFuncArr[trigger->type](trigger, &triggerBounds);
+		}
+	}
+	
+}
+
+void checkTriggerFor_EntityMerged_trigger(EntityMerged* entity, Trigger* trigger){
+	if(!trigger->alive){
+		return;
+	}
+	AABB triggerBounds = newAABB(
+		trigger->pos.x + trigger->rect.min.x,
+		trigger->pos.x + trigger->rect.max.x,
+		trigger->pos.y + trigger->rect.min.y,
+		trigger->pos.y + trigger->rect.max.y
+	);
+	//KLog_S1("-----------", 0);
+	//KLog_S1("trigger->activated: ", trigger->activated);
+	//KLog_S1("trigger->prevActivated: ", trigger->prevActivated);
+
+	// trigger->prevActivated = trigger->activated;
+	if(((entity->trigger->pos.x + entity->trigger->rect.min.x) < triggerBounds.max.x) && ((entity->trigger->pos.x + entity->trigger->rect.max.x) > triggerBounds.min.x) && ((entity->trigger->pos.y + entity->trigger->rect.min.y) < triggerBounds.max.y) && ((entity->trigger->pos.y + entity->trigger->rect.max.y) > triggerBounds.min.y)){
+		
+		// trigger->activated = TRUE;
+		
+			// KLog_S1("trigger->type: ", trigger->type);
+			// KLog_S1("trigger->val1: ", trigger->val1);
+			// KLog_S1("trigger->val2: ", trigger->val2);
+			// KLog_S1("trigger->val3: ", trigger->val3);
+		triggerTypeFuncArr[trigger->type](trigger, &triggerBounds);
+	} else {
+		// trigger->activated = FALSE;
 		if(trigger->prevActivated) {
 			triggerTypeFuncArr[trigger->type](trigger, &triggerBounds);
 		}

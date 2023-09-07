@@ -1,4 +1,4 @@
-$entityType$* addNew_$entityName$(Vect2D_s16 posInt, Vect2D_f16 spd){
+$entityType$* addNew_$entityName$(Vect2D_s32 posInt, Vect2D_f16 spd){
     KDebug_Alert("new $entityName$");
     for(u16 i=0; i<curEntityAll->$entityType$_size; i++){
         if(!curEntityAll->$entityType$_arr[i].alive){

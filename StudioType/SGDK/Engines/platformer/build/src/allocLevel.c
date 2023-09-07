@@ -34,6 +34,7 @@ void allocLevel(){
 	//Since i possibly can add additional slots, i need to clean this slots to avoid unexpected behavior.
 	for(u16 i=0; i < curEntityAll->Trigger_size+curEntityAll->additionalEntityMergedSlots; i++){
 		curEntityAll->Trigger_arr[i].alive = FALSE;
+		curEntityAll->Trigger_arr[i].isFree = TRUE;
 	}
 	//And then, put trigger data for level
 	memcpy(curEntityAll->Trigger_arr, LevelFull_arr[levelNum].entityAll_arr->Trigger_arr, sizeof(Trigger)*LevelFull_arr[levelNum].entityAll_arr->Trigger_size);

@@ -8,4 +8,4 @@
 extern void stopLevel();
 extern void reloadLevelSprites();
 extern void resumeLevel();
-extern void loadLevel(u16 levelNum, Vect2D_s16 startPos);
+extern void loadLevel(u16 levelNum, Vect2D_s32 startPos);

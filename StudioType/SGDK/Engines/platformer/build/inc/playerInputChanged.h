@@ -6,4 +6,4 @@
 #include "types.h"
 #include "camera.h"
 
-extern void playerInputChanged();
+extern void playerInputChanged(pBody* plr, u16 joy);

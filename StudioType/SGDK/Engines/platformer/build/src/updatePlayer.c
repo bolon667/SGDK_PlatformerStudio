@@ -6,88 +6,103 @@
 
 //Platformer Engine
 
-void updatePlayer() {
+void updatePlayerBase(pBody* plr, u16 joy) {
 	//Check if the player wants to climb a stair
-	if(collidingAgainstStair && ((playerBody.onStair && playerBody.input.y > 0) || (!playerBody.onStair && playerBody.input.y < 0))){
-		playerBody.climbingStair = TRUE;
-		playerBody.velocity.fixY = FIX16(playerBody.climbingSpeed * playerBody.input.y);
+	if(collidingAgainstStair && ((plr->onStair && plr->input.y > 0) || (!plr->onStair && plr->input.y < 0))){
+		plr->climbingStair = TRUE;
+		plr->velocity.fixY = FIX16(plr->climbingSpeed * plr->input.y);
 	}
 
 	//Check if player wants to jump by looking the coyote time and jump buffer
-	if(playerBody.curAmountOfJumps > 0){
+	if(plr->curAmountOfJumps > 0){
 		if(currentJumpBufferTime > 0){
 		currentCoyoteTime = 0;
 		currentJumpBufferTime = 0;
-		playerBody.curAmountOfJumps--;
-		playerBody.jumping = TRUE;
+		plr->curAmountOfJumps--;
+		plr->jumping = TRUE;
 			//Play the SFX with the index 64 (jump sfx) with the highest priority
 		
 		//Commented because, if you not using default XGM driver, you will get a ear damage. It's really DANGEROUS you can get partially deaf in real life.
 		// XGM_startPlayPCM(64, 15, SOUND_PCM_CH1);
-		playerBody.velocity.fixY = FIX16(-playerBody.jumpSpeed);
+		plr->velocity.fixY = FIX16(-plr->jumpSpeed);
 		}
 	}
 	//The ground hasn't been checked yet so we only decrease the jump buffer time for now
 	currentJumpBufferTime = clamp((currentJumpBufferTime - 1), 0, jumpBufferTime); //Clamp to avoid underflowing, it is unlikely to happen but can happen
 
 	//If the player is climbing a stair, it only needs to go upward, if not, we apply horizontal movement
-	if (playerBody.climbingStair) {
-		playerBody.velocity.x = playerBody.velocity.fixX = 0;
-		playerBody.globalPosition.x = stairLeftEdge - stairPositionOffset;
+	if (plr->climbingStair) {
+		plr->velocity.x = plr->velocity.fixX = 0;
+		plr->globalPosition.x = stairLeftEdge - stairPositionOffset;
 	}else {
-		if (playerBody.input.x > 0) {
-			if (playerBody.velocity.x != playerBody.speed)
-				playerBody.velocity.fixX += playerBody.acceleration;
-		}else if (playerBody.input.x < 0) {
-			if (playerBody.velocity.x != -playerBody.speed)
-				playerBody.velocity.fixX -= playerBody.acceleration;
-		}else if (playerBody.onGround) {
-			if (playerBody.velocity.x > 0)
-				playerBody.velocity.fixX -= playerBody.deceleration;
-			else if (playerBody.velocity.x < 0)
-				playerBody.velocity.fixX += playerBody.deceleration;
+		if (plr->input.x > 0) {
+			if (plr->velocity.x != plr->speed)
+				plr->velocity.fixX += plr->acceleration;
+		}else if (plr->input.x < 0) {
+			if (plr->velocity.x != -plr->speed)
+				plr->velocity.fixX -= plr->acceleration;
+		}else if (plr->onGround) {
+			if (plr->velocity.x > 0)
+				plr->velocity.fixX -= plr->deceleration;
+			else if (plr->velocity.x < 0)
+				plr->velocity.fixX += plr->deceleration;
 			// else
-			// 	playerBody.velocity.fixX = 0;
+			// 	plr->velocity.fixX = 0;
 		}
-		playerBody.velocity.x = clamp(fix16ToInt(playerBody.velocity.fixX), -playerBody.speed, playerBody.speed);
+		plr->velocity.x = clamp(fix16ToInt(plr->velocity.fixX), -plr->speed, plr->speed);
 	}
 
 	//Apply gravity with a terminal velocity
-	if (!playerBody.onGround && !playerBody.climbingStair) { // && !playerBody.onPlatform
-		if (fix16ToInt(playerBody.velocity.fixY) <= playerBody.maxFallSpeed) {
-			playerBody.velocity.fixY = fix16Add(playerBody.velocity.fixY, gravityScale);
+	if (!plr->onGround && !plr->climbingStair) { // && !plr->onPlatform
+		if (fix16ToInt(plr->velocity.fixY) <= plr->maxFallSpeed) {
+			plr->velocity.fixY = fix16Add(plr->velocity.fixY, gravityScale);
 		}else {
-			playerBody.velocity.fixY = FIX16(playerBody.maxFallSpeed);
+			plr->velocity.fixY = FIX16(plr->maxFallSpeed);
 		}
 	}
 
 	//Once all the input-related have been calculated, we apply the velocities to the global positions
-	playerBody.globalPosition.x += playerBody.velocity.x + fix16ToInt(playerBody.velocity.bufferFixX);
-	playerBody.globalPosition.y += fix16ToInt(playerBody.velocity.fixY + playerBody.velocity.bufferFixY);
+	plr->globalPosition.x += plr->velocity.x + fix16ToInt(plr->velocity.bufferFixX);
+	plr->globalPosition.y += fix16ToInt(plr->velocity.fixY + plr->velocity.bufferFixY);
 
-	playerBody.velocity.bufferFixX = playerBody.velocity.bufferFixX - FIX16(fix16ToInt(playerBody.velocity.bufferFixX));
-	playerBody.velocity.bufferFixY = playerBody.velocity.bufferFixY - FIX16(fix16ToInt(playerBody.velocity.bufferFixY));
+	plr->velocity.bufferFixX = plr->velocity.bufferFixX - FIX16(fix16ToInt(plr->velocity.bufferFixX));
+	plr->velocity.bufferFixY = plr->velocity.bufferFixY - FIX16(fix16ToInt(plr->velocity.bufferFixY));
 
 	//Now we can check for collisions and correct those positions
-	checkCollisions();
+	checkCollisions(plr);
 
 	//Checking trigger collision with player
 	for(u16 i=0; i<curEntityAll->Trigger_size; i++){
-		checkTriggerForPlayer(&curEntityAll->Trigger_arr[i]);
+		checkTriggerForPlayer(&curEntityAll->Trigger_arr[i], plr);
 	}
 
 	//Now that the collisions have been checked, we know if the player is on a stair or not
-	if (!collidingAgainstStair && playerBody.climbingStair) {
-		playerBody.climbingStair = FALSE;
-		playerBody.input.y = 0;
+	if (!collidingAgainstStair && plr->climbingStair) {
+		plr->climbingStair = FALSE;
+		plr->input.y = 0;
 	}
 
 	//Once the positions are correct, we position the player taking into account the camera position
-	playerBody.position.x = playerBody.globalPosition.x - cameraPosition.x;
-	playerBody.position.y = playerBody.globalPosition.y - cameraPosition.y;
-	SPR_setPosition(playerBody.sprite, playerBody.position.x, playerBody.position.y);
+	plr->position.x = plr->globalPosition.x - cameraPosition.x;
+	plr->position.y = plr->globalPosition.y - cameraPosition.y;
+	//if player outside camera
+	if ((plr->position.x > 320) || (plr->position.x < -plr->aabb.max.x) || (plr->position.y > 224) || (plr->position.y < -plr->aabb.max.y)){
+		SPR_setVisibility(plr->sprite, 1);
+		
+	} else {
+		SPR_setVisibility(plr->sprite, 0);
+		SPR_setPosition(plr->sprite, plr->position.x, plr->position.y);
+	}
+	
 	//$showTriggerRects$
 	
-	updateAnimations();
-	playerInputChanged();
+	updateAnimations(plr);
+	playerInputChanged(plr, joy);
+}
+
+void updatePlayer() {
+	updatePlayerBase(&playerBody, JOY_1);
+	if(twoPlayers){
+		updatePlayerBase(&playerBody2, JOY_2);
+	}
 }

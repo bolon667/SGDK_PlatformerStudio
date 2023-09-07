@@ -6,7 +6,7 @@ PAL_fadeOutAll(3,FALSE);
 //val2 = side_id
 //val3 = side_offset
 	
-	Vect2D_s16 newStartPos;
+	Vect2D_s32 newStartPos;
 	levelNum = trigger->val1;
 	switch(trigger->val2) // position mode
 	{
@@ -21,6 +21,7 @@ PAL_fadeOutAll(3,FALSE);
 		case 2: //Up
 			newStartPos.x = playerBody.globalPosition.x-trigger->val3;
 			newStartPos.y = LevelFull_arr[levelNum].lvl->sizeinPx.y-playerBody.aabb.max.y-trigger->rect.max.y;
+			playerBody.velocity.fixY = FIX16(-7);
 			break;
 		case 3: //Down
 			newStartPos.x = playerBody.globalPosition.x-trigger->val3;
@@ -29,4 +30,4 @@ PAL_fadeOutAll(3,FALSE);
 	}
 					
 	
-	loadLevel(levelNum, (Vect2D_s16)newStartPos);
+	loadLevel(levelNum, newStartPos);

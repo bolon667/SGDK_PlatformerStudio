@@ -8,4 +8,4 @@
 #include "types.h"
 
 extern void checkCollisions_forEntityMerged(EntityMerged* entity);
-extern void checkCollisions();
+extern void checkCollisions(pBody* plr);

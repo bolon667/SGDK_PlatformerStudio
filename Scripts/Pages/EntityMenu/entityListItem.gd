@@ -23,7 +23,10 @@ func _on_DeleteBtn_button_down():
 
 func _on_ConfirmationDialogDelete_confirmed():
 	singleton.cur_entity_type_ind = get_index()
-	singleton.delete_entityDef("entities", $HBoxContainer/TextBtn.text)
+	singleton.remove_entityDef_by_defId("entities", defId)
+	
+	print("Delete defId: ", defId)
+	get_tree().call_group("levelContainer", "remove_entities_by_defId", defId)
 	#print(singleton.entity_types)
 	get_tree().call_group("entityMenu", "clear_entity_fields")
 	get_tree().call_group("entityMenu", "clear_field_properties")

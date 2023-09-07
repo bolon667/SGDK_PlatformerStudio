@@ -24,83 +24,124 @@ mouse_filter = 0
 theme = ExtResource( 1 )
 
 [node name="DeleteLevelBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
-margin_right = 300.0
+margin_right = 350.0
 margin_bottom = 26.0
 text = "Delete Level"
 
 [node name="AddLevelBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
 margin_top = 30.0
-margin_right = 300.0
+margin_right = 350.0
 margin_bottom = 56.0
 text = "Add Level"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
 margin_top = 60.0
-margin_right = 300.0
+margin_right = 350.0
 margin_bottom = 86.0
 
+[node name="PasteBga" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+margin_right = 49.0
+margin_bottom = 26.0
+text = "Paste"
+
 [node name="loadImageOptionBga" type="OptionButton" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
-margin_right = 105.0
+margin_left = 53.0
+margin_right = 158.0
 margin_bottom = 26.0
 theme = ExtResource( 1 )
 text = "Map mode"
-items = [ "Map mode", null, false, 0, null, "Image mode", null, false, 1, null ]
+items = [ "Map mode", null, false, 0, null, "Image mode", null, false, 1, null, "Map mode (all pal)", null, false, 2, null ]
 selected = 0
 
 [node name="ChangeBgaBtn" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
-margin_left = 109.0
-margin_right = 264.0
+margin_left = 162.0
+margin_right = 265.0
 margin_bottom = 26.0
 size_flags_horizontal = 3
 text = "Change Bga"
 
+[node name="CopyBga" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
+margin_left = 269.0
+margin_right = 314.0
+margin_bottom = 26.0
+text = "Copy"
+
 [node name="DeleteBgaBtn" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
-margin_left = 268.0
-margin_right = 300.0
+margin_left = 318.0
+margin_right = 350.0
 margin_bottom = 26.0
 text = " X "
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
 margin_top = 90.0
-margin_right = 300.0
+margin_right = 350.0
 margin_bottom = 116.0
 
+[node name="PasteBgb" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
+margin_right = 49.0
+margin_bottom = 26.0
+text = "Paste"
+
 [node name="loadImageOptionBgb" type="OptionButton" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
-margin_right = 105.0
+margin_left = 53.0
+margin_right = 158.0
 margin_bottom = 26.0
 theme = ExtResource( 1 )
 text = "Map mode"
-items = [ "Map mode", null, false, 0, null, "Image mode", null, false, 1, null ]
+items = [ "Map mode", null, false, 0, null, "Image mode", null, false, 1, null, "Map mode (all pal)", null, false, 2, null ]
 selected = 0
 
 [node name="ChangeBgbBtn" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
-margin_left = 109.0
-margin_right = 264.0
+margin_left = 162.0
+margin_right = 265.0
 margin_bottom = 26.0
 size_flags_horizontal = 3
 text = "Change Bgb"
 
+[node name="CopyBgb" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
+margin_left = 269.0
+margin_right = 314.0
+margin_bottom = 26.0
+text = "Copy"
+
 [node name="DeleteBgbBtn" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer2"]
-margin_left = 268.0
-margin_right = 300.0
+margin_left = 318.0
+margin_right = 350.0
 margin_bottom = 26.0
 text = " X "
 
 [node name="MessagePacksBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
 margin_top = 120.0
-margin_right = 300.0
+margin_right = 350.0
 margin_bottom = 146.0
 text = "Message Packs"
 
-[node name="LevelSettingsBtn" type="Button" parent="CanvasLayer/VBoxContainer"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
 margin_top = 150.0
-margin_right = 300.0
+margin_right = 350.0
 margin_bottom = 176.0
+
+[node name="PasteLevelSettingsBtn" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer3"]
+margin_right = 49.0
+margin_bottom = 26.0
+text = "Paste"
+
+[node name="LevelSettingsBtn" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer3"]
+margin_left = 53.0
+margin_right = 301.0
+margin_bottom = 26.0
+size_flags_horizontal = 3
 text = "Level Settings"
+
+[node name="CopyLevelSettingsBtn" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer3"]
+margin_left = 305.0
+margin_right = 350.0
+margin_bottom = 26.0
+text = "Copy"
 
 [node name="LocalVariablesBtn2" type="Button" parent="CanvasLayer/VBoxContainer"]
 margin_top = 180.0
-margin_right = 300.0
+margin_right = 350.0
 margin_bottom = 206.0
 text = "Local Variables"
 
@@ -118,13 +159,19 @@ filters = PoolStringArray( "*.png", "*.bmp" )
 
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/DeleteLevelBtn" to="." method="_on_DeleteLevelBtn_pressed"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/AddLevelBtn" to="." method="_on_AddLevelBtn_pressed"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer/PasteBga" to="." method="_on_PasteBga_button_down"]
 [connection signal="item_selected" from="CanvasLayer/VBoxContainer/HBoxContainer/loadImageOptionBga" to="." method="_on_loadImageOptionBga_item_selected"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/HBoxContainer/ChangeBgaBtn" to="." method="_on_ChangeBgaBtn_pressed"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer/CopyBga" to="." method="_on_CopyBga_button_down"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/HBoxContainer/DeleteBgaBtn" to="." method="_on_DeleteBgaBtn_pressed"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer2/PasteBgb" to="." method="_on_PasteBgb_button_down"]
 [connection signal="item_selected" from="CanvasLayer/VBoxContainer/HBoxContainer2/loadImageOptionBgb" to="." method="_on_loadImageOptionBgb_item_selected"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/HBoxContainer2/ChangeBgbBtn" to="." method="_on_ChangeBgbBtn_pressed"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer2/CopyBgb" to="." method="_on_CopyBgb_button_down"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/HBoxContainer2/DeleteBgbBtn" to="." method="_on_DeleteBgbBtn_pressed"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/MessagePacksBtn" to="." method="_on_MessagePacksBtn_button_down"]
-[connection signal="button_down" from="CanvasLayer/VBoxContainer/LevelSettingsBtn" to="." method="_on_LevelSettingsBtn_button_down"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer3/PasteLevelSettingsBtn" to="." method="_on_PasteLevelSettingsBtn_button_down"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer3/LevelSettingsBtn" to="." method="_on_LevelSettingsBtn_button_down"]
+[connection signal="button_down" from="CanvasLayer/VBoxContainer/HBoxContainer3/CopyLevelSettingsBtn" to="." method="_on_CopyLevelSettingsBtn_button_down"]
 [connection signal="button_down" from="CanvasLayer/VBoxContainer/LocalVariablesBtn2" to="." method="_on_LocalVariablesBtn2_button_down"]
 [connection signal="file_selected" from="CanvasLayer2/LoadBGFile" to="." method="_on_LoadBGFile_file_selected"]

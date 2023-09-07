@@ -3,6 +3,7 @@ extends Control
 onready var layer_list = $VBoxContainer/LayerList
 onready var button_list = $VBoxContainer/ButtonList
 onready var layer_value_list = $VBoxContainer/LayerValuesList/LayerValuesContainer
+onready var scrollContainer1 = $VBoxContainer/ScrollContainer1
 
 onready var entity_menu_t = preload("res://Scenes/Pages/EntityMenu/EntityMenu.tscn")
 onready var bullet_menu_t = preload("res://Scenes/Pages/BulletMenu/BulletMenu.tscn")
@@ -12,6 +13,8 @@ onready var project_settings_menu_t = preload("res://Scenes/Pages/ProjectSetting
 onready var layer_button_t = preload("res://Scenes/LayerButton.tscn")
 onready var variables_menu_t = preload("res://Scenes/Pages/GlobalVariablesMenu/VariablesMenu.tscn")
 onready var sprOpt_menu_t = preload("res://Scenes/Pages/SpriteOptimizationsMenu/SprOptMenu.tscn")
+onready var generator_menu_t = preload("res://Scenes/Pages/GeneratorMenu/GeneratorMenu.tscn")
+
 
 onready var entity_layer_value_btn_t = preload("res://Scenes/EntityLayerValueButton.tscn")
 
@@ -24,6 +27,10 @@ func _ready():
 		layer_button_node.text = layer["__identifier"]
 		layer_button_node.type = layer["__type"]
 		layer_list.add_child(layer_button_node)
+	
+	#scrollContainer1.rect_min_size = scrollContainer1.get_node("VBoxContainer").rect_min_size
+	print("test111111111")
+	print(scrollContainer1.get_node("VBoxContainer").rect_size)
 
 func clear_layer_values():
 	var children = layer_value_list.get_children()
@@ -56,6 +63,16 @@ func load_layer_values(btn: Button):
 			singleton.cur_editor_mode = singleton.EditorMode.COLLISION
 			print("Collision mode")
 			singleton.cur_entity_type_ind = -1 #Can't create entity
+		"Generator":
+			singleton.cur_editor_mode = singleton.EditorMode.GENERATOR
+			print("Generator mode")
+			var entity_names = singleton.get_def_entityCollection_names("generators")
+			for entity_dict in entity_names:
+				var entity_layer_value_btn_node = entity_layer_value_btn_t.instance()
+				entity_layer_value_btn_node.text = entity_dict["name"]
+				entity_layer_value_btn_node.defId = entity_dict["defId"]
+				
+				layer_value_list.add_child(entity_layer_value_btn_node)
 
 
 func _on_addNewEntityTypeBtn_button_down():
@@ -79,4 +96,9 @@ func _on_GlobalVariablesBtn_button_down():
 
 func _on_SpriteOptimizationsBtn_button_down():
 	var node = sprOpt_menu_t.instance()
+	add_child(node)
+
+
+func _on_generatorDefinitionBtn_button_down():
+	var node = generator_menu_t.instance()
 	add_child(node)

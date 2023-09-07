@@ -25,45 +25,66 @@ color = Color( 1, 1, 1, 0.505882 )
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="addNewEntityTypeBtn" type="Button" parent="VBoxContainer"]
+[node name="ScrollContainer1" type="ScrollContainer" parent="VBoxContainer"]
 margin_right = 200.0
+margin_bottom = 170.0
+rect_min_size = Vector2( 0, 170 )
+scroll_horizontal_enabled = false
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/ScrollContainer1"]
+margin_right = 190.0
+margin_bottom = 260.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="addNewEntityTypeBtn" type="Button" parent="VBoxContainer/ScrollContainer1/VBoxContainer"]
+margin_right = 190.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 0, 40 )
 size_flags_horizontal = 3
 theme = ExtResource( 4 )
 text = "Entity Definitions"
 
-[node name="bulletDefinitionsBtn" type="Button" parent="VBoxContainer"]
+[node name="bulletDefinitionsBtn" type="Button" parent="VBoxContainer/ScrollContainer1/VBoxContainer"]
 margin_top = 44.0
-margin_right = 200.0
+margin_right = 190.0
 margin_bottom = 84.0
 rect_min_size = Vector2( 0, 40 )
 size_flags_horizontal = 3
 theme = ExtResource( 4 )
 text = "Bullet Definitions"
 
-[node name="projectSettingsBtn" type="Button" parent="VBoxContainer"]
+[node name="generatorDefinitionBtn" type="Button" parent="VBoxContainer/ScrollContainer1/VBoxContainer"]
 margin_top = 88.0
-margin_right = 200.0
+margin_right = 190.0
 margin_bottom = 128.0
+rect_min_size = Vector2( 0, 40 )
+size_flags_horizontal = 3
+theme = ExtResource( 4 )
+text = "Generator Definitions"
+
+[node name="projectSettingsBtn" type="Button" parent="VBoxContainer/ScrollContainer1/VBoxContainer"]
+margin_top = 132.0
+margin_right = 190.0
+margin_bottom = 172.0
 rect_min_size = Vector2( 0, 40 )
 size_flags_horizontal = 3
 theme = ExtResource( 4 )
 text = "Project Settings"
 
-[node name="GlobalVariablesBtn" type="Button" parent="VBoxContainer"]
-margin_top = 132.0
-margin_right = 200.0
-margin_bottom = 172.0
+[node name="GlobalVariablesBtn" type="Button" parent="VBoxContainer/ScrollContainer1/VBoxContainer"]
+margin_top = 176.0
+margin_right = 190.0
+margin_bottom = 216.0
 rect_min_size = Vector2( 0, 40 )
 size_flags_horizontal = 3
 theme = ExtResource( 4 )
 text = "Global Variables"
 
-[node name="SpriteOptimizationsBtn" type="Button" parent="VBoxContainer"]
-margin_top = 176.0
-margin_right = 200.0
-margin_bottom = 216.0
+[node name="SpriteOptimizationsBtn" type="Button" parent="VBoxContainer/ScrollContainer1/VBoxContainer"]
+margin_top = 220.0
+margin_right = 190.0
+margin_bottom = 260.0
 rect_min_size = Vector2( 0, 40 )
 size_flags_horizontal = 3
 theme = ExtResource( 4 )
@@ -71,25 +92,25 @@ text = "Sprite Optimizations"
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
 modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
-margin_top = 220.0
+margin_top = 174.0
 margin_right = 200.0
-margin_bottom = 224.0
+margin_bottom = 178.0
 
 [node name="LayerList" type="VBoxContainer" parent="VBoxContainer"]
-margin_top = 228.0
+margin_top = 182.0
 margin_right = 200.0
-margin_bottom = 228.0
+margin_bottom = 182.0
 size_flags_horizontal = 3
 theme = ExtResource( 3 )
 
 [node name="HSeparator4" type="HSeparator" parent="VBoxContainer"]
 modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
-margin_top = 232.0
+margin_top = 186.0
 margin_right = 200.0
-margin_bottom = 236.0
+margin_bottom = 190.0
 
 [node name="LayerValuesList" type="ScrollContainer" parent="VBoxContainer"]
-margin_top = 240.0
+margin_top = 194.0
 margin_right = 200.0
 margin_bottom = 588.0
 size_flags_horizontal = 3
@@ -112,8 +133,9 @@ margin_top = 600.0
 margin_right = 200.0
 margin_bottom = 600.0
 
-[connection signal="button_down" from="VBoxContainer/addNewEntityTypeBtn" to="." method="_on_addNewEntityTypeBtn_button_down"]
-[connection signal="button_down" from="VBoxContainer/bulletDefinitionsBtn" to="." method="_on_bulletDefinitionsBtn_button_down"]
-[connection signal="button_down" from="VBoxContainer/projectSettingsBtn" to="." method="_on_projectSettingsBtn_button_down"]
-[connection signal="button_down" from="VBoxContainer/GlobalVariablesBtn" to="." method="_on_GlobalVariablesBtn_button_down"]
-[connection signal="button_down" from="VBoxContainer/SpriteOptimizationsBtn" to="." method="_on_SpriteOptimizationsBtn_button_down"]
+[connection signal="button_down" from="VBoxContainer/ScrollContainer1/VBoxContainer/addNewEntityTypeBtn" to="." method="_on_addNewEntityTypeBtn_button_down"]
+[connection signal="button_down" from="VBoxContainer/ScrollContainer1/VBoxContainer/bulletDefinitionsBtn" to="." method="_on_bulletDefinitionsBtn_button_down"]
+[connection signal="button_down" from="VBoxContainer/ScrollContainer1/VBoxContainer/generatorDefinitionBtn" to="." method="_on_generatorDefinitionBtn_button_down"]
+[connection signal="button_down" from="VBoxContainer/ScrollContainer1/VBoxContainer/projectSettingsBtn" to="." method="_on_projectSettingsBtn_button_down"]
+[connection signal="button_down" from="VBoxContainer/ScrollContainer1/VBoxContainer/GlobalVariablesBtn" to="." method="_on_GlobalVariablesBtn_button_down"]
+[connection signal="button_down" from="VBoxContainer/ScrollContainer1/VBoxContainer/SpriteOptimizationsBtn" to="." method="_on_SpriteOptimizationsBtn_button_down"]

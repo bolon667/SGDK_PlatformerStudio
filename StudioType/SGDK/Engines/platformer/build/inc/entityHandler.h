@@ -5,6 +5,7 @@
 #include "../inc/levels.h"
 
 extern u32 findSprOptIndexBySpriteDefinition(SpriteDefinition* sprDef);
+extern void checkTriggerFor_EntityMerged_trigger(EntityMerged* entity, Trigger* trigger);
 EntityMerged* getEntityMergedByInstId(u16 instId);
 u16 getEntityMergedIndInArrByInstId(u16 instId);
 u16 getTriggerParrentIndInArr(Trigger* trigger);

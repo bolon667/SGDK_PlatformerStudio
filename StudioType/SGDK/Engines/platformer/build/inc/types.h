@@ -21,6 +21,13 @@ typedef struct {
 }AABB;
 
 typedef struct {
+	u16 instId;
+	Vect2D_s32 pos;
+	u16* tiedWith_ids_arr;
+	u8 tiedWith_ids_arr_size;
+} Position;
+
+typedef struct {
 	MapDefinition* foregroundMap;
 	MapDefinition* backgroundMap;
 	TileSet* foregroundTileset;
@@ -29,7 +36,7 @@ typedef struct {
 	Palette* backgroundPallete;
 	Image* foregroundImage;
 	Image* backgroundImage;
-	Vect2D_s16* posArr;
+	Position* posArr;
 	u16 posAmount;
 	u8* collArr;
 	Vect2D_s16 sizeinPx;
@@ -53,6 +60,9 @@ typedef struct {
 	u8 pcmChannel;
 	u8 musicLoop;
 	u8 freshMusicStart;
+	u8 bgaLoadMode;
+	u8 bgbLoadMode;
+	u8 changeLevelAnim;
 } Level;
 
 typedef struct {
@@ -63,7 +73,7 @@ typedef struct {
 
 typedef struct {
 	bool alive;
-	Vect2D_s16 pos;
+	Vect2D_s32 pos;
 	AABB rect;
 	u8 type;
 	s16 val1;
@@ -72,6 +82,7 @@ typedef struct {
 	s16 triggerHp;
 	bool activated;
 	bool prevActivated;
+	bool isFree;
 } Trigger;
 
 /*
@@ -105,6 +116,7 @@ typedef struct {
 	char* name
 } MessagePack;
 
+
 //$entityBulletMergedStruct$
 
 //$entityMergedStruct$
@@ -122,7 +134,9 @@ typedef struct {
 	u16 additionalEntityMergedSlots;
     u16 EntityBulletMerged_size;
 	EntityBulletMerged* EntityBulletMerged_arr;
+	s16 curEntityBulletMerged_aliveAmount;
 	//$EntityMergedArrStruct$
+	s16 curEntityMerged_aliveAmount;
 	u16 Trigger_size;
 	Trigger* Trigger_arr;
 } EntityAll;

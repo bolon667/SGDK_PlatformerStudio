@@ -22,7 +22,6 @@ void printMessageBase(char* str, Image* img_msg_sign, u8 msg_sign_pal) {
 	VDP_setWindowVPos(FALSE, 10);
 	VDP_drawImageEx(WINDOW, img_msg_sign, TILE_ATTR_FULL(msg_sign_pal, 255, FALSE, FALSE, VDPTilesFilled), 0, 0, FALSE, FALSE);
 	
-
 	u32 str_len = strlen(str);
 	char str_char[1];
 	char str_char_line[1];
@@ -55,15 +54,9 @@ void printMessageBase(char* str, Image* img_msg_sign, u8 msg_sign_pal) {
 	bool prev_joy_pressed = FALSE;
 	bool joy_pressed = FALSE;
 
-	
 	if (joy_value & BUTTON_A || joy_value & BUTTON_B || joy_value & BUTTON_C || joy_value & BUTTON_START) {
 		can_skip = FALSE;
 	}
-	
-	// if(characterSpr_def){
-	// 	SpriteCharacter = SPR_addSprite(characterSpr_def, posX-(characterSpr_def->w/2), 160-characterSpr_def->h, TILE_ATTR(PAL3, 244, FALSE, FALSE));
-	// 	SPR_update();
-	// }
 	
 	strncpy(&str_line, 0, max_x);
 	
@@ -158,7 +151,6 @@ void printMessageBase(char* str, Image* img_msg_sign, u8 msg_sign_pal) {
 		if (joy_value & BUTTON_A || joy_value & BUTTON_B || joy_value & BUTTON_C || joy_value & BUTTON_START)  {
 			joy_pressed = TRUE;
 			if(joy_pressed && !prev_joy_pressed) {
-				//VDP_setWindowVPos(FALSE, 0); //deleting message from screen
 				break;
 			}
 		} else {
@@ -167,9 +159,6 @@ void printMessageBase(char* str, Image* img_msg_sign, u8 msg_sign_pal) {
 		prev_joy_pressed = joy_pressed;
 		SYS_doVBlankProcess();	
 	}
-	// if(characterSpr_def){
-	// 	SPR_releaseSprite(SpriteCharacter);
-	// }
     
 	VDP_setWindowVPos(FALSE, 0);
 }

@@ -16,7 +16,7 @@
 
 u16 levelNum = 0;
 Level* curLvlData;
-EntityAllPlayer* curEntityAll;
+EntityAll* curEntityAll;
 MessagePack* curMessagePacks;
 LocalVariableMerged* curLocalVariables;
 u16** curSprTileIndexes[20];
@@ -26,8 +26,23 @@ u16 palette_full[64];
 
 //$levelFullArr$
 
-Vect2D_s16 getLevelPos(u16 posNum) {
-	return LevelFull_arr[levelNum].lvl->posArr[posNum];
+Position* getLevelPos(u16 posNum) {
+	return &(LevelFull_arr[levelNum].lvl->posArr[posNum]);
+}
+
+Position* getLevelPosById(u16 posInstId) {
+	//Finding array index by instId
+	for(u16 i=0; i<LevelFull_arr[levelNum].lvl->posAmount; i++){
+		if(LevelFull_arr[levelNum].lvl->posArr[i].instId == posInstId){
+			return &(LevelFull_arr[levelNum].lvl->posArr[i]);
+		}
+	}
+	
+}
+
+Vect2D_s32 getLevelPosCoords(u16 posNum) {
+	//KLog_S1("test: ", LevelFull_arr[levelNum].lvl->posArr[posNum].pos.y);
+	return LevelFull_arr[levelNum].lvl->posArr[posNum].pos;
 }
 
 void updateRoomSize(Level* lvl){

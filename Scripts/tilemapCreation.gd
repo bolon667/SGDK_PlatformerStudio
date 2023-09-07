@@ -96,6 +96,7 @@ func _on_Button_button_down():
 
 
 func _on_buildProjectBtn_pressed():
+	singleton.save_project()
 	$CanvasLayer/VBoxContainer/buildProjectBtn.call("buildProject")
 	pass # Replace with function body.
 

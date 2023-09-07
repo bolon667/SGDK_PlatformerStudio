@@ -24,9 +24,10 @@ int main(bool resetType) {
 
 	//Setup the basic things we need for this demo
 	levelNum = $curLevel$;
-	loadLevel(levelNum, getLevelPos(0));
+	loadLevel(levelNum, getLevelPosCoords(0));
 	//playerInit();
-	setupCamera(newVector2D_u16(160, 112), 20, 20); //We have to setup always after the player, it directly depends on player's data
+	
+	// setupCamera(newVector2D_u16(160, 112), 20, 20); //We have to setup always after the player, it directly depends on player's data
 
 	//Setup a callback when a button is pressed, we could call it a "pseudo parallel" joypad handler
 
@@ -37,15 +38,19 @@ int main(bool resetType) {
 		// if(curLvlData->levelMode == 0){
 		// 	updatePlayer();
 		// }
-		customScriptArr[curLvlData->controlScript]();
+		
 		customScriptArr[curLvlData->updateCameraScript]();
 		
-		showEntityAll();		
+		showEntityAll();	
+
+		customScriptArr[curLvlData->controlScript]();	
 
 		//Then we update sprites and after that we tell the Mega Drive that we have finished processing all the frame data
 		SPR_update();
 		SYS_doVBlankProcess();
-		(*curLvlData->everyFrameFunc)();
+		if(curLvlData->everyFrameFunc){
+			(*curLvlData->everyFrameFunc)();
+		}
 		//$chunkLoadFunc$
 	}
 

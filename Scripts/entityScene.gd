@@ -11,6 +11,8 @@ onready var camera2D = $"../../../../Camera2D"
 
 onready var settings_field_t = preload("res://Scenes/Fields/string_field.tscn")
 onready var settings_field_sprite_t = preload("res://Scenes/Fields/sprite_field.tscn")
+onready var settings_field_bool_t = preload("res://Scenes/Fields/bool_field.tscn")
+
 onready var settings_field_aabb_t = preload("res://Scenes/Fields/aabb_field.tscn")
 onready var settings_field_trigger_type_t = preload("res://Scenes/Fields/trigger_type_field.tscn")
 onready var settings_field_pal_type_t = preload("res://Scenes/Fields/pal_type_field.tscn")
@@ -88,6 +90,7 @@ func _process(delta):
 
 func show_fields_of_entity():
 	ContainerRight.visible = true
+	ContainerRight.entityObj = self
 	var settings_head_node = settings_head_t.instance()
 	var entity_definition = singleton.get_entityInst_by_instInd_levelInd(entityInst_id, level_ind)
 	if(!entity_definition):
@@ -105,7 +108,16 @@ func show_fields_of_entity():
 			if(!entity_definition.has("triggerTypeName")):
 				entity_definition["triggerTypeName"] = "0"
 			settings_field_node.triggerType_name = entity_definition["triggerTypeName"]
-			settings_field_node.get_node("Label").text = str(field_inst["__identifier"])
+			print("Super test: ", field_inst["__identifier"])
+			#settings_field_node.get_node("Label").text = str(field_inst["__identifier"])
+		elif field_inst["__type"] == "Bool":
+			settings_field_node = settings_field_bool_t.instance()
+			settings_field_node.level_ind = level_ind
+			settings_field_node.entityInst_id = entityInst_id
+			settings_field_node.entityObj = self
+			
+			settings_field_node.get_node("Label").text = field_inst["__identifier"]
+			settings_field_node.get_node("CheckButton").pressed = bool(field_inst["__value"])
 		elif field_inst["__type"] == "Sprite":
 			settings_field_node = settings_field_sprite_t.instance()
 			settings_field_node.level_ind = level_ind
@@ -211,4 +223,4 @@ func _on_Area2D_mouse_exited():
 		if(singleton.cur_editor_mode == singleton.EditorMode.ENTITY):
 			remove_from_group("entity_hovered")
 			can_move = false
-			singleton.save_entityInst_pos(entityInst_id, [position.x, position.y])
+			#singleton.save_entityInst_pos(entityInst_id, [position.x, position.y])

@@ -4,6 +4,7 @@ using System.IO;
 using System.Diagnostics;
 using Godot;
 using Godot.Collections;
+using System.Collections.Generic;
 
 public class buidProject : Node
 {
@@ -373,7 +374,20 @@ public class buidProject : Node
 				{
 					continue;
 				}
+				
 				String fieldVal = field["defaultValue"].ToString();
+				if (field["__type"].ToString() == "Bool")
+				{
+					fieldVal = fieldVal.ToUpper();
+				}
+				else if (fieldVal == "True")
+				{
+					fieldVal = fieldVal.ToUpper();
+				}
+				else if (fieldVal == "False")
+				{
+					fieldVal = fieldVal.ToUpper();
+				}
 				result += $"{fieldVal}, ";
 			}
 			result += "};\n";
@@ -404,6 +418,7 @@ public class buidProject : Node
 				result += "1, "; //triggerHp
 				result += "FALSE, "; //activated
 				result += "FALSE, "; //prevActivated
+				result += "FALSE, "; //isFree
 				result += "};\n";
 			}
 
@@ -444,7 +459,7 @@ public class buidProject : Node
 		result += "  u16 entityType;\n";
 		result += "  bool alive;\n";
 		result += "  bool preDeath;\n";
-		result += "  Vect2D_s16 posInt;\n";
+		result += "  Vect2D_s32 posInt;\n";
 		result += "  Vect2D_f32 pos;\n";
 		result += "  Vect2D_f16 spd;\n";
 		result += "  Vect2D_s16 size;\n";
@@ -490,7 +505,7 @@ public class buidProject : Node
 		result += "  u16 entityType;\n";
 		result += "  u16 instId;\n";
 		result += "  bool alive;\n";
-		result += "  Vect2D_s16 posInt;\n";
+		result += "  Vect2D_s32 posInt;\n";
 		result += "  Vect2D_f32 pos;\n";
 		result += "  Vect2D_f16 spd;\n";
 		result += "  Vect2D_s16 size;\n";
@@ -739,6 +754,8 @@ public class buidProject : Node
 		customScriptsC_CodeReplacer();
 		customScriptsH_CodeReplacer();
 
+		genGeneratorCode();
+
 		mainC_CodeReplacer();
 	}
 
@@ -757,6 +774,170 @@ public class buidProject : Node
 		}
 		System.IO.File.WriteAllText(mainC_path, finalCode);
 		GD.Print("main.c code replaced");
+	}
+
+	private void genGeneratorCode()
+	{
+		GD.Print("In genGeneratorCode...");
+		Node singleton = (Node)GetNode("/root/singleton");
+
+		String customScriptsFolderPathRoot = engineRootPath + "/code_template/customScripts/";
+		String scriptsFolderPathRoot = engineRootPath + "/code_template/generatorScripts/";
+		String templatesFolderPathRoot = engineRootPath + "/code_template/generatorTemplates/";
+
+		int amountOfLevel = (int)singleton.Call("get_level_count");
+
+		String plane = "BG_A";
+		String curPal = "0";
+		for (int curLevel = 0; curLevel < amountOfLevel; curLevel++)
+		{
+			String result = "";
+			String defaultContainer_code = "";
+			String menuContainer_positions_code = "";
+			String menuContainer_code = "";
+			String preMenuContainer_code = "";
+			Godot.Collections.Array generatorArr = (Godot.Collections.Array)singleton.Call("get_entityInstances", curLevel, "Generator");
+
+			Godot.Collections.Array tilePos_Arr = new Godot.Collections.Array();
+			int curMenuInd = -1;
+			//Generating funcs
+			foreach (Godot.Collections.Dictionary generatorDict in generatorArr)
+			{
+
+				String generatorName = generatorDict["__identifier"].ToString();
+				int defId = int.Parse(generatorDict["defId"].ToString());
+				int generatorType = int.Parse(generatorDict["type"].ToString());
+
+				Godot.Collections.Array px = (Godot.Collections.Array)generatorDict["px"];
+
+				int tileX = ((int)px[0] / 8);
+				int tileY = ((int)px[1] / 8);
+
+				Godot.Collections.Array fieldInstances = (Godot.Collections.Array)generatorDict["fieldInstances"];
+
+				plane = "BG_A";
+				curPal = "0";
+
+				if (generatorType == 0) //Text
+				{
+					String text = "";
+					foreach (Godot.Collections.Dictionary fieldInst in fieldInstances)
+					{
+						if(fieldInst["__type"].ToString() == "Text")
+						{
+							text = fieldInst["__value"].ToString();
+						}
+						else if (fieldInst["__type"].ToString() == "Palette")
+						{
+							curPal = fieldInst["__value"].ToString();
+						}
+					}
+					defaultContainer_code += $"VDP_drawTextEx({plane}, \"{text}\", TILE_ATTR({curPal}, 0, FALSE, FALSE), {tileX.ToString()}, {tileY.ToString()}, CPU);\n";
+				} 
+				else if(generatorType == 1) //Image
+				{
+					String imgRefInCode = "";
+
+					foreach (Godot.Collections.Dictionary fieldInst in fieldInstances)
+					{
+						if (fieldInst["__type"].ToString() == "Sprite")
+						{
+							imgRefInCode = fieldInst["__value"].ToString();
+						}
+						else if (fieldInst["__type"].ToString() == "Palette")
+						{
+							curPal = fieldInst["__value"].ToString();
+						}
+
+					}
+					defaultContainer_code += $"VDP_drawImageEx({plane}, {imgRefInCode}, TILE_ATTR_FULL({curPal}, 0, FALSE, FALSE, VDPTilesFilled), {tileX.ToString()}, {tileY.ToString()}, FALSE, CPU);\n";
+					String temp = imgRefInCode.Substring(1);
+					defaultContainer_code += $"VDPTilesFilled += {temp}.tileset->numTile;\n";
+				}
+				else if (generatorType == 2) //Menu btn
+				{
+					String text = "";
+					foreach (Godot.Collections.Dictionary fieldInst in fieldInstances)
+					{
+						if (fieldInst["__type"].ToString() == "Text")
+						{
+							text = fieldInst["__value"].ToString();
+						}
+						else if (fieldInst["__type"].ToString() == "Palette")
+						{
+							curPal = fieldInst["__value"].ToString();
+						}
+
+					}
+					preMenuContainer_code += $"VDP_drawTextEx({plane}, \"{text}\", TILE_ATTR({curPal}, 0, FALSE, FALSE), {tileX.ToString()}, {tileY.ToString()}, CPU);\n";
+					curMenuInd++;
+
+					tilePos_Arr.Add(new Godot.Collections.Array { tileX, tileY });
+				}
+			}
+
+			if(curMenuInd >= 0)
+			{
+				menuContainer_code += System.IO.File.ReadAllText(templatesFolderPathRoot + "menuControl.c");
+				menuContainer_positions_code += "const Vect2D_s16 const tilePos_arr[] = {";
+				foreach(Godot.Collections.Array coord in tilePos_Arr)
+				{
+					menuContainer_positions_code += $"{{{coord[0].ToString()}, {coord[1].ToString()}}}, ";
+
+				}
+				menuContainer_positions_code += "};\n";
+
+				menuContainer_code = menuContainer_code.Replace("//$tilePosArr$", menuContainer_positions_code);
+				String menuContainer_switchCode = "";
+				menuContainer_switchCode += "switch(curMenuInd) {\n";
+				for (int i = 0; i <= curMenuInd; i++)
+				{
+					menuContainer_switchCode += $"  case {i.ToString()}:\n";
+					menuContainer_switchCode += "    if((joy_value & (BUTTON_A | BUTTON_B | BUTTON_C)) && !(prev_joy_value & (BUTTON_A | BUTTON_B | BUTTON_C))) {\n";
+					menuContainer_switchCode += "      //Change for your needs\n";
+					menuContainer_switchCode += "      KLog_S1(\"curMenuInd: \", curMenuInd);\n";
+
+					menuContainer_switchCode += "    }\n";
+					menuContainer_switchCode += $"    break;\n";
+				}
+				menuContainer_switchCode += "}\n";
+
+				menuContainer_code = menuContainer_code.Replace("//$switchActions$", menuContainer_switchCode);
+				menuContainer_code = menuContainer_code.Replace("$pal$", curPal.ToString());
+				menuContainer_code = menuContainer_code.Replace("$maxMenuInd$", curMenuInd.ToString());
+				
+			}
+
+			result += "//PreLevel code\n";
+			result += preMenuContainer_code + defaultContainer_code;
+			result += "//ControlScript code\n";
+			result += menuContainer_code;
+
+			
+
+			if (generatorArr.Count > 0)
+			{
+				String savePath = scriptsFolderPathRoot + "genForLevel_" + curLevel.ToString() + ".c";
+				GD.Print("Saving generator: ", savePath);
+				System.IO.File.WriteAllText(savePath, result);
+
+				//If (no after level script) and (default cameraScript) and (have at least 1 generator object), then, creating script
+				savePath = customScriptsFolderPathRoot + "preGenLevel_" + curLevel.ToString() + ".c";
+				if(!System.IO.File.Exists(savePath))
+				{
+					System.IO.File.WriteAllText(savePath, preMenuContainer_code + defaultContainer_code);
+				}
+				
+				savePath = customScriptsFolderPathRoot + "controlGenLevel_" + curLevel.ToString() + ".c";
+				if (!System.IO.File.Exists(savePath))
+				{
+					System.IO.File.WriteAllText(savePath, menuContainer_code);
+				}
+			}
+			
+		}
+		
+
 	}
 
 	private void customScriptsC_CodeReplacer()
@@ -790,10 +971,14 @@ public class buidProject : Node
 		foreach (String path in paths)
 		{
 			String curScriptText = System.IO.File.ReadAllText(path);
-			result += curScriptText + "\n";
+			
 			String fileNameNoExt = System.IO.Path.GetFileName(path);
 			fileNameNoExt = fileNameNoExt.Substring(0, fileNameNoExt.Find("."));
 			fileNames.Add(fileNameNoExt);
+
+			result += $"void {fileNameNoExt}() {{\n";
+			result += curScriptText + "\n}\n";
+
 		}
 		//Add default empty func
 		result += "void emptyScript(){};\n";
@@ -909,7 +1094,10 @@ public class buidProject : Node
 				insertData = insertData.Replace("$entityName$", entityName);
 				insertData = insertData.Replace("$entityType$", "EntityBulletMerged");
 
-				System.IO.File.WriteAllText(checkPath, insertData);
+				//                                |
+				//Messy thing, go out from studio V
+
+				//System.IO.File.WriteAllText(checkPath, insertData);
 				result += insertData + "\n";
 			}
 		}
@@ -934,6 +1122,8 @@ public class buidProject : Node
 			String defaultEntityCodePath = engineRootPath + "/code_template/addNewEntity/addNewDefault.c";
 			String defaultAddEntityTriggerPath = engineRootPath + "/code_template/addNewEntity/addNewDefaultTrigger.c";
 			String checkPath = engineRootPath + "/code_template/addNewEntity/addNew" + entityName + ".c";
+
+			//If template exists, then use him
 			if (System.IO.File.Exists(checkPath))
 			{
 				String insertData = System.IO.File.ReadAllText(checkPath);
@@ -942,6 +1132,7 @@ public class buidProject : Node
 				
 				result += insertData + "\n";
 			}
+			//otherwise, using default template
 			else
 			{
 				String insertData;
@@ -958,7 +1149,10 @@ public class buidProject : Node
 				insertData = insertData.Replace("$entityName$", entityName);
 				insertData = insertData.Replace("$entityType$", "EntityMerged");
 				
-				System.IO.File.WriteAllText(checkPath, insertData);
+				//                                |
+				//Messy thing, go out from studio V
+
+				//System.IO.File.WriteAllText(checkPath, insertData);
 				result += insertData + "\n";
 			}
 		}
@@ -1000,18 +1194,20 @@ public class buidProject : Node
 				insertData = insertData.Replace("$entityName$", entityName);
 				insertData = insertData.Replace("$entityType$", "EntityMerged");
 				String addSpriteCode = "";
+				String slaveAddSpriteCode = "";
 				String releaseSpriteCode = "";
+				String slaveReleaseSpriteCode = "";
 				//Add slaves code
 				Godot.Collections.Array slaves = (Godot.Collections.Array)(Godot.Collections.Array)entityDef["subordinates"];
 				if(slaves.Count > 0)
 				{
 					releaseSpriteCode += "for(u16 curSlaveInd=0; curSlaveInd<entity->slave_amount; curSlaveInd++){\n" +
-							"curSlave = entity->slaves_arr[curSlaveInd];\n" +
-							"curSlave->trigger->alive = FALSE;\n" +
+							"entity->curSlave = entity->slaves_arr[curSlaveInd];\n" +
+							"entity->trigger->alive = FALSE;\n" +
 							"}\n";
 
 					int curSlaveInd = 0;
-					addSpriteCode += "if(!entity->activated) {\n";
+					slaveAddSpriteCode += "if(!entity->activated) {\n";
 					//addSpriteCode += "EntityMerged* curSlave;\n";
 					foreach (Godot.Collections.Dictionary slaveDict in slaves)
 					{
@@ -1025,7 +1221,7 @@ public class buidProject : Node
 						Godot.Collections.Dictionary slaveEntityDef = (Godot.Collections.Dictionary)singleton.Call("get_entityDef_by_defId", slaveDefId);
 						String slaveEntityName = slaveEntityDef["identifier"].ToString();
 						//addSpriteCode += $"curSlave = entity->slaves_arr[{curSlaveInd.ToString()}];\n";
-						addSpriteCode += $"entity->slaves_arr[{curSlaveInd.ToString()}] = addNew_{slaveEntityName}((Vect2D_s16){{{x_pos}+entity->posInt.x, {y_pos}+entity->posInt.y}}, (Vect2D_f16){{0, 0}});\n";
+						slaveAddSpriteCode += $"entity->slaves_arr[{curSlaveInd.ToString()}] = addNew_{slaveEntityName}((Vect2D_s32){{{x_pos}+entity->posInt.x, {y_pos}+entity->posInt.y}}, (Vect2D_f16){{0, 0}});\n";
 
 						
 
@@ -1047,8 +1243,8 @@ public class buidProject : Node
 
 						curSlaveInd++;
 					}
-					addSpriteCode += "entity->activated = TRUE;\n";
-					addSpriteCode += "}\n";
+					slaveAddSpriteCode += "entity->activated = TRUE;\n";
+					slaveAddSpriteCode += "}\n";
 				}
 					
 				//addSpriteCode += 
@@ -1066,6 +1262,8 @@ public class buidProject : Node
 				}
 				insertData = insertData.Replace("//$showTriggerRects_releaseSprite$", releaseSpriteCode);
 				insertData = insertData.Replace("//$showTriggerRects_addSprite$", addSpriteCode);
+				insertData = insertData.Replace("//$showTriggerRects_slaveAddSprite$", slaveAddSpriteCode);
+
 				result += insertData + "\n";
 			} else
 			{
@@ -1079,7 +1277,7 @@ public class buidProject : Node
 				String insertData = System.IO.File.ReadAllText(defaultEntityCodePath);
 				insertData = insertData.Replace("$entityName$", entityName);
 				insertData = insertData.Replace("$entityType$", "EntityMerged");
-				System.IO.File.WriteAllText(checkPath, insertData);
+				//System.IO.File.WriteAllText(checkPath, insertData);
 				result += insertData + "\n";
 			}
 		}
@@ -1251,6 +1449,16 @@ public class buidProject : Node
 		String musicLoop = "0";
 		String freshMusicStart = "1";
 
+		String changeLevelAnim = "0";
+
+		if (levelDict.Contains("changeLevelAnim"))
+		{
+			String temp = levelDict["changeLevelAnim"].ToString();
+			if (temp.Length > 0)
+			{
+				changeLevelAnim = temp;
+			}
+		}
 
 		if (levelDict.Contains("freshMusicStart"))
 		{
@@ -1315,23 +1523,21 @@ public class buidProject : Node
 			}
 		}
 
-		if(int.Parse(levelMode) > 0)
+		if (levelDict.Contains("controlScript"))
 		{
-			if (levelDict.Contains("controlScript"))
+			String temp = levelDict["controlScript"].ToString();
+
+			if (temp.Length > 0 && temp != "0")
 			{
-				String temp = levelDict["controlScript"].ToString();
-				if (temp.Length > 0)
-				{
-					controlScript = "CUSTOM_SCRIPT_" + temp;
-				}
+				controlScript = "CUSTOM_SCRIPT_" + temp;
 			}
-			if (levelDict.Contains("updateCameraScript"))
+		}
+		if (levelDict.Contains("updateCameraScript"))
+		{
+			String temp = levelDict["updateCameraScript"].ToString();
+			if (temp.Length > 0)
 			{
-				String temp = levelDict["updateCameraScript"].ToString();
-				if (temp.Length > 0)
-				{
-					updateCameraScript = "CUSTOM_SCRIPT_" + temp;
-				}
+				updateCameraScript = "CUSTOM_SCRIPT_" + temp;
 			}
 		}
 		
@@ -1437,8 +1643,14 @@ public class buidProject : Node
 					bgaTilesetResName = "&tileset_" + fileName;
 					bgaPalResName = "&pal_" + fileName;
 					break;
+
 				case 1: //image mode
 					bgaImageName = "&img_" + fileName;
+					break;
+				case 2: //map mode 2
+					bgaMapResName = "&map_" + fileName;
+					bgaTilesetResName = "&tileset_" + fileName;
+					bgaPalResName = "&pal_" + fileName;
 					break;
 			}		
 		}
@@ -1457,6 +1669,11 @@ public class buidProject : Node
 				case 1: //image mode
 					bgbImageName = "&img_" + fileName;
 					break;
+				case 2: //map mode 2
+					bgbMapResName = "&map_" + fileName;
+					bgbTilesetResName = "&tileset_" + fileName;
+					bgbPalResName = "&pal_" + fileName;
+					break;
 			}
 		}
 
@@ -1471,7 +1688,7 @@ public class buidProject : Node
 		String levelCode = $"const Level const lvl_Level_{curLevel.ToString()} = {{{bgaMapResName}, {bgbMapResName}, {bgaTilesetResName}, {bgbTilesetResName}, {bgaPalResName}, {bgbPalResName}," +
 			$" {bgaImageName}, {bgbImageName}, {posArrText}, {posAmountText}, {collMapName}, {levelSizePxText}, {levelSizeTilesText}, {levelSizeChunksText}, {musicName}, {musicSizeof}, {beforeLevelScriptName}, {everyFrameScriptName}," +
 			$" {afterLevelScriptName}, {pal0Name}, {pal1Name}, {pal2Name}, {pal3Name}, {levelMode}, {controlScript}, {updateCameraScript}, {forePalIndex}, {backPalIndex}, {musicMode}, {pcmChannel}, {musicLoop}," +
-			$" {freshMusicStart}}};\n";
+			$" {freshMusicStart}, {bgaMode.ToString()}, {bgbMode.ToString()}, {changeLevelAnim.ToString()}}};\n";
 		return levelCode;
 	}
 
@@ -1516,23 +1733,65 @@ public class buidProject : Node
 		Node singleton = (Node)GetNode("/root/singleton");
 		String result = "";
 		Godot.Collections.Array positionInstances = (Godot.Collections.Array)singleton.Call("get_positionInstances_by_levelNum", curLevel);
-		result += $"const Vect2D_s16 const Position_arr_Level_{curLevel.ToString()}[] = ";
+
+		String tiedIds_code = "";
+		
+		String positionArrCode = $"const Position const Position_arr_Level_{curLevel.ToString()}[] = ";
 
 		//Opening Position_arr block
-		result += "{";
+		positionArrCode += "{";
+		int posNum = 0;
+
 		foreach (Godot.Collections.Dictionary positionInst in positionInstances)
 		{
 			Godot.Collections.Array px = (Godot.Collections.Array)positionInst["px"];
-			//Opening Position block
-			result += "{";
-			result += px[0] + ", ";
-			result += px[1];
+			Godot.Collections.Array tiedWithIds = (Godot.Collections.Array)positionInst["tiedWith"];
 
-			//Closing Position block
-			result += "}, ";
+			//Opening Position block
+			positionArrCode += "{";
+
+			//Adding instId
+
+			positionArrCode += positionInst["instId"].ToString() + ", ";
+
+			//Adding pos (Vect2D_s32)
+			positionArrCode += "{";
+			positionArrCode += px[0] + ", ";
+			positionArrCode += px[1];
+			positionArrCode += "}, ";
+			GD.Print(1);
+			if(tiedWithIds.Count > 0)
+			{
+				GD.Print(2);
+				//Putting elements in arr of tied ids
+				tiedIds_code += $"const u16 const TiedPosition_arr_Level_{curLevel.ToString()}_{posNum.ToString()}[] = {{";
+				foreach (var tiedId in tiedWithIds)
+				{
+					//Find index in array by id
+					foreach (var tiedIdInternal in tiedWithIds)
+					{
+						tiedIds_code += tiedId.ToString() + ", ";
+					}	
+				}
+				GD.Print(3);
+
+				tiedIds_code += "};\n";
+
+				//Adding pointer on tied ids arr
+				positionArrCode += $"&TiedPosition_arr_Level_{curLevel.ToString()}_{posNum.ToString()}, ";
+			} else
+			{
+				positionArrCode += "NULL, ";
+			}
+			//Adding size of this arr
+			positionArrCode += tiedWithIds.Count.ToString();
+			//closing whole Position block
+			positionArrCode += "}, ";
+			posNum++;
 		}
 		//Closing Position_arr block
-		result += "};\n";
+		positionArrCode += "};\n";
+		result = tiedIds_code + positionArrCode;
 		GD.Print($"Created Position code for level {curLevel}");
 		return result;
 	}
@@ -2014,7 +2273,7 @@ public class buidProject : Node
 
 		//Getting gate entityInstance
 		//Godot.Collections.Dictionary gateInst_t = (Godot.Collections.Dictionary)singleton.Call("get_entityInstance_t_defId", 0);
-		//GD.Print(2);
+		GD.Print(2);
 		result += $"const EntityMerged const EntityMerged_arr_Level_{curLevel.ToString()}[] = ";
 
 		//Opening EntityMerged_arr block
@@ -2027,15 +2286,18 @@ public class buidProject : Node
 			{
 				continue;
 			}
+			GD.Print(0.3);
 			bool addTrigger = false;
 			String entityName = (String)entityInst["__identifier"];
+			GD.Print(entityName);
+			GD.Print(0.35);
 			int mergedId = (int)mergedIdsDict[entityName];
 			Godot.Collections.Array pos = (Godot.Collections.Array)entityInst["px"];
 			int width = 0;
 			int height = 0;
-		//	GD.Print(0.4);
+			GD.Print(0.4);
 			width = (int)int.Parse(entityInst["width"].ToString());
-		//	GD.Print(0.5);
+			GD.Print(0.5);
 			//Studio crashes if you don't do proper conversion.
 			height = (int)int.Parse(entityInst["height"].ToString());
 
@@ -2120,17 +2382,32 @@ public class buidProject : Node
 				{
 					continue;
 				}
+
 				
+
 				//finding value of this fieldName, why? Because in struct order is nessesary
-				var value = "";
+					var value = "";
 				foreach (Godot.Collections.Dictionary fieldInst in fieldInstances)
 				{
 					//if names of fieldDef and fieldInstance are equal
 					if((String)fieldInst["__identifier"] == (String)fieldDef["identifier"])
 					{
-						//GD.Print(fieldInst["__identifier"]);
+						//GD.Print(fieldInst["__identifier"]); 
 						//Then value is found
 						value = fieldInst["__value"].ToString();
+
+						if (fieldDef["__type"].ToString() == "Bool")
+						{
+							value = value.ToUpper();
+						} 
+						else if (value == "True")
+						{
+							value = value.ToUpper();
+						} 
+						else if (value == "False")
+						{
+							value = value.ToUpper();
+						}
 						break;
 					}
 
@@ -2140,6 +2417,18 @@ public class buidProject : Node
 				if(value.Length == 0)
 				{
 					value = fieldDef["defaultValue"].ToString();
+					if (fieldDef["__type"].ToString() == "Bool")
+					{
+						value = value.ToUpper();
+					}
+					else if (value == "True")
+					{
+						value = value.ToUpper();
+					}
+					else if (value == "False")
+					{
+						value = value.ToUpper();
+					}
 				}
 				result += value + ", ";
 				
@@ -2277,6 +2566,7 @@ public class buidProject : Node
 			result += "1, "; //triggerHp
 			result += "FALSE, "; //activated
 			result += "FALSE, "; //prevActivated
+			result += "FALSE, "; //isFree
 
 			//Closing Trigger block
 			result += "}, ";
@@ -2319,6 +2609,7 @@ public class buidProject : Node
 
 	private String genEntityAllCode(int curLevel)
 	{
+		GD.Print("Gen entityAll code for level ", curLevel.ToString());
 		Node singleton = (Node)GetNode("/root/singleton");
 		int entityLoadMode = int.Parse(singleton.Call("get_entity_load_opt_mode").ToString());
 
@@ -2346,9 +2637,13 @@ public class buidProject : Node
 		//Additional slots
 		result += additionalSlots + ", ";
 
-		//Bullet
+		//Bullet size
 		result += bulletAmount + ", ";
+		//Bullet arr
 		result += "NULL, ";
+		//Bullet alive amount
+		result += "0, ";
+
 		//Entity all
 		switch (entityLoadMode)
 		{
@@ -2361,9 +2656,11 @@ public class buidProject : Node
 				result += $"&EntityMergedChunk_arr_Level_{curLevel.ToString()}, ";
 				break;
 		}
-		
-		//Trigger
+		//curEntityMerged_aliveAmount
+		result += "0, ";
+		//Trigger size
 		result += triggerAmount.ToString() + ", ";
+		//Trigger arr
 		result += $"&Trigger_arr_Level_{curLevel.ToString()}, ";
 
 
